@@ -2,6 +2,9 @@ import os
 import tempfile
 from pathlib import Path
 
+from pydantic import BaseModel
+from app.services.segmentation import segment_topics
+
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -21,6 +24,14 @@ ALLOWED_EXTENSIONS = {
     ".mp3", ".wav", ".m4a", ".mp4", ".mov", ".webm"
 }
 
+class TranscriptSegment(BaseModel):
+    start: float
+    end: float
+    text: str
+
+
+class SegmentationRequest(BaseModel):
+    segments: list[TranscriptSegment]
 
 @app.get("/")
 def home():
@@ -31,9 +42,23 @@ def home():
 def health():
     return {"status": "ok"}
 
+@app.post("/segment")
+def create_topics(payload: SegmentationRequest):
+    segments = [
+        segment.model_dump()
+        for segment in payload.segments
+    ]
+
+    topics = segment_topics(segments)
+
+    return {
+        "topic_count": len(topics),
+        "topics": topics,
+    }
 
 @app.post("/transcribe")
 async def transcribe_lecture(file: UploadFile = File(...)):
+    
     filename = file.filename or "lecture"
 
     extension = Path(filename).suffix.lower()
