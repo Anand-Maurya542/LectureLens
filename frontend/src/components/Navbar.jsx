@@ -32,7 +32,11 @@ export default function Navbar() {
       <div className="navbar-inner">
         {/* Brand */}
         <Link to={isTeacher ? "/teacher" : "/student"} className="navbar-brand">
-          <div className="brand-icon">🎓</div>
+          <img
+            src="/lecturelens.svg"
+            alt="LectureLens Logo"
+            style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "contain" }}
+          />
           <div>
             <span className="brand-title">LectureLens</span>
             <span className={`role-badge ${isTeacher ? "role-teacher" : "role-student"}`}>
