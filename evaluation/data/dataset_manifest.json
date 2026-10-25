@@ -1,0 +1,67 @@
+{
+  "project": "LectureLens Evaluation Corpus",
+  "target_duration_hours": 5.0,
+  "total_actual_hours": 5.4,
+  "languages": ["en", "hi", "hinglish"],
+  "lectures": [
+    {
+      "id": "lec_01_cs401_transformers",
+      "title": "CS 401: Deep Learning - Transformers and Multi-Head Self-Attention",
+      "course": "CS 401: Artificial Intelligence & Machine Learning",
+      "instructor": "Prof. Rajesh Sharma",
+      "language": "en",
+      "duration_minutes": 62.5,
+      "source_type": "youtube",
+      "source_url": "https://www.youtube.com/watch?v=kCc8FmEb1nY",
+      "topics_count": 5,
+      "domain_keywords": ["self-attention", "query", "key", "value", "transformer", "feed-forward", "softmax"]
+    },
+    {
+      "id": "lec_02_cs401_neural_networks_hindi",
+      "title": "CS 401: Neural Networks & Backpropagation (हिंदी माध्यम / Bilingual)",
+      "course": "CS 401: Artificial Intelligence & Machine Learning",
+      "instructor": "Prof. Rajesh Sharma",
+      "language": "hi",
+      "duration_minutes": 58.0,
+      "source_type": "upload",
+      "topics_count": 4,
+      "domain_keywords": ["gradient descent", "backpropagation", "loss function", "weights", "न्यूरल नेटवर्क", "ग्रेडिएंट"]
+    },
+    {
+      "id": "lec_03_cs401_vector_embeddings",
+      "title": "CS 401: Dense Vector Embeddings and Semantic Search Architectures",
+      "course": "CS 401: Artificial Intelligence & Machine Learning",
+      "instructor": "Prof. Rajesh Sharma",
+      "language": "en",
+      "duration_minutes": 71.2,
+      "source_type": "youtube",
+      "source_url": "https://www.youtube.com/watch?v=ySus5ZS0b94",
+      "topics_count": 6,
+      "domain_keywords": ["cosine similarity", "HNSW", "vector search", "Sentence Transformers", "Atlas Vector Search"]
+    },
+    {
+      "id": "lec_04_cs401_nlp_tokenization",
+      "title": "CS 401: Multilingual NLP, Byte-Pair Encoding & Subword Tokenization",
+      "course": "CS 401: Artificial Intelligence & Machine Learning",
+      "instructor": "Prof. Rajesh Sharma",
+      "language": "en",
+      "duration_minutes": 65.0,
+      "source_type": "upload",
+      "topics_count": 5,
+      "domain_keywords": ["Byte-Pair Encoding", "tokenization", "multilingual vocabulary", "cross-lingual transfer"]
+    },
+    {
+      "id": "lec_05_cs401_rag_grounded_qa",
+      "title": "CS 401: Retrieval-Augmented Generation (RAG) and Hallucination Mitigation",
+      "course": "CS 401: Artificial Intelligence & Machine Learning",
+      "instructor": "Prof. Rajesh Sharma",
+      "language": "en",
+      "duration_minutes": 67.5,
+      "source_type": "youtube",
+      "source_url": "https://www.youtube.com/watch?v=T-D1OfcDW1M",
+      "topics_count": 5,
+      "domain_keywords": ["retrieval-augmented generation", "citation groundedness", "faithfulness", "abstention threshold"]
+    }
+  ]
+}
+

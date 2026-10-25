@@ -1,0 +1,38 @@
+[
+  {
+    "sample_id": "asr_sample_01_en",
+    "language": "en",
+    "reference": "in transformer self attention the input vectors are projected into queries keys and values using learned weight matrices",
+    "hypothesis_baseline": "in transformer self attention the input vectors are projected into queries keys and values using learn weight matrices",
+    "hypothesis_postprocessed": "in transformer self attention the input vectors are projected into queries keys and values using learned weight matrices"
+  },
+  {
+    "sample_id": "asr_sample_02_en",
+    "language": "en",
+    "reference": "gradient descent iteratively updates the model parameters in the opposite direction of the loss function gradient",
+    "hypothesis_baseline": "gradient descent iteratively updates the model parameter in the opposite direction of the loss function gradient",
+    "hypothesis_postprocessed": "gradient descent iteratively updates the model parameters in the opposite direction of the loss function gradient"
+  },
+  {
+    "sample_id": "asr_sample_03_en",
+    "language": "en",
+    "reference": "multilingual sentence transformers map semantically equivalent sentences in different languages into nearby coordinates in euclidean space",
+    "hypothesis_baseline": "multilingual sentence transformers map semantic equivalent sentence in different language into nearby coordinates in euclidean space",
+    "hypothesis_postprocessed": "multilingual sentence transformers map semantically equivalent sentences in different languages into nearby coordinates in euclidean space"
+  },
+  {
+    "sample_id": "asr_sample_04_hi",
+    "language": "hi",
+    "reference": "हम न्यूरल नेटवर्क में बैकप्रॉपैगैशन का उपयोग करके ग्रेडिएंट की गणना करते हैं",
+    "hypothesis_baseline": "हम न्यूरल नेटवर्क में बैकप्रोपगेशन का उपयोग करके ग्रेडियंट की गणना करते हैं",
+    "hypothesis_postprocessed": "हम न्यूरल नेटवर्क में बैकप्रॉपैगैशन का उपयोग करके ग्रेडिएंट की गणना करते हैं"
+  },
+  {
+    "sample_id": "asr_sample_05_hi",
+    "language": "hi",
+    "reference": "लॉस फंक्शन मॉडल के प्रेडिक्शन और वास्तविक लेबल के बीच के अंतर को मापता है",
+    "hypothesis_baseline": "लॉस फंक्शन मॉडल के प्रिडिक्शन और वास्तविक लेबल के बीच के अंतर को मापता है",
+    "hypothesis_postprocessed": "लॉस फंक्शन मॉडल के प्रेडिक्शन और वास्तविक लेबल के बीच के अंतर को मापता है"
+  }
+]
+
