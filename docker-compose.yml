@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lecturelens_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - SECRET_KEY=lecturelens_prod_secret_key_change_me_32bytes_min
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_DB_NAME=lecturelens_db
+      - MEDIA_UPLOAD_DIR=/app/data/uploads
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - ./data/uploads:/app/data/uploads
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lecturelens_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
