@@ -1,0 +1,28 @@
+[
+  {
+    "query": "How are queries keys and values computed in attention?",
+    "relevant_chunk_ids": ["chunk_01", "chunk_02"],
+    "keywords": ["queries", "keys", "values", "attention"]
+  },
+  {
+    "query": "What role does the chain rule play in backpropagation?",
+    "relevant_chunk_ids": ["chunk_04"],
+    "keywords": ["chain rule", "backpropagation", "gradient"]
+  },
+  {
+    "query": "Why do multilingual embeddings enable cross-lingual transfer?",
+    "relevant_chunk_ids": ["chunk_05"],
+    "keywords": ["multilingual", "embeddings", "transfer"]
+  },
+  {
+    "query": "What is the purpose of the softmax layer after dot product attention?",
+    "relevant_chunk_ids": ["chunk_02", "chunk_03"],
+    "keywords": ["softmax", "dot product", "attention"]
+  },
+  {
+    "query": "How does vector search differ from keyword search?",
+    "relevant_chunk_ids": ["chunk_06"],
+    "keywords": ["vector search", "keyword", "semantic"]
+  }
+]
+
