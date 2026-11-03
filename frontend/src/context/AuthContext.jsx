@@ -11,6 +11,13 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("lecturelens_token"));
   const [loading, setLoading] = useState(true);
 
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("lecturelens_token");
+    localStorage.removeItem("lecturelens_user");
+  };
+
   useEffect(() => {
     async function verifySession() {
       if (token) {
@@ -52,11 +59,15 @@ export function AuthProvider({ children }) {
     return res.user;
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("lecturelens_token");
-    localStorage.removeItem("lecturelens_user");
+  const refreshUser = async () => {
+    try {
+      const profile = await api.getMe();
+      setUser(profile);
+      localStorage.setItem("lecturelens_user", JSON.stringify(profile));
+      return profile;
+    } catch {
+      return null;
+    }
   };
 
   return (
@@ -68,7 +79,9 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
-        isTeacher: user?.role === "teacher" || user?.role === "admin",
+        refreshUser,
+        isAdmin: user?.role === "admin",
+        isTeacher: user?.role === "teacher",
         isStudent: user?.role === "student",
       }}
     >

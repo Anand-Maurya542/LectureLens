@@ -5,8 +5,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from pydantic import BaseModel
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.exceptions import ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import connect_to_mongo, close_mongo_connection, db
@@ -24,6 +26,7 @@ from app.routers.search import router as search_router
 from app.routers.quizzes import router as quizzes_router
 from app.routers.revision import router as revision_router
 from app.routers.media import router as media_router
+from app.routers.admin import router as admin_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -55,6 +58,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS or ["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,6 +74,55 @@ app.include_router(search_router)
 app.include_router(quizzes_router)
 app.include_router(revision_router)
 app.include_router(media_router)
+app.include_router(admin_router)
+
+
+@app.exception_handler(ResponseValidationError)
+async def response_validation_exception_handler(request: Request, exc: ResponseValidationError):
+    logger.error(f"Response validation error during {request.method} {request.url.path}: {exc}")
+    origin = request.headers.get("origin") or "*"
+    response = JSONResponse(
+        status_code=500,
+        content={"detail": f"Response serialization error: {str(exc)}"},
+    )
+    response.headers["Access-Control-Allow-Origin"] = origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    return response
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception during {request.method} {request.url.path}: {exc}")
+    origin = request.headers.get("origin") or "*"
+    err_str = str(exc)
+    is_db_conn_error = (
+        "connection pool paused" in err_str
+        or "SSL handshake" in err_str
+        or "timed out" in err_str
+        or "ServerSelectionTimeout" in err_str
+        or "AutoReconnect" in err_str
+        or "BAD_PSK_IDENTITY" in err_str
+    )
+    if is_db_conn_error:
+        status_code = 503
+        user_message = "Database connection is temporarily reconnecting to MongoDB Atlas. Please retry in a moment."
+    else:
+        status_code = 500
+        user_message = f"Internal Server Error: {err_str}"
+
+    response = JSONResponse(
+        status_code=status_code,
+        content={"detail": user_message},
+    )
+    if is_db_conn_error:
+        response.headers["Retry-After"] = "3"
+    response.headers["Access-Control-Allow-Origin"] = origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    return response
 
 ALLOWED_EXTENSIONS = {
     ".mp3", ".wav", ".m4a", ".mp4", ".mov", ".webm", ".ogg", ".flac"

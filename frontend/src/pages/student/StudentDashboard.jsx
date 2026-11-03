@@ -12,12 +12,15 @@ import {
   Plus,
   Brain,
   ArrowRight,
+  Clock,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [lectures, setLectures] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [myEnrollments, setMyEnrollments] = useState([]);
   const [enrollCode, setEnrollCode] = useState("");
   const [enrolling, setEnrolling] = useState(false);
   const [enrollMessage, setEnrollMessage] = useState("");
@@ -25,14 +28,16 @@ export default function StudentDashboard() {
 
   const loadData = async () => {
     try {
-      const [coursesData, lecturesData, recsData] = await Promise.all([
-        api.getCourses(),
+      const [coursesData, lecturesData, recsData, enrollmentsData] = await Promise.all([
+        api.getCourses(false),
         api.getLectures(),
         api.getRevisionRecommendations(),
+        api.getMyEnrollments(),
       ]);
       setCourses(coursesData || []);
       setLectures(lecturesData || []);
       setRecommendations(recsData || []);
+      setMyEnrollments(enrollmentsData || []);
     } catch (err) {
       console.error("Failed to load student dashboard:", err);
     } finally {
@@ -46,12 +51,13 @@ export default function StudentDashboard() {
 
   const handleEnroll = async (e) => {
     e.preventDefault();
-    if (!enrollCode.trim()) return;
+    if (!enrollCode.trim() || enrolling) return;
+    const code = enrollCode.trim().toUpperCase();
     setEnrolling(true);
     setEnrollMessage("");
     try {
-      await api.enrollCourse(enrollCode.trim());
-      setEnrollMessage("Successfully enrolled in course!");
+      await api.enrollCourse(code);
+      setEnrollMessage(`Enrollment request for ${code} submitted! Awaiting administrator approval.`);
       setEnrollCode("");
       await loadData();
     } catch (err) {
@@ -73,12 +79,48 @@ export default function StudentDashboard() {
           <p>Access your enrolled courses, searchable lecture transcripts, and smart revision guides.</p>
         </div>
         <div className="header-actions">
+          <Link to="/student/courses" className="btn-secondary">
+            <BookOpen size={16} />
+            Course Catalog & Requests
+          </Link>
           <Link to="/student/search" className="btn-secondary">
             <Search size={16} />
             Atlas Vector Search
           </Link>
         </div>
       </div>
+
+      {/* Pending Requests Alert */}
+      {myEnrollments.some((e) => e.status === "pending") && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0.04) 100%)",
+            border: "1px solid rgba(245, 158, 11, 0.35)",
+            borderRadius: "12px",
+            padding: "14px 18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "14px",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <Clock size={22} style={{ color: "#d97706" }} />
+            <div>
+              <strong style={{ display: "block", color: "var(--text-main, #0f172a)" }}>
+                Enrollment Request Pending Review
+              </strong>
+              <span style={{ fontSize: "0.84rem", color: "var(--text-muted, #64748b)" }}>
+                You have {myEnrollments.filter((e) => e.status === "pending").length} course request(s) awaiting administrative approval.
+              </span>
+            </div>
+          </div>
+          <Link to="/student/courses" className="btn-secondary btn-sm" style={{ textDecoration: "none" }}>
+            View Status →
+          </Link>
+        </div>
+      )}
 
       {/* Course Enrollment Pill */}
       <div className="enroll-banner">
@@ -133,7 +175,11 @@ export default function StudentDashboard() {
           <div className="empty-state">
             <BookOpen size={48} />
             <h3>No enrolled courses yet</h3>
-            <p>Enter an enrollment code above (e.g. <code>CS401</code>) to access lecture materials.</p>
+            <p>Enter an enrollment code above (e.g. <code>CS401</code>) or browse active university courses to request enrollment.</p>
+            <Link to="/student/courses" className="btn-primary" style={{ marginTop: "14px", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+              <BookOpen size={16} />
+              Browse Course Catalog
+            </Link>
           </div>
         ) : (
           <div className="courses-grid">
@@ -145,6 +191,16 @@ export default function StudentDashboard() {
                 <div className="course-card-footer">
                   <span>Instructor: {c.teacher_name || "Faculty"}</span>
                   <span className="font-semibold">{c.lecture_count} Published Lectures</span>
+                </div>
+                <div className="mt-3 pt-3 border-t">
+                  <Link
+                    to={`/student/courses/${c.id}`}
+                    className="btn-primary w-full justify-center flex items-center gap-2"
+                    style={{ textDecoration: "none", fontSize: "0.85rem", padding: "8px 12px" }}
+                  >
+                    <span>Open Course Workspace</span>
+                    <ArrowRight size={14} />
+                  </Link>
                 </div>
               </div>
             ))}

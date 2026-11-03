@@ -42,24 +42,52 @@ async def list_lectures(
     if course_id:
         query["course_id"] = str(course_id)
 
+    oid = ObjectId(user_id) if ObjectId.is_valid(user_id) else None
+    user_match = [user_id]
+    if oid:
+        user_match.append(oid)
+
     if role == "student":
         # Students ONLY see published lectures in courses they are enrolled in
-        enrolled_courses = await db.courses.find({"student_ids": user_id}).to_list(100)
+        enrolled_courses = await db.courses.find({"student_ids": {"$in": user_match}}).to_list(100)
         enrolled_ids = [str(c["_id"]) for c in enrolled_courses]
         
         if course_id and course_id not in enrolled_ids:
             return []
         
-        query["course_id"] = {"$in": enrolled_ids}
+        target_cids = [course_id] if course_id else enrolled_ids
+        c_match = []
+        for cid in target_cids:
+            c_match.append(cid)
+            if ObjectId.is_valid(cid):
+                c_match.append(ObjectId(cid))
+
+        query["course_id"] = {"$in": c_match}
         query["is_published"] = True
     elif role == "teacher":
-        # Teachers see their lectures or course lectures
-        teacher_courses = await db.courses.find({"teacher_id": user_id}).to_list(100)
+        # Teachers see lectures in their approved courses or authored by them
+        teacher_courses = await db.courses.find({
+            "$or": [
+                {"teacher_id": {"$in": user_match}},
+                {"teacher_ids": {"$in": user_match}},
+            ]
+        }).to_list(100)
         c_ids = [str(c["_id"]) for c in teacher_courses]
+        
+        target_cids = [str(course_id)] if course_id else c_ids
+        c_match = []
+        for cid in target_cids:
+            c_match.append(cid)
+            if ObjectId.is_valid(cid):
+                c_match.append(ObjectId(cid))
+
         if course_id:
-            query["course_id"] = str(course_id)
+            query["course_id"] = {"$in": c_match}
         else:
-            query["course_id"] = {"$in": c_ids}
+            query["$or"] = [
+                {"course_id": {"$in": c_match}},
+                {"teacher_id": {"$in": user_match}},
+            ]
 
     cursor = db.lectures.find(query).sort("created_at", -1)
     lectures = await cursor.to_list(length=100)
@@ -68,9 +96,12 @@ async def list_lectures(
     result = []
     for lec in lectures:
         cid = lec.get("course_id")
+        tid = lec.get("teacher_id")
         c = await db.courses.find_one({"_id": ObjectId(cid) if ObjectId.is_valid(cid) else cid})
+        t = await db.users.find_one({"_id": ObjectId(tid) if ObjectId.is_valid(tid) else tid})
         lec_dict = serialize_doc(lec)
         lec_dict["course_title"] = c.get("title") if c else "Unknown Course"
+        lec_dict["teacher_name"] = t.get("name") if t else "Instructor"
         result.append(lec_dict)
 
     return result
@@ -111,8 +142,11 @@ async def get_lecture(
             )
 
     c = await db.courses.find_one({"_id": ObjectId(lec.get("course_id")) if ObjectId.is_valid(lec.get("course_id")) else lec.get("course_id")})
+    tid = lec.get("teacher_id")
+    t = await db.users.find_one({"_id": ObjectId(tid) if ObjectId.is_valid(tid) else tid})
     lec_dict = serialize_doc(lec)
     lec_dict["course_title"] = c.get("title") if c else "Unknown Course"
+    lec_dict["teacher_name"] = t.get("name") if t else "Instructor"
     return lec_dict
 
 
@@ -131,8 +165,14 @@ async def upload_lecture(
     course = await db.courses.find_one({"_id": ObjectId(course_id) if ObjectId.is_valid(course_id) else course_id})
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
-    if course.get("teacher_id") != str(teacher["id"]) and teacher.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Unauthorized to add lectures to this course.")
+    t_id = str(teacher["id"])
+    is_teacher_approved = (
+        t_id == str(course.get("teacher_id"))
+        or t_id in [str(x) for x in course.get("teacher_ids", [])]
+        or teacher.get("role") == "admin"
+    )
+    if not is_teacher_approved:
+        raise HTTPException(status_code=403, detail="You are not an approved instructor for this course.")
 
     filename = file.filename or "lecture_recording"
     ext = Path(filename).suffix.lower()
@@ -211,8 +251,14 @@ async def create_youtube_lecture(
     course = await db.courses.find_one({"_id": ObjectId(payload.course_id) if ObjectId.is_valid(payload.course_id) else payload.course_id})
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
-    if course.get("teacher_id") != str(teacher["id"]) and teacher.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Unauthorized for this course.")
+    t_id = str(teacher["id"])
+    is_teacher_approved = (
+        t_id == str(course.get("teacher_id"))
+        or t_id in [str(x) for x in course.get("teacher_ids", [])]
+        or teacher.get("role") == "admin"
+    )
+    if not is_teacher_approved:
+        raise HTTPException(status_code=403, detail="You are not an approved instructor for this course.")
 
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
     new_lec = {
@@ -260,7 +306,14 @@ async def update_publication_status(
     if not lec:
         raise HTTPException(status_code=404, detail="Lecture not found")
 
-    if lec.get("teacher_id") != str(teacher["id"]) and teacher.get("role") != "admin":
+    t_id = str(teacher["id"])
+    course = await db.courses.find_one({"_id": ObjectId(lec["course_id"]) if ObjectId.is_valid(lec["course_id"]) else lec["course_id"]})
+    is_authorized = (
+        lec.get("teacher_id") == t_id
+        or (course and (t_id == str(course.get("teacher_id")) or t_id in [str(x) for x in course.get("teacher_ids", [])]))
+        or teacher.get("role") == "admin"
+    )
+    if not is_authorized:
         raise HTTPException(status_code=403, detail="Unauthorized to publish this lecture.")
 
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()

@@ -1,4 +1,5 @@
-from typing import Optional, Any
+import datetime
+from typing import Optional, Any, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -63,10 +64,10 @@ class LectureOut(BaseModel):
     segments: list[SegmentItem] = []
     topics: list[TopicItem] = []
     summaries: list[SummaryItem] = []
-    created_at: str
-    updated_at: Optional[str] = None
+    created_at: Optional[Union[datetime.datetime, str]] = ""
+    updated_at: Optional[Union[datetime.datetime, str]] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
 
 
 class TranscriptCorrectionRequest(BaseModel):

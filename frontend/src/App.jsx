@@ -3,25 +3,35 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import ActivateTeacher from "./pages/auth/ActivateTeacher";
+
+// Admin Pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Teacher Pages
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import CourseManager from "./pages/teacher/CourseManager";
+import TeacherCourseWorkspace from "./pages/teacher/TeacherCourseWorkspace";
 import AddLecture from "./pages/teacher/AddLecture";
 import LectureReview from "./pages/teacher/LectureReview";
 import QuizManager from "./pages/teacher/QuizManager";
 import TeacherAnalytics from "./pages/teacher/TeacherAnalytics";
+import TeacherSettings from "./pages/teacher/TeacherSettings";
 
 // Student Pages
 import StudentDashboard from "./pages/student/StudentDashboard";
+import StudentCourses from "./pages/student/StudentCourses";
+import StudentCourseWorkspace from "./pages/student/StudentCourseWorkspace";
 import LectureViewer from "./pages/student/LectureViewer";
 import GlobalSearch from "./pages/student/GlobalSearch";
 import QuizExperience from "./pages/student/QuizExperience";
 import RevisionPlan from "./pages/student/RevisionPlan";
+import StudentSettings from "./pages/student/StudentSettings";
 
 import "./App.css";
 
@@ -35,7 +45,10 @@ function RootRedirect() {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role === "teacher" || user.role === "admin") {
+  if (user.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+  if (user.role === "teacher") {
     return <Navigate to="/teacher" replace />;
   }
   return <Navigate to="/student" replace />;
@@ -48,11 +61,24 @@ export default function App() {
         <div className="app-shell">
           <Navbar />
           <main className="main-content">
-            <Routes>
+            <ErrorBoundary>
+              <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/activate-teacher" element={<ActivateTeacher />} />
+              <Route path="/register/teacher" element={<Navigate to="/register" replace />} />
               <Route path="/" element={<RootRedirect />} />
+
+              {/* Admin Routes */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Teacher Routes */}
               <Route
@@ -68,6 +94,14 @@ export default function App() {
                 element={
                   <ProtectedRoute allowedRoles={["teacher", "admin"]}>
                     <CourseManager />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/teacher/courses/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["teacher", "admin"]}>
+                    <TeacherCourseWorkspace />
                   </ProtectedRoute>
                 }
               />
@@ -103,13 +137,37 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/teacher/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["teacher", "admin"]}>
+                    <TeacherSettings />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Student Routes */}
               <Route
                 path="/student"
                 element={
-                  <ProtectedRoute allowedRoles={["student", "teacher", "admin"]}>
+                  <ProtectedRoute allowedRoles={["student"]}>
                     <StudentDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/courses"
+                element={
+                  <ProtectedRoute allowedRoles={["student", "teacher", "admin"]}>
+                    <StudentCourses />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/courses/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["student", "teacher", "admin"]}>
+                    <StudentCourseWorkspace />
                   </ProtectedRoute>
                 }
               />
@@ -145,11 +203,20 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/student/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentSettings />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </main>
+          </ErrorBoundary>
+        </main>
         </div>
       </BrowserRouter>
     </AuthProvider>

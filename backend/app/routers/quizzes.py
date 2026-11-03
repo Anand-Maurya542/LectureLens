@@ -12,6 +12,7 @@ from app.schemas.quiz import (
     QuizQuestionOut,
     QuizResultItem,
 )
+from app.services.quiz_generation import save_draft_quizzes
 
 logger = logging.getLogger("lecturelens.router.quizzes")
 router = APIRouter(prefix="/api", tags=["Quizzes & Assessment"])
@@ -92,6 +93,88 @@ async def approve_quiz_question(
     return serialize_doc(updated_q)
 
 
+@router.post("/lectures/{lecture_id}/quizzes", response_model=QuizQuestionOut)
+async def create_quiz_question(
+    lecture_id: str,
+    payload: QuizQuestionCreate,
+    teacher: dict = Depends(require_teacher),
+):
+    """Allows a teacher to create a custom assessment question for a lecture."""
+    db = get_db()
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    course = await db.courses.find_one({"_id": ObjectId(lec["course_id"]) if ObjectId.is_valid(lec["course_id"]) else lec["course_id"]})
+    t_id = str(teacher["id"])
+    if course:
+        is_instructor = (t_id == str(course.get("teacher_id")) or t_id in [str(x) for x in course.get("teacher_ids", [])] or teacher.get("role") == "admin")
+        if not is_instructor:
+            raise HTTPException(status_code=403, detail="You are not authorized to create quizzes in this course.")
+
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    new_q = {
+        "lecture_id": str(lecture_id),
+        "course_id": str(lec.get("course_id", "")),
+        "topic_id": payload.topic_id,
+        "question_type": payload.question_type or "mcq",
+        "question": payload.question.strip(),
+        "options": payload.options or [],
+        "correct_answer": payload.correct_answer.strip(),
+        "explanation": payload.explanation.strip() if payload.explanation else "",
+        "difficulty": payload.difficulty or "medium",
+        "is_approved": payload.is_approved,
+        "created_at": now,
+        "updated_at": now,
+    }
+
+    res = await db.quizzes.insert_one(new_q)
+    new_q["_id"] = str(res.inserted_id)
+    new_q["id"] = str(res.inserted_id)
+    return serialize_doc(new_q)
+
+
+@router.post("/lectures/{lecture_id}/quizzes/generate")
+async def generate_quizzes_endpoint(
+    lecture_id: str,
+    teacher: dict = Depends(require_teacher),
+):
+    """Triggers on-demand AI quiz generation from lecture topics."""
+    db = get_db()
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    topics = lec.get("topics", [])
+    if not topics:
+        topics_cursor = db.topics.find({"lecture_id": str(lecture_id)})
+        topics = await topics_cursor.to_list(length=100)
+
+    if not topics:
+        raise HTTPException(status_code=400, detail="Cannot generate quizzes: lecture has no segmented topics.")
+
+    created = await save_draft_quizzes(lecture_id=str(lecture_id), topics=topics)
+    return {
+        "message": f"Generated {len(created)} draft quiz questions.",
+        "count": len(created),
+    }
+
+
+@router.delete("/quizzes/{quiz_id}")
+async def delete_quiz_question(
+    quiz_id: str,
+    teacher: dict = Depends(require_teacher),
+):
+    """Deletes a quiz question."""
+    db = get_db()
+    q = await db.quizzes.find_one({"_id": ObjectId(quiz_id) if ObjectId.is_valid(quiz_id) else quiz_id})
+    if not q:
+        raise HTTPException(status_code=404, detail="Quiz question not found")
+
+    await db.quizzes.delete_one({"_id": q["_id"]})
+    return {"message": "Quiz question deleted successfully."}
+
+
 @router.post("/lectures/{lecture_id}/quizzes/submit", response_model=QuizAttemptOut)
 async def submit_quiz_attempt(
     lecture_id: str,
@@ -103,6 +186,20 @@ async def submit_quiz_attempt(
     """
     db = get_db()
     
+    # Verify course membership
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found.")
+    
+    cid = str(lec.get("course_id", ""))
+    course = await db.courses.find_one({"_id": ObjectId(cid) if ObjectId.is_valid(cid) else cid})
+    uid = str(student["id"])
+    if course and uid not in [str(x) for x in course.get("student_ids", [])]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You must be an approved enrolled student to submit quiz attempts.",
+        )
+
     # Retrieve only approved questions for this lecture
     cursor = db.quizzes.find({"lecture_id": str(lecture_id), "is_approved": True})
     approved_questions = await cursor.to_list(length=50)
@@ -144,6 +241,7 @@ async def submit_quiz_attempt(
         "student_id": str(student["id"]),
         "student_name": student.get("name", "Student"),
         "lecture_id": str(lecture_id),
+        "course_id": cid,
         "score": score,
         "percentage": round(score, 1),
         "total_questions": total_q,
@@ -223,4 +321,139 @@ async def get_teacher_course_quiz_analytics(
         "topic_weakness_summary": topic_summary,
         "recent_attempts": serialize_list(attempts[-10:]),
     }
+
+
+# ==========================================
+# COURSE-LEVEL QUIZZES & SUBMISSIONS
+# ==========================================
+
+@router.get("/courses/{course_id}/quizzes", response_model=list[QuizQuestionOut])
+async def get_course_quizzes(
+    course_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Lists all quizzes created for lectures in a given course with RBAC checks."""
+    db = get_db()
+    cid = str(course_id)
+    course = await db.courses.find_one({"_id": ObjectId(cid) if ObjectId.is_valid(cid) else cid})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    user_id = str(current_user["id"])
+    role = current_user.get("role")
+
+    is_instructor = (role in ["teacher", "admin"]) and (
+        role == "admin"
+        or user_id == str(course.get("teacher_id"))
+        or user_id in [str(x) for x in course.get("teacher_ids", [])]
+    )
+    is_student_enrolled = (role == "student") and (
+        user_id in [str(x) for x in course.get("student_ids", [])]
+    )
+
+    if not is_instructor and not is_student_enrolled and role != "admin":
+        raise HTTPException(status_code=403, detail="You do not have access to quizzes in this course.")
+
+    # Find all lectures in this course
+    cursor_lec = db.lectures.find({"course_id": cid})
+    raw_lecs = await cursor_lec.to_list(100)
+    lec_ids = [str(l["_id"]) for l in raw_lecs]
+
+    # Query quizzes for this course
+    query = {"$or": [{"course_id": cid}, {"lecture_id": {"$in": lec_ids}}]}
+    if role == "student":
+        query["is_approved"] = True
+
+    cursor_quiz = db.quizzes.find(query)
+    raw_quizzes = await cursor_quiz.to_list(length=100)
+
+    results = []
+    for q in raw_quizzes:
+        q_dict = serialize_doc(q)
+        if role == "student":
+            q_dict["correct_answer"] = None
+            q_dict["explanation"] = None
+        results.append(q_dict)
+
+    return results
+
+
+@router.get("/courses/{course_id}/quiz-submissions")
+async def get_course_quiz_submissions(
+    course_id: str,
+    teacher: dict = Depends(require_teacher),
+):
+    """Allows an approved instructor or admin to view all student quiz submissions and performance for a course."""
+    db = get_db()
+    cid = str(course_id)
+    course = await db.courses.find_one({"_id": ObjectId(cid) if ObjectId.is_valid(cid) else cid})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    t_id = str(teacher["id"])
+    role = teacher.get("role")
+    is_instructor = (
+        role == "admin"
+        or t_id == str(course.get("teacher_id"))
+        or t_id in [str(x) for x in course.get("teacher_ids", [])]
+    )
+    if not is_instructor:
+        raise HTTPException(status_code=403, detail="You are not authorized to view submissions for this course.")
+
+    # Find attempts
+    cursor_lec = db.lectures.find({"course_id": cid})
+    raw_lecs = await cursor_lec.to_list(100)
+    lec_map = {str(l["_id"]): l.get("title", "Lecture") for l in raw_lecs}
+    lec_ids = list(lec_map.keys())
+
+    query = {"$or": [{"course_id": cid}, {"lecture_id": {"$in": lec_ids}}]}
+    cursor_attempts = db.quiz_attempts.find(query).sort("created_at", -1)
+    raw_attempts = await cursor_attempts.to_list(length=200)
+
+    submissions = []
+    for a in raw_attempts:
+        lid = a.get("lecture_id")
+        a_dict = serialize_doc(a)
+        a_dict["lecture_title"] = lec_map.get(lid, "Lecture Quiz")
+        submissions.append(a_dict)
+
+    return {
+        "course_id": cid,
+        "course_title": course.get("title"),
+        "total_submissions": len(submissions),
+        "submissions": submissions,
+    }
+
+
+@router.get("/courses/{course_id}/my-attempts")
+async def get_my_course_quiz_attempts(
+    course_id: str,
+    student: dict = Depends(require_student),
+):
+    """Returns the current student's quiz attempts in a given course."""
+    db = get_db()
+    cid = str(course_id)
+    student_id = str(student["id"])
+
+    cursor_lec = db.lectures.find({"course_id": cid})
+    raw_lecs = await cursor_lec.to_list(100)
+    lec_map = {str(l["_id"]): l.get("title", "Lecture") for l in raw_lecs}
+    lec_ids = list(lec_map.keys())
+
+    query = {
+        "student_id": student_id,
+        "$or": [{"course_id": cid}, {"lecture_id": {"$in": lec_ids}}],
+    }
+    cursor_attempts = db.quiz_attempts.find(query).sort("created_at", -1)
+    raw_attempts = await cursor_attempts.to_list(length=100)
+
+    attempts = []
+    for a in raw_attempts:
+        lid = a.get("lecture_id")
+        a_dict = serialize_doc(a)
+        a_dict["lecture_title"] = lec_map.get(lid, "Lecture Quiz")
+        attempts.append(a_dict)
+
+    return attempts
+
 

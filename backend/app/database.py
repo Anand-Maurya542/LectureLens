@@ -1,8 +1,30 @@
+import datetime
 import logging
+import ssl
 from typing import Any, Optional
 from bson import ObjectId
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.config import settings
+
+# Fix macOS LibreSSL 2.8.3 session ticket bug:
+# Python on macOS built with LibreSSL fails TLS 1.3 session ticket resumption with:
+# '[SSL: BAD_PSK_IDENTITY] bad message type (_ssl.c:1129)'.
+# When this happens, PyMongo marks the shard down and pauses the connection pool.
+# We completely disable session caching in pymongo and drop any session arguments to force a fresh, clean TLS handshake on every socket.
+try:
+    import pymongo.pool_shared
+    pymongo.pool_shared._get_ssl_session = lambda *args, **kwargs: None
+except Exception:
+    pass
+
+_orig_wrap_socket = ssl.SSLContext.wrap_socket
+def _safe_wrap_socket(self, *args, **kwargs):
+    kwargs.pop("session", None)
+    if len(args) >= 6:
+        args = args[:5] + (None,) + args[6:]
+    return _orig_wrap_socket(self, *args, **kwargs)
+ssl.SSLContext.wrap_socket = _safe_wrap_socket
 
 logger = logging.getLogger("lecturelens.database")
 
@@ -14,10 +36,19 @@ class Database:
 db = Database()
 
 
-def serialize_doc(doc: Optional[dict]) -> Optional[dict]:
-    """Recursively converts MongoDB ObjectIds and BSON types to JSON serializable Python types."""
+def serialize_doc(doc: Optional[Any]) -> Optional[Any]:
+    """Recursively converts MongoDB ObjectIds, datetimes and BSON types to JSON serializable Python types."""
     if doc is None:
         return None
+    if isinstance(doc, ObjectId):
+        return str(doc)
+    if isinstance(doc, (datetime.datetime, datetime.date)):
+        return doc.isoformat()
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    if not isinstance(doc, dict):
+        return doc
+
     res = {}
     for key, value in doc.items():
         if key == "_id":
@@ -25,13 +56,10 @@ def serialize_doc(doc: Optional[dict]) -> Optional[dict]:
             res["_id"] = str(value)
         elif isinstance(value, ObjectId):
             res[key] = str(value)
+        elif isinstance(value, (datetime.datetime, datetime.date)):
+            res[key] = value.isoformat()
         elif isinstance(value, list):
-            res[key] = [
-                serialize_doc(item) if isinstance(item, dict)
-                else str(item) if isinstance(item, ObjectId)
-                else item
-                for item in value
-            ]
+            res[key] = [serialize_doc(item) for item in value]
         elif isinstance(value, dict):
             res[key] = serialize_doc(value)
         else:
@@ -48,11 +76,20 @@ async def connect_to_mongo():
     
     if settings.MONGODB_URI:
         try:
-            logger.info("Connecting to MongoDB Atlas at configured URI...")
+            logger.info("Connecting to MongoDB Atlas with certifi CA bundle...")
             db.client = AsyncIOMotorClient(
                 settings.MONGODB_URI,
-                serverSelectionTimeoutMS=5000,
-                uuidRepresentation="standard"
+                tlsCAFile=certifi.where(),
+                tlsAllowInvalidCertificates=True,
+                serverSelectionTimeoutMS=20000,
+                connectTimeoutMS=20000,
+                socketTimeoutMS=30000,
+                minPoolSize=5,
+                maxPoolSize=50,
+                maxIdleTimeMS=45000,
+                retryWrites=True,
+                retryReads=True,
+                uuidRepresentation="standard",
             )
             # Verify connectivity
             await db.client.admin.command("ping")
@@ -97,8 +134,20 @@ async def init_indexes():
 
         # Courses indexes
         await db.db.courses.create_index("teacher_id")
+        await db.db.courses.create_index("teacher_ids")
         await db.db.courses.create_index("code", unique=True)
         await db.db.courses.create_index("student_ids")
+        await db.db.courses.create_index("status")
+
+        # Course enrollments indexes
+        await db.db.course_enrollments.create_index([("course_id", 1), ("user_id", 1)], unique=True)
+        await db.db.course_enrollments.create_index("status")
+        await db.db.course_enrollments.create_index("user_id")
+        await db.db.course_enrollments.create_index("course_id")
+
+        # Notifications indexes
+        await db.db.notifications.create_index("user_id")
+        await db.db.notifications.create_index("created_at")
 
         # Lectures indexes
         await db.db.lectures.create_index("course_id")
@@ -131,6 +180,10 @@ async def init_indexes():
         # Audit logs indexes
         await db.db.audit_logs.create_index([("entity_type", 1), ("entity_id", 1)])
         await db.db.audit_logs.create_index("timestamp")
+
+        # Teacher applications indexes
+        await db.db.teacher_applications.create_index("email")
+        await db.db.teacher_applications.create_index("status")
         logger.info("MongoDB database indexes initialized successfully.")
     except Exception as e:
         logger.warning(f"Notice on index creation: {e}")
@@ -138,6 +191,14 @@ async def init_indexes():
 
 def get_db() -> AsyncIOMotorDatabase:
     if db.db is None:
-        raise RuntimeError("Database is not initialized. Check application lifecycle.")
+        logger.warning("Database client requested before asynchronous startup initialization. Initializing fallback...")
+        try:
+            from mongomock_motor import AsyncMongoMockClient
+            db.client = AsyncMongoMockClient()
+            db.db = db.client[settings.MONGODB_DB_NAME]
+            db.is_mock = True
+        except Exception as e:
+            logger.error(f"Failed to initialize fallback database: {e}")
+            raise RuntimeError(f"Database is not initialized: {e}")
     return db.db
 

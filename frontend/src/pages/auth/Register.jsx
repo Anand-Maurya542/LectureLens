@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { UserPlus, User, Mail, Key, Shield, ShieldAlert } from "lucide-react";
+import { UserPlus, User, Mail, Key, ShieldAlert, GraduationCap, ShieldCheck } from "lucide-react";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
-  const [teacherCode, setTeacherCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,20 +20,21 @@ export default function Register() {
 
     try {
       const user = await register({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         password,
-        role,
-        teacher_invite_code: role === "teacher" ? teacherCode : undefined,
+        role: "student",
       });
 
-      if (user.role === "teacher" || user.role === "admin") {
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (user.role === "teacher") {
         navigate("/teacher", { replace: true });
       } else {
         navigate("/student", { replace: true });
       }
     } catch (err) {
-      setError(err.message || "Registration failed.");
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -47,7 +46,7 @@ export default function Register() {
         <div className="auth-header">
           <div className="auth-logo">🎓</div>
           <h2>Join LectureLens</h2>
-          <p>Start turning your lectures into searchable, personalized learning</p>
+          <p>Create a Student account to access courses, grounded AI search & interactive quizzes</p>
         </div>
 
         {error && (
@@ -68,13 +67,13 @@ export default function Register() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Dr. Jane Doe or Alex Smith"
+                placeholder="Alex Smith"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="reg-email">Email Address</label>
+            <label htmlFor="reg-email">Student Email Address</label>
             <div className="input-with-icon">
               <Mail size={18} className="input-icon" />
               <input
@@ -104,71 +103,38 @@ export default function Register() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Account Role</label>
-            <div className="role-selector-cards">
-              <label className={`role-card ${role === "student" ? "selected" : ""}`}>
-                <input
-                  type="radio"
-                  name="role"
-                  value="student"
-                  checked={role === "student"}
-                  onChange={() => setRole("student")}
-                />
-                <div>
-                  <strong>Student</strong>
-                  <span>Enroll in courses, search lectures, ask grounded questions & take quizzes</span>
-                </div>
-              </label>
-
-              <label className={`role-card ${role === "teacher" ? "selected" : ""}`}>
-                <input
-                  type="radio"
-                  name="role"
-                  value="teacher"
-                  checked={role === "teacher"}
-                  onChange={() => setRole("teacher")}
-                />
-                <div>
-                  <strong>Teacher / Instructor</strong>
-                  <span>Create courses, upload lectures, edit transcripts, review quizzes</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {role === "teacher" && (
-            <div className="form-group highlight-box">
-              <label htmlFor="teacher-code">
-                <Shield size={16} /> Teacher Authorization Invite Code
-              </label>
-              <input
-                id="teacher-code"
-                type="password"
-                required
-                value={teacherCode}
-                onChange={(e) => setTeacherCode(e.target.value)}
-                placeholder="Enter teacher authorization code"
-              />
-              <small className="help-text">
-                Demo code: <code>TEACHER_SECRET_2026</code> (Secures against arbitrary instructor escalation)
-              </small>
-            </div>
-          )}
-
           <button type="submit" disabled={loading} className="btn-primary w-full">
             <UserPlus size={18} />
-            {loading ? "Creating Account..." : "Create Account"}
+            {loading ? "Creating Student Account..." : "Create Student Account"}
           </button>
         </form>
 
-        <div className="auth-footer">
+        <div className="auth-footer" style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "16px" }}>
           <p>
             Already have an account? <Link to="/login">Sign in</Link>
           </p>
+
+          <div
+            style={{
+              padding: "10px 14px",
+              background: "rgba(99, 102, 241, 0.05)",
+              border: "1px solid rgba(99, 102, 241, 0.15)",
+              borderRadius: "8px",
+              fontSize: "0.82rem",
+              color: "var(--text-muted, #64748b)",
+              lineHeight: "1.4",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <ShieldCheck size={16} style={{ color: "#6366f1", flexShrink: 0 }} />
+            <span>
+              <strong>Faculty / Teachers:</strong> Instructor accounts are created exclusively by Platform Administrators. Contact your institution administrator for access credentials.
+            </span>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-

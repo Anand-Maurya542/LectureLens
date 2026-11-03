@@ -11,10 +11,12 @@ import {
   PlusCircle,
   LogOut,
   Brain,
+  Shield,
+  Settings,
 } from "lucide-react";
 
 export default function Navbar() {
-  const { user, logout, isTeacher } = useAuth();
+  const { user, logout, isAdmin, isTeacher, isStudent } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,11 +29,28 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  // Determine root destination and badge
+  let rootPath = "/student";
+  let badgeLabel = "Student Portal";
+  let badgeClass = "role-student";
+
+  if (isAdmin) {
+    rootPath = "/admin";
+    badgeLabel = "Admin Portal";
+    badgeClass = "role-admin";
+  } else if (isTeacher) {
+    rootPath = "/teacher";
+    badgeLabel = "Instructor Portal";
+    badgeClass = "role-teacher";
+  }
+
+  const settingsPath = isStudent ? "/student/settings" : "/teacher/settings";
+
   return (
     <header className="navbar-container">
       <div className="navbar-inner">
         {/* Brand */}
-        <Link to={isTeacher ? "/teacher" : "/student"} className="navbar-brand">
+        <Link to={rootPath} className="navbar-brand">
           <img
             src="/lecturelens.svg"
             alt="LectureLens Logo"
@@ -39,15 +58,44 @@ export default function Navbar() {
           />
           <div>
             <span className="brand-title">LectureLens</span>
-            <span className={`role-badge ${isTeacher ? "role-teacher" : "role-student"}`}>
-              {isTeacher ? "Instructor Portal" : "Student Portal"}
-            </span>
+            <span className={`role-badge ${badgeClass}`}>{badgeLabel}</span>
           </div>
         </Link>
 
         {/* Navigation Links */}
         <nav className="navbar-nav">
-          {isTeacher ? (
+          {isAdmin ? (
+            <>
+              <Link
+                to="/admin"
+                className={`nav-link ${isActive("/admin") ? "active" : ""}`}
+              >
+                <Shield size={18} />
+                Admin Console
+              </Link>
+              <Link
+                to="/teacher"
+                className={`nav-link ${isActive("/teacher") ? "active" : ""}`}
+              >
+                <LayoutDashboard size={18} />
+                Instructor Studio
+              </Link>
+              <Link
+                to="/teacher/courses"
+                className={`nav-link ${isActive("/teacher/courses") ? "active" : ""}`}
+              >
+                <BookOpen size={18} />
+                Courses
+              </Link>
+              <Link
+                to="/teacher/analytics"
+                className={`nav-link ${isActive("/teacher/analytics") ? "active" : ""}`}
+              >
+                <BarChart3 size={18} />
+                Analytics
+              </Link>
+            </>
+          ) : isTeacher ? (
             <>
               <Link
                 to="/teacher"
@@ -95,6 +143,13 @@ export default function Navbar() {
                 My Courses
               </Link>
               <Link
+                to="/student/courses"
+                className={`nav-link ${isActive("/student/courses") ? "active" : ""}`}
+              >
+                <BookOpen size={18} />
+                Course Catalog
+              </Link>
+              <Link
                 to="/student/search"
                 className={`nav-link ${isActive("/student/search") ? "active" : ""}`}
               >
@@ -114,10 +169,19 @@ export default function Navbar() {
 
         {/* User profile & actions */}
         <div className="navbar-actions">
+          <Link
+            to={settingsPath}
+            className={`btn-icon ${isActive(settingsPath) ? "active-icon" : ""}`}
+            title="Settings & Profile"
+          >
+            <Settings size={18} />
+          </Link>
+
           <div className="user-profile-chip">
             <span className="user-name">{user.name}</span>
             <span className="user-email">{user.email}</span>
           </div>
+
           <button onClick={handleLogout} className="btn-logout" title="Sign out">
             <LogOut size={17} />
             <span>Logout</span>
@@ -127,4 +191,3 @@ export default function Navbar() {
     </header>
   );
 }
-

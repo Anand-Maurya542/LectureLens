@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { LogIn, Key, Mail, ShieldAlert, Sparkles } from "lucide-react";
+import { LogIn, Key, Mail, ShieldAlert } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,7 +24,9 @@ export default function Login() {
       const user = await login(email, password);
       if (from) {
         navigate(from, { replace: true });
-      } else if (user.role === "teacher" || user.role === "admin") {
+      } else if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (user.role === "teacher") {
         navigate("/teacher", { replace: true });
       } else {
         navigate("/student", { replace: true });
@@ -36,10 +38,7 @@ export default function Login() {
     }
   };
 
-  const handleQuickLogin = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-  };
+
 
   return (
     <div className="auth-page">
@@ -94,33 +93,12 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Demo Fast Login Pills */}
-        <div className="demo-accounts-section">
-          <div className="demo-title">
-            <Sparkles size={14} />
-            <span>Quick Demo Accounts</span>
-          </div>
-          <div className="demo-buttons">
-            <button
-              type="button"
-              className="btn-demo teacher"
-              onClick={() => handleQuickLogin("teacher@lecturelens.edu", "TeacherPass123!")}
-            >
-              <strong>Prof. Sharma</strong> (Instructor)
-            </button>
-            <button
-              type="button"
-              className="btn-demo student"
-              onClick={() => handleQuickLogin("student@lecturelens.edu", "StudentPass123!")}
-            >
-              <strong>Priya Verma</strong> (Student)
-            </button>
-          </div>
-        </div>
-
-        <div className="auth-footer">
+        <div className="auth-footer" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <p>
             Need a student account? <Link to="/register">Create one here</Link>
+          </p>
+          <p style={{ fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
+            Faculty & Instructors: Teacher accounts are provisioned exclusively by Platform Administrators.
           </p>
         </div>
       </div>
