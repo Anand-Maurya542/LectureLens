@@ -122,42 +122,95 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* Course Enrollment Pill */}
-      <div className="enroll-banner">
-        <form onSubmit={handleEnroll} className="enroll-form">
-          <Plus size={18} />
-          <input
-            type="text"
-            placeholder="Enter course code (e.g. CS401)..."
-            value={enrollCode}
-            onChange={(e) => setEnrollCode(e.target.value)}
-          />
-          <button type="submit" disabled={enrolling} className="btn-primary btn-sm">
+      {/* Quick Course Enrollment Card */}
+      <div className="quick-enroll-card">
+        <div className="quick-enroll-info">
+          <div className="quick-enroll-icon">
+            <Plus size={22} />
+          </div>
+          <div>
+            <h4>Quick Course Enrollment</h4>
+            <p>Have an enrollment code from your instructor? Enter it to request access.</p>
+          </div>
+        </div>
+        <form onSubmit={handleEnroll} className="quick-enroll-form">
+          <div className="quick-enroll-input-wrapper">
+            <input
+              type="text"
+              placeholder="e.g. CS401"
+              value={enrollCode}
+              onChange={(e) => setEnrollCode(e.target.value)}
+              className="quick-enroll-input"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={enrolling || !enrollCode.trim()}
+            className="btn-primary"
+            style={{ whiteSpace: "nowrap" }}
+          >
             {enrolling ? "Enrolling..." : "Enroll"}
           </button>
         </form>
-        {enrollMessage && <span className="enroll-status">{enrollMessage}</span>}
       </div>
+
+      {enrollMessage && (
+        <div
+          className={`mb-4 ${
+            enrollMessage.toLowerCase().includes("invalid") ||
+            enrollMessage.toLowerCase().includes("failed") ||
+            enrollMessage.toLowerCase().includes("error")
+              ? "alert-error"
+              : "alert-success"
+          }`}
+          style={{ display: "flex", alignItems: "center", gap: "8px" }}
+        >
+          <CheckCircle2 size={16} />
+          <span>{enrollMessage}</span>
+        </div>
+      )}
 
       {/* Smart Revision Recommendations Banner */}
       {recommendations.length > 0 && (
         <div className="revision-highlight-card">
           <div className="revision-header">
-            <div className="flex items-center gap-2">
-              <Brain size={22} className="text-purple-600" />
-              <h3>Personalized Revision Focus</h3>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "8px",
+                  background: "#f3e8ff",
+                  color: "#9333ea",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Brain size={20} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Personalized Revision Focus</h3>
+                <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
+                  AI-recommended topics based on your quiz activity and syllabus progress
+                </p>
+              </div>
             </div>
-            <Link to="/student/revision" className="btn-link">View Full Plan →</Link>
+            <Link to="/student/revision" className="btn-link" style={{ fontWeight: 600, fontSize: "0.88rem" }}>
+              View Full Plan →
+            </Link>
           </div>
           <div className="recommendations-row">
             {recommendations.slice(0, 3).map((rec, i) => (
               <div key={i} className="rec-card">
-                <span className="rec-lecture-tag">{rec.lecture_title}</span>
-                <h4 className="rec-topic">{rec.topic_title}</h4>
-                <p className="rec-reason">{rec.reason}</p>
+                <div>
+                  <span className="rec-lecture-tag">{rec.lecture_title}</span>
+                  <h4 className="rec-topic">{rec.topic_title}</h4>
+                  <p className="rec-reason">{rec.reason}</p>
+                </div>
                 <Link to={rec.timestamp_url} className="btn-rec-action">
-                  <PlayCircle size={14} />
-                  <span>Review at {Math.floor(rec.suggested_start_time / 60)}m</span>
+                  <PlayCircle size={15} />
+                  <span>Review Video at {Math.floor(rec.suggested_start_time / 60)}m</span>
                 </Link>
               </div>
             ))}

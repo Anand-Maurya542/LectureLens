@@ -7,11 +7,27 @@ import certifi
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.config import settings
 
-# Fix macOS LibreSSL 2.8.3 session ticket bug:
+# Fix macOS LibreSSL 2.8.3 session ticket & TLS 1.3 bug:
 # Python on macOS built with LibreSSL fails TLS 1.3 session ticket resumption with:
 # '[SSL: BAD_PSK_IDENTITY] bad message type (_ssl.c:1129)'.
 # When this happens, PyMongo marks the shard down and pauses the connection pool.
-# We completely disable session caching in pymongo and drop any session arguments to force a fresh, clean TLS handshake on every socket.
+# We cap the TLS protocol to TLS 1.2 across all PyMongo SSL contexts and wrap_socket calls,
+# and disable TLS session caching completely to ensure clean, stable handshakes on every socket.
+try:
+    import pymongo.ssl_support
+    _orig_get_ssl_context = pymongo.ssl_support.get_ssl_context
+    def _safe_get_ssl_context(*args, **kwargs):
+        ctx = _orig_get_ssl_context(*args, **kwargs)
+        if hasattr(ctx, "maximum_version") and hasattr(ssl, "TLSVersion"):
+            try:
+                ctx.maximum_version = ssl.TLSVersion.TLSv1_2
+            except Exception:
+                pass
+        return ctx
+    pymongo.ssl_support.get_ssl_context = _safe_get_ssl_context
+except Exception:
+    pass
+
 try:
     import pymongo.pool_shared
     pymongo.pool_shared._get_ssl_session = lambda *args, **kwargs: None
@@ -20,6 +36,11 @@ except Exception:
 
 _orig_wrap_socket = ssl.SSLContext.wrap_socket
 def _safe_wrap_socket(self, *args, **kwargs):
+    if hasattr(self, "maximum_version") and hasattr(ssl, "TLSVersion"):
+        try:
+            self.maximum_version = ssl.TLSVersion.TLSv1_2
+        except Exception:
+            pass
     kwargs.pop("session", None)
     if len(args) >= 6:
         args = args[:5] + (None,) + args[6:]

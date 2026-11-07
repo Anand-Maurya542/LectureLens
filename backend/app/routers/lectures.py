@@ -19,6 +19,7 @@ from app.database import get_db, serialize_doc, serialize_list
 from app.dependencies.auth import get_current_user, require_teacher
 from app.schemas.lecture import LectureCreate, LectureOut, PublicationUpdateRequest
 from app.services.pipeline import run_lecture_processing_pipeline
+from app.services.transcription import group_segments_into_paragraphs
 from app.services.youtube import extract_youtube_video_id, get_youtube_embed_url
 
 logger = logging.getLogger("lecturelens.router.lectures")
@@ -147,6 +148,9 @@ async def get_lecture(
     lec_dict = serialize_doc(lec)
     lec_dict["course_title"] = c.get("title") if c else "Unknown Course"
     lec_dict["teacher_name"] = t.get("name") if t else "Instructor"
+    lec_dict["transcript_status"] = lec.get("transcript_status", "ai_generated")
+    if not lec_dict.get("paragraphs") and lec_dict.get("segments"):
+        lec_dict["paragraphs"] = group_segments_into_paragraphs(lec_dict["segments"])
     return lec_dict
 
 

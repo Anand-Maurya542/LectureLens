@@ -139,11 +139,35 @@ export const api = {
       method: "DELETE",
     }),
 
-  // Review & Corrections
+  // Review & Transcript Management
+  getLectureTranscript: (lectureId) =>
+    apiRequest(`/api/lectures/${lectureId}/transcript`),
   editTranscript: (lectureId, segmentIndex, newText) =>
     apiRequest(`/api/lectures/${lectureId}/transcript`, {
       method: "PATCH",
       body: JSON.stringify({ segment_index: segmentIndex, new_text: newText }),
+    }),
+  batchEditTranscript: (lectureId, corrections) =>
+    apiRequest(`/api/lectures/${lectureId}/transcript/batch-correct`, {
+      method: "POST",
+      body: JSON.stringify({ corrections }),
+    }),
+  approveTranscript: (lectureId, data = {}) =>
+    apiRequest(`/api/lectures/${lectureId}/transcript/approve`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  rejectTranscript: (lectureId, rejectionReason) =>
+    apiRequest(`/api/lectures/${lectureId}/transcript/reject`, {
+      method: "POST",
+      body: JSON.stringify({ rejection_reason: rejectionReason }),
+    }),
+  getCourseGlossary: (courseId) =>
+    apiRequest(`/api/courses/${courseId}/glossary`),
+  updateCourseGlossary: (courseId, glossary) =>
+    apiRequest(`/api/courses/${courseId}/glossary`, {
+      method: "PUT",
+      body: JSON.stringify({ glossary }),
     }),
   editTopic: (lectureId, topicIndex, data) =>
     apiRequest(`/api/lectures/${lectureId}/topics/${topicIndex}`, {

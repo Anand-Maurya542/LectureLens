@@ -1,9 +1,12 @@
 :root {
-  --bg-primary: #0f172a;
-  --bg-surface: #1e293b;
+  --bg-primary: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
   --bg-page: #f8fafc;
   --text-main: #0f172a;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
   --text-muted: #64748b;
   --text-inverse: #ffffff;
   

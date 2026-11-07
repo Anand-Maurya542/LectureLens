@@ -10,6 +10,7 @@ class CourseCreate(BaseModel):
     thumbnail_url: Optional[str] = None
     status: str = "active"  # "active" or "inactive"
     teacher_id: Optional[str] = None  # If created by admin, can optionally assign instructor
+    glossary: Optional[List[str]] = []
 
 
 class CourseUpdate(BaseModel):
@@ -18,6 +19,7 @@ class CourseUpdate(BaseModel):
     code: Optional[str] = None
     thumbnail_url: Optional[str] = None
     status: Optional[str] = None  # "active" or "inactive"
+    glossary: Optional[List[str]] = None
 
 
 class CourseEnroll(BaseModel):
@@ -85,6 +87,7 @@ class CourseOut(BaseModel):
     student_count: int = 0
     lecture_count: int = 0
     pending_requests_count: int = 0
+    glossary: List[str] = []
     user_enrollment_status: Optional[str] = None  # "approved" | "pending" | "rejected" | None
     created_at: Optional[Union[datetime.datetime, str]] = ""
     updated_at: Optional[Union[datetime.datetime, str]] = None
@@ -106,3 +109,7 @@ class CourseEnrollResponse(BaseModel):
 
 class AdminAssignTeacher(BaseModel):
     teacher_id: str
+
+
+class CourseGlossaryUpdate(BaseModel):
+    glossary: List[str] = []

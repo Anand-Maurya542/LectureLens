@@ -15,7 +15,29 @@ import {
   Search,
   Sparkles,
   Layers,
+  Tag,
+  X,
+  FileText,
 } from "lucide-react";
+
+const GLOSSARY_PRESETS = [
+  {
+    label: "Databases / SQL",
+    terms: ["DDL", "DML", "PRIMARY KEY", "FOREIGN KEY", "INDEX", "NORMALIZATION", "JOIN", "ACID", "TRANSACTION", "REDO LOG", "POSTGRESQL", "SCHEMA"],
+  },
+  {
+    label: "Machine Learning & AI",
+    terms: ["NEURAL NETWORK", "BACKPROPAGATION", "GRADIENT DESCENT", "OVERFITTING", "TRANSFORMER", "ATTENTION", "EPOCH", "LOSS FUNCTION", "EMBEDDINGS", "INFERENCE"],
+  },
+  {
+    label: "Web & Backend Systems",
+    terms: ["REST API", "GRAPHQL", "JWT", "CORS", "WEBSOCKET", "ASYNC", "MICROSERVICES", "DOCKER", "KUBERNETES", "DATABASE MIGRATION"],
+  },
+  {
+    label: "Data Structures & Algos",
+    terms: ["BINARY SEARCH TREE", "RECURSION", "DYNAMIC PROGRAMMING", "HASH MAP", "ADJACENCY LIST", "DIJKSTRA", "HEAP", "TIME COMPLEXITY", "ASYMPTOTIC"],
+  },
+];
 
 export default function CourseManager() {
   const [activeTab, setActiveTab] = useState("my"); // my | catalog
@@ -32,6 +54,13 @@ export default function CourseManager() {
   const [actionMsg, setActionMsg] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [requestingCourseId, setRequestingCourseId] = useState(null);
+
+  // Technical Vocabulary / Glossary Management
+  const [selectedCourseForGlossary, setSelectedCourseForGlossary] = useState(null);
+  const [glossaryTerms, setGlossaryTerms] = useState([]);
+  const [termInput, setTermInput] = useState("");
+  const [loadingGlossary, setLoadingGlossary] = useState(false);
+  const [savingGlossary, setSavingGlossary] = useState(false);
 
   const loadData = async () => {
     try {
@@ -95,6 +124,60 @@ export default function CourseManager() {
     navigator.clipboard.writeText(cCode);
     setCopiedCode(cCode);
     setTimeout(() => setCopiedCode(null), 2500);
+  };
+
+  const openGlossaryModal = async (course) => {
+    setSelectedCourseForGlossary(course);
+    setLoadingGlossary(true);
+    setGlossaryTerms([]);
+    setTermInput("");
+    try {
+      const data = await api.getCourseGlossary(course.id);
+      setGlossaryTerms(data.glossary || course.glossary || []);
+    } catch (err) {
+      console.error("Failed to load glossary:", err);
+      setGlossaryTerms(course.glossary || []);
+    } finally {
+      setLoadingGlossary(false);
+    }
+  };
+
+  const handleAddTerm = (e) => {
+    if (e) e.preventDefault();
+    if (!termInput.trim()) return;
+    const splitTerms = termInput
+      .split(/[,;\n]/)
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+    const updated = Array.from(new Set([...glossaryTerms, ...splitTerms]));
+    setGlossaryTerms(updated);
+    setTermInput("");
+  };
+
+  const handleRemoveTerm = (termToRemove) => {
+    setGlossaryTerms(glossaryTerms.filter((t) => t !== termToRemove));
+  };
+
+  const handleAddPreset = (presetTerms) => {
+    const updated = Array.from(new Set([...glossaryTerms, ...presetTerms]));
+    setGlossaryTerms(updated);
+  };
+
+  const handleSaveGlossary = async () => {
+    if (!selectedCourseForGlossary) return;
+    setSavingGlossary(true);
+    try {
+      await api.updateCourseGlossary(selectedCourseForGlossary.id, glossaryTerms);
+      setActionMsg(`Technical vocabulary saved for ${selectedCourseForGlossary.title} (${glossaryTerms.length} terms).`);
+      setTimeout(() => setActionMsg(""), 4000);
+      setSelectedCourseForGlossary(null);
+      await loadData();
+    } catch (err) {
+      setError(err.message || "Failed to update glossary");
+      setTimeout(() => setError(""), 4500);
+    } finally {
+      setSavingGlossary(false);
+    }
   };
 
   const filteredCatalog = catalogCourses.filter((c) => {
@@ -204,7 +287,17 @@ export default function CourseManager() {
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t">
+                  <div className="mt-4 pt-3 border-t flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => openGlossaryModal(course)}
+                      className="btn-secondary w-full justify-center flex items-center gap-2"
+                      style={{ fontSize: "0.85rem", padding: "6px 12px" }}
+                      title="Manage course-specific technical vocabulary and Whisper hotwords"
+                    >
+                      <Sparkles size={14} className="text-primary" />
+                      <span>Technical Vocabulary ({course.glossary?.length || 0})</span>
+                    </button>
                     <Link
                       to={`/teacher/courses/${course.id}`}
                       className="btn-primary w-full justify-center flex items-center gap-2"
@@ -356,6 +449,207 @@ export default function CourseManager() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: TECHNICAL VOCABULARY & GLOSSARY */}
+      {selectedCourseForGlossary && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "600px" }}>
+            <div className="modal-header">
+              <div>
+                <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Sparkles size={20} className="text-primary" />
+                  Technical Vocabulary & Glossaries
+                </h2>
+                <p className="text-muted text-sm mt-1">
+                  Configure domain-specific keywords and jargon for <strong>{selectedCourseForGlossary.title}</strong> ({selectedCourseForGlossary.code}).
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedCourseForGlossary(null)}
+                className="btn-close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div
+                style={{
+                  background: "var(--bg-secondary, #f8fafc)",
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  fontSize: "0.85rem",
+                  color: "var(--text-muted, #64748b)",
+                  border: "1px solid var(--border-color, #e2e8f0)",
+                }}
+              >
+                💡 <strong>ASR Prompt Conditioning:</strong> These terms are passed directly to the Faster-Whisper ASR model as context prompts and hotwords during lecture ingestion. This biases decoding towards correct technical jargon without blindly substituting unrecognized words.
+              </div>
+
+              {/* Add Custom Term */}
+              <div>
+                <label style={{ fontSize: "0.88rem", fontWeight: 600, marginBottom: "6px", display: "block" }}>
+                  Add Custom Technical Terms
+                </label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    type="text"
+                    value={termInput}
+                    onChange={(e) => setTermInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddTerm();
+                      }
+                    }}
+                    placeholder="e.g. Backpropagation, Normalization, DDL (comma-separated)..."
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddTerm}
+                    className="btn-secondary"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    <Plus size={16} /> Add Term
+                  </button>
+                </div>
+              </div>
+
+              {/* Presets */}
+              <div>
+                <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-muted, #64748b)", marginBottom: "6px", display: "block" }}>
+                  Load Curated Presets:
+                </label>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                  {GLOSSARY_PRESETS.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => handleAddPreset(preset.terms)}
+                      className="btn-secondary btn-sm"
+                      style={{ fontSize: "0.78rem", padding: "4px 8px" }}
+                    >
+                      + {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Current Glossary Badges */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                  <label style={{ fontSize: "0.88rem", fontWeight: 600 }}>
+                    Active Course Vocabulary ({glossaryTerms.length} terms)
+                  </label>
+                  {glossaryTerms.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setGlossaryTerms([])}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "var(--danger, #ef4444)",
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+
+                {loadingGlossary ? (
+                  <div style={{ padding: "16px", textAlign: "center", color: "var(--text-muted, #64748b)" }}>
+                    Loading glossary...
+                  </div>
+                ) : glossaryTerms.length === 0 ? (
+                  <div
+                    style={{
+                      padding: "20px",
+                      textAlign: "center",
+                      border: "1px dashed var(--border-color, #cbd5e1)",
+                      borderRadius: "8px",
+                      color: "var(--text-muted, #64748b)",
+                      fontSize: "0.88rem",
+                    }}
+                  >
+                    No technical terms defined yet. Add keywords or choose a preset above to prime AI speech recognition.
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "6px",
+                      maxHeight: "180px",
+                      overflowY: "auto",
+                      padding: "8px",
+                      background: "var(--bg-secondary, #f8fafc)",
+                      borderRadius: "8px",
+                      border: "1px solid var(--border-color, #e2e8f0)",
+                    }}
+                  >
+                    {glossaryTerms.map((term) => (
+                      <span
+                        key={term}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          background: "var(--bg-surface, #ffffff)",
+                          border: "1px solid var(--border-color, #cbd5e1)",
+                          borderRadius: "4px",
+                          padding: "2px 8px",
+                          fontSize: "0.82rem",
+                          fontWeight: 500,
+                        }}
+                      >
+                        <Tag size={12} className="text-muted" />
+                        {term}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTerm(term)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            padding: "0 2px",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            color: "var(--text-muted, #94a3b8)",
+                          }}
+                          title={`Remove ${term}`}
+                        >
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={() => setSelectedCourseForGlossary(null)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={savingGlossary}
+                onClick={handleSaveGlossary}
+                className="btn-primary"
+              >
+                {savingGlossary ? "Saving Vocabulary..." : "Save Vocabulary"}
+              </button>
+            </div>
           </div>
         </div>
       )}

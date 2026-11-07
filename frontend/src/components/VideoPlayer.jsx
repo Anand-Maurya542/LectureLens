@@ -7,6 +7,40 @@ const VideoPlayer = forwardRef(function VideoPlayer(
   const mediaRef = useRef(null);
   const iframeRef = useRef(null);
 
+  useEffect(() => {
+    if (sourceType !== "youtube" || !onTimeUpdate) return;
+
+    const handleMessage = (event) => {
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data && data.event === "infoDelivery" && data.info) {
+          if (typeof data.info.currentTime === "number") {
+            onTimeUpdate(data.info.currentTime);
+          }
+        }
+      } catch {
+        // Ignore other iframe postMessages
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    // Initial handshake so YouTube iframe starts sending infoDelivery messages
+    const handshakeTimer = setTimeout(() => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ event: "listening" }),
+          "*"
+        );
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      clearTimeout(handshakeTimer);
+    };
+  }, [sourceType, onTimeUpdate]);
+
   useImperativeHandle(ref, () => ({
     seekTo: (seconds) => {
       if (sourceType === "youtube") {
@@ -24,6 +58,10 @@ const VideoPlayer = forwardRef(function VideoPlayer(
         mediaRef.current.currentTime = seconds;
         mediaRef.current.play().catch(() => {});
       }
+    },
+    getCurrentTime: () => {
+      if (mediaRef.current) return mediaRef.current.currentTime;
+      return 0;
     },
   }));
 

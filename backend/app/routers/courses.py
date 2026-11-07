@@ -12,6 +12,7 @@ from app.schemas.course import (
     CourseEnroll,
     CourseEnrollmentOut,
     CourseEnrollmentRequest,
+    CourseGlossaryUpdate,
     CourseOut,
     CourseUpdate,
 )
@@ -174,6 +175,7 @@ async def create_course(
         "code": raw_code,
         "thumbnail_url": payload.thumbnail_url or "",
         "status": payload.status or "active",
+        "glossary": [str(t).strip() for t in payload.glossary if str(t).strip()] if payload.glossary else [],
         "teacher_id": primary_teacher_id,
         "teacher_ids": [primary_teacher_id],
         "student_ids": [],
@@ -315,6 +317,8 @@ async def update_course(
         if payload.status not in ["active", "inactive"]:
             raise HTTPException(status_code=400, detail="Status must be 'active' or 'inactive'.")
         updates["status"] = payload.status
+    if payload.glossary is not None:
+        updates["glossary"] = [str(t).strip() for t in payload.glossary if str(t).strip()]
     if payload.code is not None and payload.code.strip():
         new_code = payload.code.strip().upper()
         if new_code != course.get("code"):
@@ -345,6 +349,60 @@ async def update_course(
 
     updated_course = await db.courses.find_one({"_id": course["_id"]})
     return serialize_doc(updated_course)
+
+
+@router.get("/{course_id}/glossary")
+async def get_course_glossary(
+    course_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Retrieves technical vocabulary / glossaries configured for a course."""
+    db = get_db()
+    c_query = {"_id": ObjectId(course_id)} if ObjectId.is_valid(course_id) else {"_id": course_id}
+    course = await db.courses.find_one(c_query)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    return {
+        "course_id": str(course["_id"]),
+        "course_code": course.get("code", ""),
+        "course_title": course.get("title", ""),
+        "glossary": course.get("glossary", []),
+    }
+
+
+@router.put("/{course_id}/glossary")
+async def update_course_glossary(
+    course_id: str,
+    payload: CourseGlossaryUpdate,
+    current_user: dict = Depends(require_teacher),
+):
+    """Allows authorized course teachers and admins to configure technical vocabulary/glossary."""
+    db = get_db()
+    c_query = {"_id": ObjectId(course_id)} if ObjectId.is_valid(course_id) else {"_id": course_id}
+    course = await db.courses.find_one(c_query)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    user_id = str(current_user["id"])
+    role = current_user.get("role")
+    teacher_ids = [str(x) for x in course.get("teacher_ids", [])]
+    if str(course.get("teacher_id")):
+        teacher_ids.append(str(course.get("teacher_id")))
+
+    if role != "admin" and user_id not in teacher_ids:
+        raise HTTPException(status_code=403, detail="Unauthorized to manage vocabulary for this course.")
+
+    cleaned_terms = sorted(list({str(t).strip() for t in payload.glossary if str(t).strip()}))
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    await db.courses.update_one(c_query, {"$set": {"glossary": cleaned_terms, "updated_at": now}})
+
+    return {
+        "message": f"Course glossary updated ({len(cleaned_terms)} technical terms)",
+        "course_id": str(course["_id"]),
+        "glossary": cleaned_terms,
+        "count": len(cleaned_terms),
+    }
 
 
 @router.delete("/{course_id}")

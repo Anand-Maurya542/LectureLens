@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 
@@ -1030,6 +1031,251 @@ async def test_admin_create_teacher_profile_and_activation_workflow(client):
 
     # Manually created teacher Knuth does NOT appear in applicant review queue
     assert not any(a["email"] == "knuth@stanford.edu" for a in apps_list.json())
+
+
+@pytest.mark.asyncio
+async def test_advanced_transcript_and_glossary_features(client):
+    """
+    Comprehensive test for Advanced Transcript Features:
+    1. Course technical glossary / vocabulary management (GET/PUT)
+    2. Segment paragraph grouping with English and Hindi punctuation boundaries
+    3. Transcript export formats (TXT, SRT, VTT, JSON)
+    4. Teacher segment correction: preserves original_text, tracks editor and audit history
+    5. Transcript batch correction
+    6. RBAC access control: unapproved transcripts hidden from students
+    7. Teacher transcript approval and rejection workflow
+    8. Student access to approved/published transcripts
+    """
+    from app.database import get_db
+    from app.services.transcription import (
+        group_segments_into_paragraphs,
+        export_transcript_text,
+        export_transcript_srt,
+        export_transcript_vtt,
+    )
+    db = get_db()
+
+    # 1. Test algorithmic paragraph grouping (English + Hindi/Hinglish)
+    raw_segments = [
+        {"start": 0.0, "end": 2.5, "text": "Welcome to Database Systems."},
+        {"start": 2.6, "end": 5.0, "text": "Today we will discuss normalization."},
+        {"start": 5.1, "end": 7.8, "text": "First Normal Form requires atomic values."},
+        {"start": 12.0, "end": 15.0, "text": "यह रिलेशनल मॉडल का मुख्य सिद्धांत है।"}, # Hindi sentence with purna viram
+        {"start": 15.1, "end": 18.0, "text": "हिंग्लिश लेक्चर्स में यह बहुत महत्वपूर्ण है।"},
+    ]
+    paragraphs = group_segments_into_paragraphs(raw_segments)
+    assert len(paragraphs) >= 2
+    # Verify first paragraph preserved timestamps and joined sentences
+    assert paragraphs[0]["start"] == 0.0
+    assert "Database Systems" in paragraphs[0]["text"]
+    assert "normalization" in paragraphs[0]["text"]
+    assert 0 in paragraphs[0]["segment_indices"]
+    # Verify Hindi paragraph
+    hindi_para = next((p for p in paragraphs if "रिलेशनल" in p["text"]), None)
+    assert hindi_para is not None
+    assert hindi_para["end"] == 18.0
+
+    # 2. Test export utilities
+    txt_exp = export_transcript_text(raw_segments)
+    assert "Welcome to Database Systems" in txt_exp
+    srt_exp = export_transcript_srt(raw_segments)
+    assert "00:00:00,000 --> 00:00:02,500" in srt_exp
+    vtt_exp = export_transcript_vtt(raw_segments)
+    assert "WEBVTT" in vtt_exp
+    assert "00:00:00.000 --> 00:00:02.500" in vtt_exp
+
+    # 3. Setup users & course via API
+    # Login Admin
+    a_res = await client.post("/api/auth/login", json={"email": "admin@lecturelens.edu", "password": "AdminPass123!"})
+    a_token = a_res.json()["access_token"]
+    a_headers = {"Authorization": f"Bearer {a_token}"}
+
+    # Login Teacher
+    t_res = await client.post("/api/auth/login", json={"email": "teacher@lecturelens.edu", "password": "TeacherPass123!"})
+    t_token = t_res.json()["access_token"]
+    t_headers = {"Authorization": f"Bearer {t_token}"}
+
+    # Register & Login Student
+    await client.post(
+        "/api/auth/register",
+        json={
+            "name": "Transcript Student",
+            "email": "transcript_student@lecturelens.edu",
+            "password": "StudentPass123!",
+            "role": "student",
+        },
+    )
+    s_res = await client.post(
+        "/api/auth/login",
+        json={"email": "transcript_student@lecturelens.edu", "password": "StudentPass123!"},
+    )
+    s_token = s_res.json()["access_token"]
+    s_headers = {"Authorization": f"Bearer {s_token}"}
+
+    # Create Course
+    c_res = await client.post(
+        "/api/courses",
+        json={"title": "Relational Databases CS401", "description": "SQL and RDBMS fundamentals", "code": "DBMS401"},
+        headers=t_headers,
+    )
+    assert c_res.status_code == 200
+    course_id = c_res.json()["id"]
+
+    # 4. Course Technical Glossary API
+    glossary_terms = ["PostgreSQL", "DDL", "DML", "Normalization", "Primary Key", "Foreign Key"]
+    put_gloss = await client.put(
+        f"/api/courses/{course_id}/glossary",
+        json={"glossary": glossary_terms},
+        headers=t_headers,
+    )
+    assert put_gloss.status_code == 200
+    assert put_gloss.json()["count"] == len(glossary_terms)
+
+    get_gloss = await client.get(f"/api/courses/{course_id}/glossary", headers=t_headers)
+    assert get_gloss.status_code == 200
+    assert "PostgreSQL" in get_gloss.json()["glossary"]
+    assert "Normalization" in get_gloss.json()["glossary"]
+
+    # 5. Seed a lecture directly in DB with AI-generated segments
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    lecture_doc = {
+        "title": "Introduction to SQL Queries",
+        "description": "Lecture covering basic DDL and DML operations.",
+        "course_id": course_id,
+        "teacher_id": str(t_res.json()["user"]["id"]),
+        "status": "review_required",
+        "transcript_status": "ai_generated",
+        "is_published": False,
+        "segments": [
+            {
+                "start": 0.0,
+                "end": 4.5,
+                "text": "Selct all colums from table employe.",  # Intentional Whisper typo
+                "original_text": "Selct all colums from table employe.",
+                "speaker": "Speaker 1",
+                "is_edited": False,
+            },
+            {
+                "start": 4.6,
+                "end": 9.0,
+                "text": "Where salry is grater than fifty thousand.",
+                "original_text": "Where salry is grater than fifty thousand.",
+                "speaker": "Speaker 1",
+                "is_edited": False,
+            },
+        ],
+        "created_at": now_iso,
+        "updated_at": now_iso,
+    }
+    ins_res = await db.lectures.insert_one(lecture_doc)
+    lecture_id = str(ins_res.inserted_id)
+
+    # 6. Verify Student RBAC: Student cannot access unapproved transcript
+    student_get = await client.get(f"/api/lectures/{lecture_id}/transcript", headers=s_headers)
+    assert student_get.status_code == 403
+    assert "pending instructor review" in student_get.json()["detail"].lower()
+
+    # 7. Teacher retrieves transcript with paragraph grouping
+    teacher_get = await client.get(f"/api/lectures/{lecture_id}/transcript", headers=t_headers)
+    assert teacher_get.status_code == 200
+    t_data = teacher_get.json()
+    assert t_data["transcript_status"] == "ai_generated"
+    assert len(t_data["segments"]) == 2
+    assert len(t_data["paragraphs"]) >= 1
+
+    # 8. Teacher edits segment 0: corrects typos
+    # CRITICAL REQUIREMENT: original_text must NOT be overwritten!
+    patch_res = await client.patch(
+        f"/api/lectures/{lecture_id}/transcript",
+        json={
+            "segment_index": 0,
+            "text": "SELECT all columns FROM table employees.",
+            "start": 0.0,
+            "end": 4.5,
+        },
+        headers=t_headers,
+    )
+    assert patch_res.status_code == 200
+    patch_data = patch_res.json()
+    assert patch_data["segment"]["text"] == "SELECT all columns FROM table employees."
+    # Original AI text preserved
+    assert patch_data["segment"]["original_text"] == "Selct all colums from table employe."
+    assert patch_data["segment"]["is_edited"] is True
+    assert patch_data["segment"]["corrected_by"] == str(t_res.json()["user"]["id"])
+
+    # 9. Teacher batch corrects segment 1
+    batch_res = await client.post(
+        f"/api/lectures/{lecture_id}/transcript/batch-correct",
+        json={
+            "updates": [
+                {
+                    "segment_index": 1,
+                    "text": "WHERE salary is greater than fifty thousand.",
+                }
+            ]
+        },
+        headers=t_headers,
+    )
+    assert batch_res.status_code == 200
+    assert batch_res.json()["changes_count"] == 1
+
+    # Verify both segments persisted in transcript
+    updated_t = await client.get(f"/api/lectures/{lecture_id}/transcript", headers=t_headers)
+    assert updated_t.status_code == 200
+    u_segs = updated_t.json()["segments"]
+    assert u_segs[0]["text"] == "SELECT all columns FROM table employees."
+    assert u_segs[0]["original_text"] == "Selct all colums from table employe."
+    assert u_segs[1]["text"] == "WHERE salary is greater than fifty thousand."
+    assert u_segs[1]["original_text"] == "Where salry is grater than fifty thousand."
+
+    # 10. Teacher rejects transcript first (e.g. asking for re-review)
+    reject_res = await client.post(
+        f"/api/lectures/{lecture_id}/transcript/reject",
+        json={"rejection_reason": "Inaudible background noise in latter half."},
+        headers=t_headers,
+    )
+    assert reject_res.status_code == 200
+    assert reject_res.json()["transcript_status"] == "rejected"
+    assert reject_res.json()["rejection_reason"] == "Inaudible background noise in latter half."
+
+    # 11. Teacher approves and publishes transcript
+    approve_res = await client.post(
+        f"/api/lectures/{lecture_id}/transcript/approve",
+        json={"publish_immediately": True},
+        headers=t_headers,
+    )
+    assert approve_res.status_code == 200
+    assert approve_res.json()["transcript_status"] == "approved"
+    assert approve_res.json()["is_published"] is True
+
+    # 12. Student enrolls and accesses the approved, published transcript!
+    from bson import ObjectId
+    student_id = str(s_res.json()["user"]["id"])
+    await db.courses.update_one(
+        {"_id": ObjectId(course_id)},
+        {"$addToSet": {"student_ids": student_id}}
+    )
+
+    student_get_ok = await client.get(f"/api/lectures/{lecture_id}/transcript", headers=s_headers)
+    assert student_get_ok.status_code == 200
+    student_data = student_get_ok.json()
+    assert student_data["transcript_status"] == "approved"
+    assert student_data["segments"][0]["text"] == "SELECT all columns FROM table employees."
+    assert len(student_data["paragraphs"]) >= 1
+
+    # 13. Export transcript formats via API
+    for fmt in ["txt", "srt", "vtt", "json"]:
+        exp_res = await client.get(f"/api/lectures/{lecture_id}/transcript/export?format={fmt}", headers=t_headers)
+        assert exp_res.status_code == 200
+        if fmt == "vtt":
+            assert "WEBVTT" in exp_res.text
+        elif fmt == "srt":
+            assert "-->" in exp_res.text
+        elif fmt == "txt":
+            assert "SELECT all columns" in exp_res.text
+        elif fmt == "json":
+            assert "segments" in exp_res.json()
+
 
 
 

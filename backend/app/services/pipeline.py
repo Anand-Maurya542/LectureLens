@@ -4,7 +4,7 @@ import os
 from typing import Optional
 from bson import ObjectId
 from app.database import get_db
-from app.services.transcription import transcribe_file
+from app.services.transcription import transcribe_file, group_segments_into_paragraphs
 from app.services.segmentation import segment_topics
 from app.services.summarization import generate_lecture_summaries
 from app.services.quiz_generation import save_draft_quizzes
@@ -52,12 +52,33 @@ async def run_lecture_processing_pipeline(
         detected_prob = 1.0
         duration = 0.0
 
+        # Fetch course-specific technical vocabulary/glossary to prime Faster-Whisper ASR
+        course_glossary = []
+        course_id = lec.get("course_id")
+        if course_id:
+            c_query = {"_id": ObjectId(course_id)} if ObjectId.is_valid(course_id) else {"_id": course_id}
+            course_doc = await db.courses.find_one(c_query)
+            if course_doc and course_doc.get("glossary"):
+                course_glossary = [str(term).strip() for term in course_doc["glossary"] if str(term).strip()]
+
+        initial_prompt = None
+        hotwords = None
+        if course_glossary:
+            initial_prompt = f"Technical terminology and course vocabulary: {', '.join(course_glossary)}."
+            hotwords = " ".join(course_glossary)
+            logger.info(f"Applying technical glossary to lecture {lecture_id} ({len(course_glossary)} terms): {hotwords[:60]}...")
+
         if source_type == "upload":
             if not media_path or not os.path.exists(media_path):
                 raise FileNotFoundError(f"Media file not found at: {media_path}")
             
-            # Execute Faster-Whisper ASR
-            asr_res = transcribe_file(media_path, language=language_hint)
+            # Execute Faster-Whisper ASR with glossary priming and hallucination suppression
+            asr_res = transcribe_file(
+                media_path,
+                language=language_hint,
+                initial_prompt=initial_prompt,
+                hotwords=hotwords,
+            )
             segments = asr_res.get("segments", [])
             detected_language = asr_res.get("language", "en")
             detected_prob = asr_res.get("language_probability", 1.0)
@@ -78,6 +99,16 @@ async def run_lecture_processing_pipeline(
 
         if not segments:
             raise ValueError("No speech or text segments detected in the lecture source.")
+
+        # Ensure original_text is preserved on every segment
+        for idx, seg in enumerate(segments):
+            seg["segment_index"] = idx
+            if not seg.get("original_text"):
+                seg["original_text"] = seg.get("text", "")
+            seg["is_edited"] = seg.get("is_edited", False)
+
+        # Generate intelligent paragraphs combining consecutive sentences
+        paragraphs = group_segments_into_paragraphs(segments)
 
         # Persist transcript segments to dedicated collection
         await db.transcript_segments.delete_many({"lecture_id": lecture_id})
@@ -115,10 +146,12 @@ async def run_lecture_processing_pipeline(
         # 6. Update lecture to review_required
         update_payload = {
             "status": "review_required",
+            "transcript_status": "ai_generated",
             "language": detected_language,
             "language_probability": detected_prob,
             "duration": duration,
             "segments": segments,
+            "paragraphs": paragraphs,
             "topics": topics,
             "summaries": summaries,
             "failure_reason": None,
