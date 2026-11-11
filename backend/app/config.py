@@ -22,10 +22,10 @@ class Settings:
     )
     
     ALLOWED_ORIGINS: list[str] = [
-        origin.strip()
+        origin.strip().rstrip("/")
         for origin in os.getenv(
             "ALLOWED_ORIGINS",
-            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,https://lecture-lens-five.vercel.app,https://lecturelens-five.vercel.app",
         ).split(",")
         if origin.strip()
     ]

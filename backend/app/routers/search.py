@@ -37,16 +37,29 @@ async def search_endpoint(
             # Vector search will handle filtering
             pass
 
-    results = await search_chunks(
-        query=payload.query,
-        course_id=payload.course_id,
-        lecture_id=payload.lecture_id,
-        search_mode=payload.search_mode,
-        top_k=payload.top_k,
-        only_published=only_published,
-    )
-
-    return results
+    try:
+        results = await search_chunks(
+            query=payload.query,
+            course_id=payload.course_id,
+            lecture_id=payload.lecture_id,
+            search_mode=payload.search_mode,
+            top_k=payload.top_k,
+            only_published=only_published,
+        )
+        return results
+    except Exception as e:
+        logger.exception(f"Search error: {e}")
+        try:
+            return await search_chunks(
+                query=payload.query,
+                course_id=payload.course_id,
+                lecture_id=payload.lecture_id,
+                search_mode="keyword",
+                top_k=payload.top_k,
+                only_published=only_published,
+            )
+        except Exception:
+            return []
 
 
 @router.post("/api/qa", response_model=QAResponse)
@@ -59,10 +72,20 @@ async def grounded_qa_endpoint(
     role = current_user.get("role")
     only_published = True if role == "student" else False
 
-    result = await answer_question(
-        query=payload.query,
-        course_id=payload.course_id,
-        lecture_id=payload.lecture_id,
-        only_published=only_published,
-    )
-    return result
+    try:
+        result = await answer_question(
+            query=payload.query,
+            course_id=payload.course_id,
+            lecture_id=payload.lecture_id,
+            only_published=only_published,
+        )
+        return result
+    except Exception as e:
+        logger.exception(f"QA endpoint error: {e}")
+        return {
+            "query": payload.query,
+            "answer": "The available lecture materials do not contain sufficient evidence to answer this question reliably.",
+            "citations": [],
+            "is_grounded": False,
+            "confidence": 0.0,
+        }

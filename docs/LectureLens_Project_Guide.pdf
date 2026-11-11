@@ -1,0 +1,1280 @@
+%PDF-1.4
+1 0 obj
+<< /Length 5181 >>
+stream
+BT /F2 14 Tf 45 722.0 Td (LectureLens: Complete Comprehensive Project Guide & Viva Compendium) Tj ET
+BT /F3 8.5 Tf 45 698.0 Td (> **A Comprehensive Reference Guide for Students, Faculty Evaluators, Project Demonstrators,) Tj ET
+BT /F3 8.5 Tf 45 686.0 Td (and Viva Candidates**) Tj ET
+BT /F3 8.5 Tf 45 674.0 Td (> *Repository:* `LectureLens` | *Architecture:* React 19 Frontend + FastAPI Backend + MongoDB) Tj ET
+BT /F3 8.5 Tf 45 662.0 Td (Atlas Vector Search + Faster-Whisper ASR + Sentence-Transformers) Tj ET
+BT /F3 8.5 Tf 45 650.0 Td (> *Target Audience:* Beginners, Academic Evaluators, Final-Year Project Committees, System) Tj ET
+BT /F3 8.5 Tf 45 638.0 Td (Architects) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 620.0 m 567 620.0 l S
+BT /F2 11.5 Tf 45 598.0 Td (Table of Contents) Tj ET
+BT /F1 9.0 Tf 45 577.0 Td (1. [Project Introduction & Problem Statement]\(#1-project-introduction--problem-statement\)) Tj ET
+BT /F1 9.0 Tf 45 565.0 Td (2. [Complete End-to-End System Workflow]\(#2-complete-end-to-end-system-workflow\)) Tj ET
+BT /F1 9.0 Tf 45 553.0 Td (3. [User Roles & Access Control \(RBAC\)]\(#3-user-roles--access-control-rbac\)) Tj ET
+BT /F1 9.0 Tf 45 541.0 Td (4. [Core Functionalities & User Experience]\(#4-core-functionalities--user-experience\)) Tj ET
+BT /F1 9.0 Tf 45 529.0 Td (5. [System Architecture & Component Communication]\(#5-system-architecture--component-) Tj ET
+BT /F1 9.0 Tf 45 517.0 Td (communication\)) Tj ET
+BT /F1 9.0 Tf 45 505.0 Td (6. [Technology Stack & Dependency Reference]\(#6-technology-stack--dependency-reference\)) Tj ET
+BT /F1 9.0 Tf 45 493.0 Td (7. [AI & Machine Learning Engineering]\(#7-ai--machine-learning-engineering\)) Tj ET
+BT /F1 9.0 Tf 45 481.0 Td (8. [Database Architecture & MongoDB Design]\(#8-database-architecture--mongodb-design\)) Tj ET
+BT /F1 9.0 Tf 45 469.0 Td (9. [Evaluation Metrics & Academic Benchmarks]\(#9-evaluation-metrics--academic-benchmarks\)) Tj ET
+BT /F1 9.0 Tf 45 457.0 Td (10. [Installation, Environment Setup & Execution]\(#10-installation-environment-setup--) Tj ET
+BT /F1 9.0 Tf 45 445.0 Td (execution\)) Tj ET
+BT /F1 9.0 Tf 45 433.0 Td (11. [Deployment Architecture & Production Setup]\(#11-deployment-architecture--production-setup\)) Tj ET
+BT /F1 9.0 Tf 45 421.0 Td (12. [System Limitations & Future Roadmap]\(#12-system-limitations--future-roadmap\)) Tj ET
+BT /F1 9.0 Tf 45 409.0 Td (13. [Testing Checklist & Live Demonstration Sequence]\(#13-testing-checklist--live-) Tj ET
+BT /F1 9.0 Tf 45 397.0 Td (demonstration-sequence\)) Tj ET
+BT /F1 9.0 Tf 45 385.0 Td (14. [Viva Voce Technical FAQs & Defense Guide]\(#14-viva-voce-technical-faqs--defense-guide\)) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 367.0 m 567 367.0 l S
+BT /F2 11.5 Tf 45 345.0 Td (1. Project Introduction & Problem Statement) Tj ET
+BT /F2 10 Tf 45 320.0 Td (1.1 The Educational Problem) Tj ET
+BT /F1 9.0 Tf 45 307.0 Td (Higher education institutions and online learning platforms record hundreds of hours of) Tj ET
+BT /F1 9.0 Tf 45 295.0 Td (classroom lectures every semester. While video capture has become standard, the **student) Tj ET
+BT /F1 9.0 Tf 45 283.0 Td (learning experience with recorded lectures remains fundamentally broken**:) Tj ET
+BT /F1 9.0 Tf 45 265.0 Td (- **Linear, Opaque Media**: Video recordings are opaque blobs of time. Finding where an) Tj ET
+BT /F1 9.0 Tf 45 253.0 Td (instructor explained a specific formula, code snippet, or theoretical distinction requires) Tj ET
+BT /F1 9.0 Tf 45 241.0 Td (manual, frustrating scrubbing through hours of video.) Tj ET
+BT /F1 9.0 Tf 45 229.0 Td (- **Code-Mixed & Bilingual Delivery**: In university environments globally \(and particularly in) Tj ET
+BT /F1 9.0 Tf 45 217.0 Td (India\), instructors naturally teach using bilingual code-mixed speech \(e.g., Hinglish -- mixing) Tj ET
+BT /F1 9.0 Tf 45 205.0 Td (English technical terminology with Hindi explanations\). Generic transcription tools fail) Tj ET
+BT /F1 9.0 Tf 45 193.0 Td (drastically on this terminology.) Tj ET
+BT /F1 9.0 Tf 45 181.0 Td (- **Cognitive Overload**: Students reviewing a 60-to-90-minute lecture before exams struggle to) Tj ET
+BT /F1 9.0 Tf 45 169.0 Td (extract concise key takeaways or identify the logical topic boundaries within continuous) Tj ET
+BT /F1 9.0 Tf 45 157.0 Td (speech.) Tj ET
+BT /F1 9.0 Tf 45 145.0 Td (- **Unverified AI Hallucinations**: Standard Generative AI chatbots \(like ChatGPT\) lack) Tj ET
+BT /F1 9.0 Tf 45 133.0 Td (grounding in the specific course lectures. When students ask conceptual questions, generic LLMs) Tj ET
+BT /F1 9.0 Tf 45 121.0 Td (frequently hallucinate facts or contradict the instructor's specific curriculum notation.) Tj ET
+BT /F1 9.0 Tf 45 109.0 Td (- **Lack of Targeted Remediation**: When students perform poorly on assessments, existing) Tj ET
+BT /F1 9.0 Tf 45 97.0 Td (Learning Management Systems \(LMS\) provide raw numerical scores but fail to direct students to) Tj ET
+BT /F1 9.0 Tf 45 85.0 Td (the exact seconds in lecture recordings where the missing concept was taught.) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 1 of 20) Tj ET
+endstream
+endobj
+2 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 1 0 R >>
+endobj
+3 0 obj
+<< /Length 5003 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F2 10 Tf 45 726.0 Td (1.2 What LectureLens Is) Tj ET
+BT /F1 9.0 Tf 45 713.0 Td (**LectureLens** is an open-source, intelligent, AI-powered lecture transcription, semantic) Tj ET
+BT /F1 9.0 Tf 45 701.0 Td (search, and personalized revision platform. It bridges speech processing, dense multilingual) Tj ET
+BT /F1 9.0 Tf 45 689.0 Td (vector embeddings, document database architecture, and human-in-the-loop education governance.) Tj ET
+BT /F4 8 Tf 45 671.0 Td (       Spoken Lecture Audio / Video / YouTube) Tj ET
+BT /F4 8 Tf 45 660.5 Td (                         |) Tj ET
+BT /F4 8 Tf 45 650.0 Td (                         v) Tj ET
+BT /F4 8 Tf 45 639.5 Td (        Faster-Whisper Speech Recognition) Tj ET
+BT /F4 8 Tf 45 629.0 Td (        \(Bilingual en/hi + Technical Glossary\)) Tj ET
+BT /F4 8 Tf 45 618.5 Td (                         |) Tj ET
+BT /F4 8 Tf 45 608.0 Td (                         v) Tj ET
+BT /F4 8 Tf 45 597.5 Td (        Multilingual Thematic Segmentation) Tj ET
+BT /F4 8 Tf 45 587.0 Td (        \(Sentence-Transformers Cosine Clustering\)) Tj ET
+BT /F4 8 Tf 45 576.5 Td (                         |) Tj ET
+BT /F4 8 Tf 45 566.0 Td (                         v) Tj ET
+BT /F4 8 Tf 45 555.5 Td (       MongoDB Atlas Hybrid Vector Search & RAG) Tj ET
+BT /F4 8 Tf 45 545.0 Td (        \(Timestamped Citations & Honest Cutoff\)) Tj ET
+BT /F4 8 Tf 45 534.5 Td (                         |) Tj ET
+BT /F4 8 Tf 45 524.0 Td (                         v) Tj ET
+BT /F4 8 Tf 45 513.5 Td (        Instructor Review & Assessment Gate) Tj ET
+BT /F4 8 Tf 45 503.0 Td (                         |) Tj ET
+BT /F4 8 Tf 45 492.5 Td (                         v) Tj ET
+BT /F4 8 Tf 45 482.0 Td (    Student Synchronized Video Player & Smart Revision) Tj ET
+BT /F2 10 Tf 45 461.5 Td (1.3 Core Project Objectives) Tj ET
+BT /F1 9.0 Tf 45 448.5 Td (1. **Accurate Speech-to-Text**: Automatically transcribe university lectures using Faster-) Tj ET
+BT /F1 9.0 Tf 45 436.5 Td (Whisper \(`small` or `base` model with `int8` CPU quantization\) while detecting transcription) Tj ET
+BT /F1 9.0 Tf 45 424.5 Td (uncertainty \(`avg_logprob`\) and supporting bilingual code-mixed delivery.) Tj ET
+BT /F1 9.0 Tf 45 412.5 Td (2. **Semantic Thematic Structuring**: Divide continuous spoken transcripts into logical, bite-) Tj ET
+BT /F1 9.0 Tf 45 400.5 Td (sized topics using multilingual transformer sentence embeddings rather than arbitrary fixed) Tj ET
+BT /F1 9.0 Tf 45 388.5 Td (time windows.) Tj ET
+BT /F1 9.0 Tf 45 376.5 Td (3. **Conceptual Vector Search**: Ingest transcript chunks into **MongoDB Atlas Vector Search**,) Tj ET
+BT /F1 9.0 Tf 45 364.5 Td (enabling students to search by concept or synonym rather than exact keywords alone.) Tj ET
+BT /F1 9.0 Tf 45 352.5 Td (4. **Evidence-Grounded Question Answering \(RAG\)**: Provide an AI learning assistant that) Tj ET
+BT /F1 9.0 Tf 45 340.5 Td (answers student queries strictly using lecture evidence, deep-links directly to the exact video) Tj ET
+BT /F1 9.0 Tf 45 328.5 Td (timestamp proof, and honestly abstains when material is absent.) Tj ET
+BT /F1 9.0 Tf 45 316.5 Td (5. **Responsible Human-in-the-Loop Governance**: Provide an Instructor Review Studio where) Tj ET
+BT /F1 9.0 Tf 45 304.5 Td (educators verify and edit transcripts, correct topic titles, and approve auto-generated quiz) Tj ET
+BT /F1 9.0 Tf 45 292.5 Td (questions before students can access them.) Tj ET
+BT /F1 9.0 Tf 45 280.5 Td (6. **Data-Driven Smart Revision**: Diagnose student misconceptions from quiz submissions and) Tj ET
+BT /F1 9.0 Tf 45 268.5 Td (automatically map weak topics back to the exact video timestamps needed for revision.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 250.5 m 567 250.5 l S
+BT /F2 11.5 Tf 45 228.5 Td (2. Complete End-to-End System Workflow) Tj ET
+BT /F1 9.0 Tf 45 207.5 Td (The LectureLens platform operates as a cohesive lifecycle spanning lecture ingestion, AI) Tj ET
+BT /F1 9.0 Tf 45 195.5 Td (processing, instructor moderation, student exploration, and assessment-driven revision.) Tj ET
+BT /F2 10 Tf 45 167.5 Td (Detailed Workflow Stages) Tj ET
+BT /F1 9.0 Tf 45 148.5 Td (1. **Ingestion Stage**:) Tj ET
+BT /F1 9.0 Tf 45 136.5 Td (   - Instructors upload video/audio files \(`.mp4`, `.mp3`, `.wav`, `.m4a`\) or provide public) Tj ET
+BT /F1 9.0 Tf 45 124.5 Td (YouTube URLs.) Tj ET
+BT /F1 9.0 Tf 45 112.5 Td (   - For YouTube links, the backend validates video accessibility and retrieves metadata via) Tj ET
+BT /F1 9.0 Tf 45 100.5 Td (official YouTube caption APIs or embedded players.) Tj ET
+BT /F1 9.0 Tf 45 88.5 Td (   - For file uploads, FFmpeg strips audio channels, resamples to 16 kHz mono PCM, and prepares) Tj ET
+BT /F1 9.0 Tf 45 76.5 Td (audio buffers.) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 2 of 20) Tj ET
+endstream
+endobj
+4 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 3 0 R >>
+endobj
+5 0 obj
+<< /Length 5521 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (2. **Transcription & Vocabulary Conditioning**:) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (   - Audio is processed through `Faster-Whisper` with domain glossary prompt conditioning) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (\(e.g., SQL terms: `DDL`, `DML`, `PRIMARY KEY`, `VARCHAR`; Machine Learning terms:) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (`Backpropagation`, `Attention`, `Eigenvalues`\).) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (   - Granular segments are generated with start/end timestamps, acoustic confidence) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (\(`avg_logprob`\), and punctuation/paragraph grouping.) Tj ET
+BT /F1 9.0 Tf 45 652.0 Td (3. **Thematic Segmentation & Summarization**:) Tj ET
+BT /F1 9.0 Tf 45 640.0 Td (   - Individual transcript segments are encoded into 384-dimensional dense vectors using) Tj ET
+BT /F1 9.0 Tf 45 628.0 Td (`paraphrase-multilingual-MiniLM-L12-v2`.) Tj ET
+BT /F1 9.0 Tf 45 616.0 Td (   - Cosine similarity is computed between adjacent segment embeddings. When semantic) Tj ET
+BT /F1 9.0 Tf 45 604.0 Td (similarity drops below a tuned threshold \(\\theta = 0.45\) after a minimum group size, a topic) Tj ET
+BT /F1 9.0 Tf 45 592.0 Td (boundary is established.) Tj ET
+BT /F1 9.0 Tf 45 580.0 Td (   - For each topic cluster, extractive summaries and key learning points are computed via) Tj ET
+BT /F1 9.0 Tf 45 568.0 Td (topic centroid distance ranking.) Tj ET
+BT /F1 9.0 Tf 45 550.0 Td (4. **Atlas Vector Chunking & Indexing**:) Tj ET
+BT /F1 9.0 Tf 45 538.0 Td (   - Transcripts are grouped into overlapping windows of 2 to 3 consecutive segments \(~80 - 180) Tj ET
+BT /F1 9.0 Tf 45 526.0 Td (words\) within topic boundaries.) Tj ET
+BT /F1 9.0 Tf 45 514.0 Td (   - Vectors are indexed into the `lecture_chunks` collection with course and publication) Tj ET
+BT /F1 9.0 Tf 45 502.0 Td (metadata filters.) Tj ET
+BT /F1 9.0 Tf 45 484.0 Td (5. **Human-in-the-Loop Review Gate**:) Tj ET
+BT /F1 9.0 Tf 45 472.0 Td (   - Newly processed lectures enter `review_required` state with `is_published=False`.) Tj ET
+BT /F1 9.0 Tf 45 460.0 Td (   - The instructor opens the **Lecture Review Studio** to review confidence-coded segments) Tj ET
+BT /F1 9.0 Tf 45 448.0 Td (\(green = high confidence, amber = moderate, red = review suggested\), edit misrecognized) Tj ET
+BT /F1 9.0 Tf 45 436.0 Td (technical terms, refine topic names, and review auto-generated draft quizzes.) Tj ET
+BT /F1 9.0 Tf 45 424.0 Td (   - Once verified, the instructor clicks **Publish Lecture**, making it visible to enrolled) Tj ET
+BT /F1 9.0 Tf 45 412.0 Td (students and activating its vector search index.) Tj ET
+BT /F1 9.0 Tf 45 394.0 Td (6. **Interactive Student Learning & Grounded Q&A**:) Tj ET
+BT /F1 9.0 Tf 45 382.0 Td (   - Students stream the lecture video with a synchronized, interactive transcript. Clicking) Tj ET
+BT /F1 9.0 Tf 45 370.0 Td (any paragraph seeks the video player to that exact second.) Tj ET
+BT /F1 9.0 Tf 45 358.0 Td (   - Students use **Atlas Search & Q&A** to ask conceptual questions. The system embeds the) Tj ET
+BT /F1 9.0 Tf 45 346.0 Td (question, queries `vectorSearch`, synthesizes an answer from top matching chunks, and adds) Tj ET
+BT /F1 9.0 Tf 45 334.0 Td (clickable video citation pills. If relevance falls below threshold \(< 0.30\), it abstains) Tj ET
+BT /F1 9.0 Tf 45 322.0 Td (honestly.) Tj ET
+BT /F1 9.0 Tf 45 304.0 Td (7. **Assessment & Personalized Revision**:) Tj ET
+BT /F1 9.0 Tf 45 292.0 Td (   - Students attempt multiple-choice quizzes linked to specific topics.) Tj ET
+BT /F1 9.0 Tf 45 280.0 Td (   - The backend records question-level scores in `quiz_attempts`. Topics with an error rate >) Tj ET
+BT /F1 9.0 Tf 45 268.0 Td (33\\% are diagnosed as weak topics.) Tj ET
+BT /F1 9.0 Tf 45 256.0 Td (   - The **Smart Revision Dashboard** creates an individualized study agenda, linking each) Tj ET
+BT /F1 9.0 Tf 45 244.0 Td (struggling topic directly to the video timestamp where it was explained.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 226.0 m 567 226.0 l S
+BT /F2 11.5 Tf 45 204.0 Td (3. User Roles & Access Control \(RBAC\)) Tj ET
+BT /F1 9.0 Tf 45 183.0 Td (LectureLens enforces strict Role-Based Access Control across three distinct user roles:) Tj ET
+BT /F1 9.0 Tf 45 165.0 Td (| Capability | Administrator \(`admin`\) | Instructor \(`teacher`\) | Student \(`student`\) |) Tj ET
+BT /F1 9.0 Tf 45 153.0 Td (| :--- | :---: | :---: | :---: |) Tj ET
+BT /F1 9.0 Tf 45 141.0 Td (| **System Governance & Health Telemetry** | Full Access | No Access | No Access |) Tj ET
+BT /F1 9.0 Tf 45 129.0 Td (| **Manual Teacher Account Creation** | Full Access | No Access | No Access |) Tj ET
+BT /F1 9.0 Tf 45 117.0 Td (| **Teacher Application Review & Approval** | Full Access | No Access | No Access |) Tj ET
+BT /F1 9.0 Tf 45 105.0 Td (| **Course Catalog Management** | Create / Edit All | Create Owned | View Enrolled |) Tj ET
+BT /F1 9.0 Tf 45 93.0 Td (| **Student Enrollment Request Approval** | Full Access | View Roster | Request Enrollment |) Tj ET
+BT /F1 9.0 Tf 45 81.0 Td (| **Lecture Upload & Pipeline Ingestion** | Full Access | Owned Courses | No Access |) Tj ET
+BT /F1 9.0 Tf 45 69.0 Td (| **Transcript & Topic Boundary Editing** | Full Access | Owned Courses | No Access |) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 3 of 20) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 5296 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (| **Quiz Draft Generation & Approval** | Full Access | Owned Courses | No Access |) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (| **Interactive Video Playback & Synchronized Transcript** | Full Access | Full Access |) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (Enrolled Courses |) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (| **Atlas Vector Search & Grounded Q&A** | Full Access | Full Access | Enrolled Courses |) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (| **Quiz Taking & Score Tracking** | Full Access | Full Access | Enrolled Courses |) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (| **Personalized Smart Revision Dashboard** | Full Access | Full Access | Personal History |) Tj ET
+BT /F2 10 Tf 45 648.0 Td (3.1 Administrator Workflow) Tj ET
+BT /F1 9.0 Tf 45 635.0 Td (- **Teacher Account Creation**: Administrators can manually create verified teacher accounts) Tj ET
+BT /F1 9.0 Tf 45 623.0 Td (through a dedicated modal in the Admin Console, specifying full name, email, department,) Tj ET
+BT /F1 9.0 Tf 45 611.0 Td (institution, and pre-assigning active courses. This bypasses public registration queues and) Tj ET
+BT /F1 9.0 Tf 45 599.0 Td (generates an activation link.) Tj ET
+BT /F1 9.0 Tf 45 587.0 Td (- **Teacher Application Approval**: If prospective faculty submit onboarding applications,) Tj ET
+BT /F1 9.0 Tf 45 575.0 Td (administrators review credentials, verify institutional affiliations, and approve or reject) Tj ET
+BT /F1 9.0 Tf 45 563.0 Td (applications.) Tj ET
+BT /F1 9.0 Tf 45 551.0 Td (- **Course Enrollment Moderation**: Students requesting enrollment via course code or catalog) Tj ET
+BT /F1 9.0 Tf 45 539.0 Td (browsing are vetted and approved by administrators or instructors.) Tj ET
+BT /F1 9.0 Tf 45 527.0 Td (- **System Telemetry**: Live telemetry monitors MongoDB Atlas connectivity, collection document) Tj ET
+BT /F1 9.0 Tf 45 515.0 Td (counts, and inference hardware configurations.) Tj ET
+BT /F2 10 Tf 45 493.0 Td (3.2 Instructor \(Teacher\) Workflow) Tj ET
+BT /F1 9.0 Tf 45 480.0 Td (- **Course Studio**: Create new courses, define unique course codes \(e.g., `CS401`\), and set) Tj ET
+BT /F1 9.0 Tf 45 468.0 Td (course-specific technical glossaries.) Tj ET
+BT /F1 9.0 Tf 45 456.0 Td (- **Ingestion Queue**: Upload lecture media files or enter YouTube video links. Monitor) Tj ET
+BT /F1 9.0 Tf 45 444.0 Td (background transcription and segmentation progress.) Tj ET
+BT /F1 9.0 Tf 45 432.0 Td (- **Review Studio**: Inspect transcript segments color-coded by Whisper confidence. Edit text) Tj ET
+BT /F1 9.0 Tf 45 420.0 Td (inline, adjust topic split points, and approve auto-generated quiz questions.) Tj ET
+BT /F1 9.0 Tf 45 408.0 Td (- **Class Analytics**: View aggregated student performance distributions and topic-level error) Tj ET
+BT /F1 9.0 Tf 45 396.0 Td (rates to identify concepts the class struggled with.) Tj ET
+BT /F2 10 Tf 45 374.0 Td (3.3 Student Workflow) Tj ET
+BT /F1 9.0 Tf 45 361.0 Td (- **Course Workspace**: Browse available university courses or enroll directly using a course) Tj ET
+BT /F1 9.0 Tf 45 349.0 Td (code.) Tj ET
+BT /F1 9.0 Tf 45 337.0 Td (- **Synchronized Study**: Watch lectures with bidirectional video-transcript synchronization.) Tj ET
+BT /F1 9.0 Tf 45 325.0 Td (Click any sentence to jump the video. Search keywords within the transcript with live word) Tj ET
+BT /F1 9.0 Tf 45 313.0 Td (highlighting.) Tj ET
+BT /F1 9.0 Tf 45 301.0 Td (- **Conceptual Q&A**: Ask free-form questions and receive answers cited with exact video) Tj ET
+BT /F1 9.0 Tf 45 289.0 Td (timestamps.) Tj ET
+BT /F1 9.0 Tf 45 277.0 Td (- **Interactive Quizzes**: Take instructor-approved topic quizzes to test understanding.) Tj ET
+BT /F1 9.0 Tf 45 265.0 Td (- **Personalized Revision**: Follow automated revision recommendations that point directly back) Tj ET
+BT /F1 9.0 Tf 45 253.0 Td (to the video moments needing review.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 235.0 m 567 235.0 l S
+BT /F2 11.5 Tf 45 213.0 Td (4. Core Functionalities & User Experience) Tj ET
+BT /F2 10 Tf 45 188.0 Td (4.1 Ingestion & Normalization Engine) Tj ET
+BT /F1 9.0 Tf 45 175.0 Td (- **Universal Format Support**: Accepts `.mp4`, `.mp3`, `.wav`, `.m4a`, `.mov`, `.webm`,) Tj ET
+BT /F1 9.0 Tf 45 163.0 Td (`.ogg`, and `.flac`.) Tj ET
+BT /F1 9.0 Tf 45 151.0 Td (- **YouTube Ingestion**: Validates YouTube URLs, extracts canonical video IDs, retrieves) Tj ET
+BT /F1 9.0 Tf 45 139.0 Td (official captions when available, and prepares video embed URLs \(`youtube-nocookie.com`\)) Tj ET
+BT /F1 9.0 Tf 45 127.0 Td (configured with the JavaScript API for precise seeking.) Tj ET
+BT /F1 9.0 Tf 45 115.0 Td (- **Asynchronous Task Management**: Heavy AI processing runs in FastAPI `BackgroundTasks`,) Tj ET
+BT /F1 9.0 Tf 45 103.0 Td (keeping API endpoints non-blocking and returning an immediate `queued` status.) Tj ET
+BT /F2 10 Tf 45 81.0 Td (4.2 Interactive Lecture Review Studio) Tj ET
+BT /F1 9.0 Tf 45 68.0 Td (- **Confidence Visualization**: Every segment displays an `UncertaintyPill` derived from) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 4 of 20) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 5073 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (Whisper's `avg_logprob`:) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (  - **High Confidence** \(`avg_logprob` \\ge -0.35\): Solid green indicator.) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (  - **Moderate Confidence** \(-0.70 \\le \\logprob < -0.35\): Amber indicator.) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (  - **Review Suggested** \(`avg_logprob` < -0.70\): Red badge alerting the educator to possible) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (acoustic errors.) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (- **Inline Segment Editing**: Teachers can click and edit any segment text. Edits are saved) Tj ET
+BT /F1 9.0 Tf 45 658.0 Td (immediately to MongoDB, an audit log record is created with previous and new text diffs, and) Tj ET
+BT /F1 9.0 Tf 45 646.0 Td (corresponding vector chunks are re-indexed.) Tj ET
+BT /F1 9.0 Tf 45 634.0 Td (- **Paragraph & Typography Modes**: View transcripts as timestamped speech chunks or formatted,) Tj ET
+BT /F1 9.0 Tf 45 622.0 Td (flowing paragraphs grouped at natural sentence punctuation boundaries \(`.?!  `\).) Tj ET
+BT /F1 9.0 Tf 45 610.0 Td (- **Search & Word Highlighting**: In-transcript search field highlights matching keywords in) Tj ET
+BT /F1 9.0 Tf 45 598.0 Td (real-time.) Tj ET
+BT /F1 9.0 Tf 45 586.0 Td (- **Copy & Export**: One-click copying to clipboard or exporting as formatted text \(`.txt`\) and) Tj ET
+BT /F1 9.0 Tf 45 574.0 Td (subtitles \(`.srt`\).) Tj ET
+BT /F2 10 Tf 45 552.0 Td (4.3 Atlas Semantic Search & Grounded Q&A) Tj ET
+BT /F1 9.0 Tf 45 539.0 Td (- **Tri-Mode Search Engine**:) Tj ET
+BT /F1 9.0 Tf 45 527.0 Td (  1. *Vector Search*: Pure dense cosine similarity using 384-dimensional embeddings.) Tj ET
+BT /F1 9.0 Tf 45 515.0 Td (  2. *Keyword Search*: Exact token and regex matching across transcript text.) Tj ET
+BT /F1 9.0 Tf 45 503.0 Td (  3. *Hybrid Search*: Reciprocal Rank Fusion \(RRF\) combining vector and lexical rankings for) Tj ET
+BT /F1 9.0 Tf 45 491.0 Td (optimal precision.) Tj ET
+BT /F1 9.0 Tf 45 479.0 Td (- **Evidence-Grounded RAG**:) Tj ET
+BT /F1 9.0 Tf 45 467.0 Td (  - The Q&A engine retrieves the top-k most relevant lecture chunks.) Tj ET
+BT /F1 9.0 Tf 45 455.0 Td (  - If the top similarity score is below `0.30`, the system outputs:) Tj ET
+BT /F1 9.0 Tf 45 443.0 Td (    `"The available lecture materials do not contain sufficient evidence to answer this) Tj ET
+BT /F1 9.0 Tf 45 431.0 Td (question reliably."`) Tj ET
+BT /F1 9.0 Tf 45 419.0 Td (  - When evidence is sufficient, it synthesizes an answer and attaches clickable citation) Tj ET
+BT /F1 9.0 Tf 45 407.0 Td (badges:) Tj ET
+BT /F1 9.0 Tf 45 395.0 Td (    `[Lecture 4: Self-Attention | 04:12 - 05:30]`. Clicking the badge immediately loads and) Tj ET
+BT /F1 9.0 Tf 45 383.0 Td (seeks the player.) Tj ET
+BT /F2 10 Tf 45 361.0 Td (4.4 Assessment Engine & Teacher Review Gate) Tj ET
+BT /F1 9.0 Tf 45 348.0 Td (- **AI Question Synthesis**: The system extracts key propositions from topic clusters and) Tj ET
+BT /F1 9.0 Tf 45 336.0 Td (formats 4-option multiple-choice questions with plausible distractors, correct answers, and) Tj ET
+BT /F1 9.0 Tf 45 324.0 Td (timestamped explanations.) Tj ET
+BT /F1 9.0 Tf 45 312.0 Td (- **Mandatory Instructor Approval Gate**: Newly generated questions are saved with `is_approved) Tj ET
+BT /F1 9.0 Tf 45 300.0 Td (= False`. They are completely invisible to students until an instructor reviews and toggles) Tj ET
+BT /F1 9.0 Tf 45 288.0 Td (approval.) Tj ET
+BT /F1 9.0 Tf 45 276.0 Td (- **Instant Student Feedback**: When students submit quizzes, answers are scored instantly with) Tj ET
+BT /F1 9.0 Tf 45 264.0 Td (detailed explanations and deep links to relevant lecture moments.) Tj ET
+BT /F2 10 Tf 45 242.0 Td (4.5 Smart Personalized Revision Planner) Tj ET
+BT /F1 9.0 Tf 45 229.0 Td (- **Rule-Based Weakness Diagnostic**: Compares correct and incorrect answers across all) Tj ET
+BT /F1 9.0 Tf 45 217.0 Td (attempts grouped by topic.) Tj ET
+BT /F1 9.0 Tf 45 205.0 Td (- **Transparent Explanation**: Informs the student why a topic is flagged \(e.g., *"You scored) Tj ET
+BT /F1 9.0 Tf 45 193.0 Td (0/2 \(0%\) on Query-Key Dot Products"*\).) Tj ET
+BT /F1 9.0 Tf 45 181.0 Td (- **Targeted Action**: Provides a direct "Review Topic" button that opens the lecture player) Tj ET
+BT /F1 9.0 Tf 45 169.0 Td (and seeks to the exact start second of that topic.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 151.0 m 567 151.0 l S
+BT /F2 11.5 Tf 45 129.0 Td (5. System Architecture & Component Communication) Tj ET
+BT /F1 9.0 Tf 45 108.0 Td (LectureLens is structured as a modern decoupled client-server architecture with an asynchronous) Tj ET
+BT /F1 9.0 Tf 45 96.0 Td (backend API, dedicated AI service layer, and unified document-plus-vector database.) Tj ET
+BT /F2 10 Tf 45 74.0 Td (5.1 Architecture Diagram) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 5 of 20) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 5030 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F2 10 Tf 45 726.0 Td (5.2 Client-Server Communication Details) Tj ET
+BT /F1 9.0 Tf 45 713.0 Td (- **Protocol**: RESTful HTTP over TLS / JSON.) Tj ET
+BT /F1 9.0 Tf 45 701.0 Td (- **Authentication Flow**:) Tj ET
+BT /F1 9.0 Tf 45 689.0 Td (  1. Client sends user credentials to `POST /api/auth/login`.) Tj ET
+BT /F1 9.0 Tf 45 677.0 Td (  2. Backend validates bcrypt password hash and issues a signed JSON Web Token \(JWT\) with) Tj ET
+BT /F1 9.0 Tf 45 665.0 Td (standard claims \(`sub`, `role`, `exp`\).) Tj ET
+BT /F1 9.0 Tf 45 653.0 Td (  3. Client stores the token in `localStorage` and includes it in all subsequent requests via) Tj ET
+BT /F1 9.0 Tf 45 641.0 Td (HTTP header:) Tj ET
+BT /F1 9.0 Tf 45 629.0 Td (     `Authorization: Bearer <access_token>`.) Tj ET
+BT /F1 9.0 Tf 45 617.0 Td (  4. FastAPI `get_current_user` dependency intercepts requests, decodes the token, checks) Tj ET
+BT /F1 9.0 Tf 45 605.0 Td (account active status in MongoDB, and enforces role access rules.) Tj ET
+BT /F1 9.0 Tf 45 593.0 Td (- **Media Streaming Protocol**: Local lecture video and audio files are served via `GET) Tj ET
+BT /F1 9.0 Tf 45 581.0 Td (/api/media/{file_path` using **HTTP 206 Partial Content** range requests. This allows the) Tj ET
+BT /F1 9.0 Tf 45 569.0 Td (browser player to seek instantaneously to any point in the video without downloading the entire) Tj ET
+BT /F1 9.0 Tf 45 557.0 Td (file first.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 539.0 m 567 539.0 l S
+BT /F2 11.5 Tf 45 517.0 Td (6. Technology Stack & Dependency Reference) Tj ET
+BT /F1 9.0 Tf 45 496.0 Td (Every library and technology in the LectureLens repository was selected for specific) Tj ET
+BT /F1 9.0 Tf 45 484.0 Td (architectural and operational reasons:) Tj ET
+BT /F2 10 Tf 45 462.0 Td (6.1 Frontend Technologies \(Directory: `frontend/`\)) Tj ET
+BT /F1 9.0 Tf 45 443.0 Td (| Library / Tool | Version | Purpose in LectureLens |) Tj ET
+BT /F1 9.0 Tf 45 431.0 Td (| :--- | :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 419.0 Td (| **React** | `^19.2.0` | Core UI framework for component hierarchy, reactive state, and DOM) Tj ET
+BT /F1 9.0 Tf 45 407.0 Td (rendering. |) Tj ET
+BT /F1 9.0 Tf 45 395.0 Td (| **Vite** | `^8.3.0` | Ultra-fast build tool and local development server using ES modules. |) Tj ET
+BT /F1 9.0 Tf 45 383.0 Td (| **React Router** | `^7.13.0` | Client-side routing, protected routes, and role-based path) Tj ET
+BT /F1 9.0 Tf 45 371.0 Td (authorization \(`/admin`, `/teacher`, `/student`\). |) Tj ET
+BT /F1 9.0 Tf 45 359.0 Td (| **Lucide React** | `^1.16.0` | Clean, accessible vector icons for UI navigation and status) Tj ET
+BT /F1 9.0 Tf 45 347.0 Td (indicators. |) Tj ET
+BT /F1 9.0 Tf 45 335.0 Td (| **Tailwind CSS** | Standard | Utility-first CSS classes for responsive layouts, modals, and) Tj ET
+BT /F1 9.0 Tf 45 323.0 Td (design tokens. |) Tj ET
+BT /F2 10 Tf 45 301.0 Td (6.2 Backend Technologies \(Directory: `backend/`\)) Tj ET
+BT /F1 9.0 Tf 45 282.0 Td (| Library / Tool | Version | Purpose in LectureLens |) Tj ET
+BT /F1 9.0 Tf 45 270.0 Td (| :--- | :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 258.0 Td (| **FastAPI** | `^0.128.0` | High-performance asynchronous Python web framework providing) Tj ET
+BT /F1 9.0 Tf 45 246.0 Td (native async/await, OpenAPI generation, and dependency injection. |) Tj ET
+BT /F1 9.0 Tf 45 234.0 Td (| **Pydantic** | `^2.13.0` | Strict data validation, schema enforcement, and JSON serialization) Tj ET
+BT /F1 9.0 Tf 45 222.0 Td (for request/response bodies. |) Tj ET
+BT /F1 9.0 Tf 45 210.0 Td (| **Uvicorn** | `^0.39.0` | Lightning-fast ASGI production server running the FastAPI) Tj ET
+BT /F1 9.0 Tf 45 198.0 Td (application. |) Tj ET
+BT /F1 9.0 Tf 45 186.0 Td (| **Motor** | `^3.7.0` | Official asynchronous MongoDB driver for non-blocking database queries) Tj ET
+BT /F1 9.0 Tf 45 174.0 Td (with `asyncio`. |) Tj ET
+BT /F1 9.0 Tf 45 162.0 Td (| **PyMongo** | `^4.10.0` | Synchronous driver underlying Motor, providing BSON utilities and) Tj ET
+BT /F1 9.0 Tf 45 150.0 Td (Atlas connectivity. |) Tj ET
+BT /F1 9.0 Tf 45 138.0 Td (| **mongomock-motor** | `^0.0.35` | In-memory asynchronous MongoDB mock allowing local) Tj ET
+BT /F1 9.0 Tf 45 126.0 Td (execution and offline testing when external Atlas credentials are unavailable. |) Tj ET
+BT /F1 9.0 Tf 45 114.0 Td (| **PyJWT** | `^2.10.0` | Encodes and verifies HMAC-SHA256 JSON Web Tokens for authentication.) Tj ET
+BT /F1 9.0 Tf 45 102.0 Td (|) Tj ET
+BT /F1 9.0 Tf 45 90.0 Td (| **Bcrypt** | `^4.3.0` | Cryptographic password hashing with randomized salting to protect) Tj ET
+BT /F1 9.0 Tf 45 78.0 Td (stored credentials. |) Tj ET
+BT /F1 9.0 Tf 45 66.0 Td (| **HTTPX** | `^0.28.0` | Asynchronous HTTP client used for automated API integration tests. |) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 6 of 20) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 5238 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (| **Pytest & Pytest-Asyncio** | `^8.4.2` | Test runner and async plugin for executing the) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (15-test integration suite. |) Tj ET
+BT /F2 10 Tf 45 696.0 Td (6.3 AI, Speech & NLP Stack) Tj ET
+BT /F1 9.0 Tf 45 677.0 Td (| Library / Model | Purpose in LectureLens |) Tj ET
+BT /F1 9.0 Tf 45 665.0 Td (| :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 653.0 Td (| **Faster-Whisper** | Re-implementation of OpenAI's Whisper model using `CTranslate2`.) Tj ET
+BT /F1 9.0 Tf 45 641.0 Td (Achieves up to 4x faster speech-to-text inference with 8-bit integer quantization \(`int8`\) on) Tj ET
+BT /F1 9.0 Tf 45 629.0 Td (CPU, extracting word-level timestamps and confidence log-probabilities. |) Tj ET
+BT /F1 9.0 Tf 45 617.0 Td (| **Sentence-Transformers** | Framework for dense vector embeddings. Used to embed sentences) Tj ET
+BT /F1 9.0 Tf 45 605.0 Td (and transcript chunks for topic segmentation and Atlas vector search. |) Tj ET
+BT /F1 9.0 Tf 45 593.0 Td (| **`paraphrase-multilingual-MiniLM-L12-v2`** | 384-dimensional multilingual embedding model) Tj ET
+BT /F1 9.0 Tf 45 581.0 Td (supporting English, Hindi, and 50+ languages. Maps semantically similar sentences in English) Tj ET
+BT /F1 9.0 Tf 45 569.0 Td (and Hindi into proximate vector spaces. |) Tj ET
+BT /F1 9.0 Tf 45 557.0 Td (| **PyTorch** | Deep learning tensor computation framework powering Sentence-Transformers) Tj ET
+BT /F1 9.0 Tf 45 545.0 Td (inference. |) Tj ET
+BT /F1 9.0 Tf 45 533.0 Td (| **Scikit-Learn** | Used for cosine similarity computation and centroid ranking algorithms. |) Tj ET
+BT /F1 9.0 Tf 45 521.0 Td (| **FFmpeg** | System-level multimedia binary used to normalize audio sampling rates, extract) Tj ET
+BT /F1 9.0 Tf 45 509.0 Td (audio tracks from video files, and support video playback. |) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 491.0 m 567 491.0 l S
+BT /F2 11.5 Tf 45 469.0 Td (7. AI & Machine Learning Engineering) Tj ET
+BT /F2 10 Tf 45 444.0 Td (7.1 Speech Recognition Pipeline \(Faster-Whisper\)) Tj ET
+BT /F1 9.0 Tf 45 431.0 Td (- **Model Size & Quantization**: Default configuration uses `small` \(or `base`\) quantized to) Tj ET
+BT /F1 9.0 Tf 45 419.0 Td (`int8` on CPU. This avoids requiring high-end GPU hardware while maintaining transcription) Tj ET
+BT /F1 9.0 Tf 45 407.0 Td (fidelity.) Tj ET
+BT /F1 9.0 Tf 45 395.0 Td (- **Uncertainty Extraction**: For every segment, Whisper computes the average log-probability:) Tj ET
+BT /F1 9.0 Tf 45 383.0 Td (  \\avg\\_logprob = \\1{T \\sum_{t=1^T \\log P\(w_t \\mid w_{<t, X\)) Tj ET
+BT /F1 9.0 Tf 45 371.0 Td (  A value near 0.0 signifies high acoustic certainty, whereas values below -0.70 highlight) Tj ET
+BT /F1 9.0 Tf 45 359.0 Td (potential misrecognitions.) Tj ET
+BT /F1 9.0 Tf 45 347.0 Td (- **Domain Technical Glossary Conditioning**: Technical terms like *Backpropagation*,) Tj ET
+BT /F1 9.0 Tf 45 335.0 Td (*Eigenvalue*, *DDL*, and *VARCHAR* are injected into Whisper's initial decoding prompt. This) Tj ET
+BT /F1 9.0 Tf 45 323.0 Td (biases beam search decoding toward university domain vocabulary rather than generic) Tj ET
+BT /F1 9.0 Tf 45 311.0 Td (conversational phrases.) Tj ET
+BT /F1 9.0 Tf 45 299.0 Td (- **Intelligent Paragraph Formation**: Individual Whisper segments are often short \(2 - 4) Tj ET
+BT /F1 9.0 Tf 45 287.0 Td (seconds\). LectureLens combines consecutive sentences into coherent paragraphs using pause) Tj ET
+BT /F1 9.0 Tf 45 275.0 Td (boundaries \(> 1.2 seconds\) and punctuation detection \(`.?!  `\), preserving both start and end) Tj ET
+BT /F1 9.0 Tf 45 263.0 Td (timestamps.) Tj ET
+BT /F2 10 Tf 45 241.0 Td (7.2 Thematic Topic Segmentation) Tj ET
+BT /F1 9.0 Tf 45 228.0 Td (Instead of slicing video blindly every 5 minutes, LectureLens segments lectures along) Tj ET
+BT /F1 9.0 Tf 45 216.0 Td (**semantic boundaries**:) Tj ET
+BT /F4 8 Tf 45 198.0 Td (Segment 1: "Today we begin our study of database management systems." --+) Tj ET
+BT /F4 8 Tf 45 187.5 Td (Segment 2: "Relational databases organize information into tables."   --+- Topic 1: Relational) Tj ET
+BT /F4 8 Tf 45 177.0 Td (Concepts) Tj ET
+BT /F4 8 Tf 45 166.5 Td (Segment 3: "Each table contains rows representing distinct records."  --+  \(Cosine Similarity >) Tj ET
+BT /F4 8 Tf 45 156.0 Td (0.45\)) Tj ET
+BT /F4 8 Tf 45 145.5 Td (-----------------------------) Tj ET
+BT /F4 8 Tf 45 135.0 Td (Segment 4: "Now let's switch gears and look at SQL DDL syntax."        --+  Cosine Similarity Drops) Tj ET
+BT /F4 8 Tf 45 124.5 Td (to 0.28!) Tj ET
+BT /F4 8 Tf 45 114.0 Td (Segment 5: "The CREATE TABLE command establishes schema columns."      --+- Topic 2: SQL DDL) Tj ET
+BT /F4 8 Tf 45 103.5 Td (Statements) Tj ET
+BT /F4 8 Tf 45 93.0 Td (Segment 6: "You specify column names followed by data types."          --+  \(New Topic Created\)) Tj ET
+BT /F1 9.0 Tf 45 76.5 Td (1. **Embedding**: Each segment text s_i is mapped to unit-normalized embedding \\e_i \\in) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 7 of 20) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 4169 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (\\R^{384.) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (2. **Cosine Similarity**: \\sim\(\\e_{i-1, \\e_i\) = \\e_{i-1 \\cdot \\e_i.) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (3. **Thresholding**: When similarity drops below \\theta = 0.45 and the current section has at) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (least 3 segments, a new topic boundary is declared.) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (4. **Descriptive Naming**: Topic titles are generated from the initial core sentence of the) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (cluster, truncated cleanly at word boundaries.) Tj ET
+BT /F2 10 Tf 45 648.0 Td (7.3 Topic-Centroid Extractive Summarization) Tj ET
+BT /F1 9.0 Tf 45 635.0 Td (Rather than invoking unpredictable LLMs that can hallucinate details, the summarizer uses) Tj ET
+BT /F1 9.0 Tf 45 623.0 Td (**geometric centroid ranking**:) Tj ET
+BT /F1 9.0 Tf 45 611.0 Td (1. Compute the topic cluster centroid vector:) Tj ET
+BT /F1 9.0 Tf 45 599.0 Td (   \\C = \\1{M \\sum_{j=1^M \\e_j) Tj ET
+BT /F1 9.0 Tf 45 587.0 Td (2. Rank each segment in the topic by its cosine similarity to the centroid \\C.) Tj ET
+BT /F1 9.0 Tf 45 575.0 Td (3. Select the top-ranking sentences as the representative **Summary** and **Key Points**,) Tj ET
+BT /F1 9.0 Tf 45 563.0 Td (preserving exact references to the spoken audio.) Tj ET
+BT /F2 10 Tf 45 541.0 Td (7.4 MongoDB Atlas Vector Search Architecture) Tj ET
+BT /F1 9.0 Tf 45 528.0 Td (- **Chunking**: Transcripts are partitioned into overlapping windows of 2 to 3 consecutive) Tj ET
+BT /F1 9.0 Tf 45 516.0 Td (segments \(~80 - 180 words\) within topic boundaries.) Tj ET
+BT /F1 9.0 Tf 45 504.0 Td (- **Dense Embedding**: Each chunk is embedded with `paraphrase-multilingual-MiniLM-L12-v2` into) Tj ET
+BT /F1 9.0 Tf 45 492.0 Td (384 dimensions.) Tj ET
+BT /F1 9.0 Tf 45 480.0 Td (- **Atlas Index Definition**: An Atlas Search vector index named `vector_index` is defined on) Tj ET
+BT /F1 9.0 Tf 45 468.0 Td (`lecture_chunks`:) Tj ET
+BT /F1 9.0 Tf 45 456.0 Td (  ```json) Tj ET
+BT /F1 9.0 Tf 45 444.0 Td (  {) Tj ET
+BT /F1 9.0 Tf 45 432.0 Td (    "fields": [) Tj ET
+BT /F1 9.0 Tf 45 420.0 Td (      {) Tj ET
+BT /F1 9.0 Tf 45 408.0 Td (        "type": "vector",) Tj ET
+BT /F1 9.0 Tf 45 396.0 Td (        "path": "embedding",) Tj ET
+BT /F1 9.0 Tf 45 384.0 Td (        "numDimensions": 384,) Tj ET
+BT /F1 9.0 Tf 45 372.0 Td (        "similarity": "cosine") Tj ET
+BT /F1 9.0 Tf 45 360.0 Td (      ,) Tj ET
+BT /F1 9.0 Tf 45 348.0 Td (      { "type": "filter", "path": "course_id" ,) Tj ET
+BT /F1 9.0 Tf 45 336.0 Td (      { "type": "filter", "path": "lecture_id" ,) Tj ET
+BT /F1 9.0 Tf 45 324.0 Td (      { "type": "filter", "path": "is_published") Tj ET
+BT /F1 9.0 Tf 45 312.0 Td (    ]) Tj ET
+BT /F1 9.0 Tf 45 294.0 Td (  ```) Tj ET
+BT /F1 9.0 Tf 45 282.0 Td (- **Aggregation Pipeline Execution**:) Tj ET
+BT /F1 9.0 Tf 45 270.0 Td (  ```python) Tj ET
+BT /F1 9.0 Tf 45 258.0 Td (  pipeline = [) Tj ET
+BT /F1 9.0 Tf 45 246.0 Td (      {) Tj ET
+BT /F1 9.0 Tf 45 234.0 Td (          "vectorSearch": {) Tj ET
+BT /F1 9.0 Tf 45 222.0 Td (              "index": "vector_index",) Tj ET
+BT /F1 9.0 Tf 45 210.0 Td (              "path": "embedding",) Tj ET
+BT /F1 9.0 Tf 45 198.0 Td (              "queryVector": query_vector,) Tj ET
+BT /F1 9.0 Tf 45 186.0 Td (              "numCandidates": 50,) Tj ET
+BT /F1 9.0 Tf 45 174.0 Td (              "limit": 5,) Tj ET
+BT /F1 9.0 Tf 45 162.0 Td (              "filter": {) Tj ET
+BT /F1 9.0 Tf 45 150.0 Td (                  "course_id": target_course_id,) Tj ET
+BT /F1 9.0 Tf 45 138.0 Td (                  "is_published": True) Tj ET
+BT /F1 9.0 Tf 45 114.0 Td (      ,) Tj ET
+BT /F1 9.0 Tf 45 102.0 Td (      {) Tj ET
+BT /F1 9.0 Tf 45 90.0 Td (          "project": {) Tj ET
+BT /F1 9.0 Tf 45 78.0 Td (              "lecture_id": 1,) Tj ET
+BT /F1 9.0 Tf 45 66.0 Td (              "topic_title": 1,) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 8 of 20) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 4636 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (              "start": 1,) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (              "end": 1,) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (              "text": 1,) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (              "score": {"meta": "vectorSearchScore") Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (  ]) Tj ET
+BT /F1 9.0 Tf 45 658.0 Td (  ```) Tj ET
+BT /F2 10 Tf 45 636.0 Td (7.5 Retrieval-Augmented Generation \(RAG\) & Abstention Gate) Tj ET
+BT /F1 9.0 Tf 45 623.0 Td (1. Retrieve top matching chunks using `vectorSearch`.) Tj ET
+BT /F1 9.0 Tf 45 611.0 Td (2. **Abstention Cutoff Gate**:) Tj ET
+BT /F1 9.0 Tf 45 599.0 Td (   - If the top chunk score is < 0.30, the query is considered out-of-scope.) Tj ET
+BT /F1 9.0 Tf 45 587.0 Td (   - The system immediately returns an honest abstention response:) Tj ET
+BT /F1 9.0 Tf 45 575.0 Td (     `"The available lecture materials do not contain sufficient evidence to answer this) Tj ET
+BT /F1 9.0 Tf 45 563.0 Td (question reliably."`) Tj ET
+BT /F1 9.0 Tf 45 551.0 Td (3. **Grounded Synthesis**: If score \\ge 0.30, answers are synthesized directly from retrieved) Tj ET
+BT /F1 9.0 Tf 45 539.0 Td (passages.) Tj ET
+BT /F1 9.0 Tf 45 527.0 Td (4. **Clickable Citations**: Every answer includes metadata containing `lecture_id`,) Tj ET
+BT /F1 9.0 Tf 45 515.0 Td (`topic_title`, `start`, and `end`. Clicking a citation in the UI immediately plays the source) Tj ET
+BT /F1 9.0 Tf 45 503.0 Td (excerpt.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 485.0 m 567 485.0 l S
+BT /F2 11.5 Tf 45 463.0 Td (8. Database Design & MongoDB Collections) Tj ET
+BT /F1 9.0 Tf 45 442.0 Td (LectureLens stores all structured entities and vector embeddings in **MongoDB Atlas** across) Tj ET
+BT /F1 9.0 Tf 45 430.0 Td (**13 collections**.) Tj ET
+BT /F2 10 Tf 45 402.0 Td (Complete Collection Schemas & Indexing Strategy) Tj ET
+BT /F1 9.0 Tf 45 383.0 Td (#### 1. `users`) Tj ET
+BT /F1 9.0 Tf 45 371.0 Td (Stores user identity, role, and authentication credentials.) Tj ET
+BT /F1 9.0 Tf 45 359.0 Td (- **Fields**: `_id`, `name`, `email`, `password_hash`, `role` \(`admin` | `teacher` |) Tj ET
+BT /F1 9.0 Tf 45 347.0 Td (`student`\), `status` \(`active` | `pending` | `deactivated`\), `department`, `institution`,) Tj ET
+BT /F1 9.0 Tf 45 335.0 Td (`created_by_admin` \(boolean\), `created_at`, `updated_at`.) Tj ET
+BT /F1 9.0 Tf 45 323.0 Td (- **Indexes**: `email` \(Unique\), `role`, `status`.) Tj ET
+BT /F1 9.0 Tf 45 305.0 Td (#### 2. `courses`) Tj ET
+BT /F1 9.0 Tf 45 293.0 Td (Stores academic courses and instructor ownership.) Tj ET
+BT /F1 9.0 Tf 45 281.0 Td (- **Fields**: `_id`, `title`, `description`, `code` \(e.g., `CS401`\), `teacher_id`,) Tj ET
+BT /F1 9.0 Tf 45 269.0 Td (`teacher_ids` \(array\), `student_ids` \(array\), `glossary` \(array of technical terms\), `status`) Tj ET
+BT /F1 9.0 Tf 45 257.0 Td (\(`active` | `archived`\), `created_at`.) Tj ET
+BT /F1 9.0 Tf 45 245.0 Td (- **Indexes**: `code` \(Unique\), `teacher_id`, `teacher_ids`, `student_ids`, `status`.) Tj ET
+BT /F1 9.0 Tf 45 227.0 Td (#### 3. `course_enrollments`) Tj ET
+BT /F1 9.0 Tf 45 215.0 Td (Tracks student enrollment requests and approval states.) Tj ET
+BT /F1 9.0 Tf 45 203.0 Td (- **Fields**: `_id`, `course_id`, `user_id`, `student_name`, `student_email`, `status`) Tj ET
+BT /F1 9.0 Tf 45 191.0 Td (\(`approved` | `pending` | `rejected`\), `requested_at`, `approved_at`, `approved_by`.) Tj ET
+BT /F1 9.0 Tf 45 179.0 Td (- **Indexes**: Compound `[\("course_id", 1\), \("user_id", 1\)]` \(Unique\), `status`, `user_id`,) Tj ET
+BT /F1 9.0 Tf 45 167.0 Td (`course_id`.) Tj ET
+BT /F1 9.0 Tf 45 149.0 Td (#### 4. `lectures`) Tj ET
+BT /F1 9.0 Tf 45 137.0 Td (Stores lecture metadata, media paths, processing states, and publication flags.) Tj ET
+BT /F1 9.0 Tf 45 125.0 Td (- **Fields**: `_id`, `title`, `description`, `course_id`, `teacher_id`, `source_type` \(`file` |) Tj ET
+BT /F1 9.0 Tf 45 113.0 Td (`youtube`\), `media_url`, `youtube_url`, `status` \(`queued` | `processing` | `review_required` |) Tj ET
+BT /F1 9.0 Tf 45 101.0 Td (`published` | `failed`\), `is_published` \(boolean\), `duration`, `language`,) Tj ET
+BT /F1 9.0 Tf 45 89.0 Td (`language_probability`, `segments` \(embedded array\), `topics` \(embedded array\), `created_at`.) Tj ET
+BT /F1 9.0 Tf 45 77.0 Td (- **Indexes**: `course_id`, `teacher_id`, `status`, `is_published`.) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 9 of 20) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 17 0 R >>
+endobj
+19 0 obj
+<< /Length 4972 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (#### 5. `transcript_segments`) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (Stores individual spoken segments with acoustic confidence.) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (- **Fields**: `_id`, `lecture_id`, `segment_index`, `start`, `end`, `text`, `avg_logprob`,) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (`no_speech_prob`, `compression_ratio`, `is_edited`, `original_text`.) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (- **Indexes**: Compound `[\("lecture_id", 1\), \("segment_index", 1\)]`.) Tj ET
+BT /F1 9.0 Tf 45 664.0 Td (#### 6. `topics`) Tj ET
+BT /F1 9.0 Tf 45 652.0 Td (Stores semantic boundaries derived from sentence-transformer clustering.) Tj ET
+BT /F1 9.0 Tf 45 640.0 Td (- **Fields**: `_id`, `lecture_id`, `topic_index`, `title`, `start`, `end`, `segment_count`,) Tj ET
+BT /F1 9.0 Tf 45 628.0 Td (`is_edited`.) Tj ET
+BT /F1 9.0 Tf 45 616.0 Td (- **Indexes**: Compound `[\("lecture_id", 1\), \("topic_index", 1\)]`.) Tj ET
+BT /F1 9.0 Tf 45 598.0 Td (#### 7. `summaries`) Tj ET
+BT /F1 9.0 Tf 45 586.0 Td (Stores centroid-based extractive summaries.) Tj ET
+BT /F1 9.0 Tf 45 574.0 Td (- **Fields**: `_id`, `lecture_id`, `topic_id`, `summary_type` \(`extractive`\), `summary_text`,) Tj ET
+BT /F1 9.0 Tf 45 562.0 Td (`key_points` \(array\), `is_approved`.) Tj ET
+BT /F1 9.0 Tf 45 550.0 Td (- **Indexes**: `lecture_id`.) Tj ET
+BT /F1 9.0 Tf 45 532.0 Td (#### 8. `lecture_chunks` \(Atlas Vector Search Storage\)) Tj ET
+BT /F1 9.0 Tf 45 520.0 Td (Stores context windows with 384-dimensional dense embeddings for semantic search.) Tj ET
+BT /F1 9.0 Tf 45 508.0 Td (- **Fields**: `_id`, `lecture_id`, `course_id`, `topic_id`, `topic_title`, `chunk_index`,) Tj ET
+BT /F1 9.0 Tf 45 496.0 Td (`start`, `end`, `text`, `embedding_model`, `embedding_dim` \(384\), `embedding` \(array of 384) Tj ET
+BT /F1 9.0 Tf 45 484.0 Td (floats\), `is_published`.) Tj ET
+BT /F1 9.0 Tf 45 472.0 Td (- **Indexes**: Compound `[\("lecture_id", 1\), \("chunk_index", 1\)]`, `course_id`, `is_published`.) Tj ET
+BT /F1 9.0 Tf 45 460.0 Td (*Atlas Search Index:* `vector_index` \(Cosine\).) Tj ET
+BT /F1 9.0 Tf 45 442.0 Td (#### 9. `quizzes`) Tj ET
+BT /F1 9.0 Tf 45 430.0 Td (Stores multiple-choice questions generated from topics.) Tj ET
+BT /F1 9.0 Tf 45 418.0 Td (- **Fields**: `_id`, `lecture_id`, `topic_id`, `question_type` \(`mcq`\), `question`, `options`) Tj ET
+BT /F1 9.0 Tf 45 406.0 Td (\(array of 4 strings\), `correct_answer`, `explanation`, `difficulty`, `is_approved` \(boolean,) Tj ET
+BT /F1 9.0 Tf 45 394.0 Td (defaults to `False`\).) Tj ET
+BT /F1 9.0 Tf 45 382.0 Td (- **Indexes**: `lecture_id`, `is_approved`.) Tj ET
+BT /F1 9.0 Tf 45 364.0 Td (#### 10. `quiz_attempts`) Tj ET
+BT /F1 9.0 Tf 45 352.0 Td (Records student test submissions, scores, and weak topics.) Tj ET
+BT /F1 9.0 Tf 45 340.0 Td (- **Fields**: `_id`, `student_id`, `student_name`, `lecture_id`, `score`, `percentage`,) Tj ET
+BT /F1 9.0 Tf 45 328.0 Td (`total_questions`, `correct_count`, `results` \(array with question details\), `weak_topics`) Tj ET
+BT /F1 9.0 Tf 45 316.0 Td (\(array of topic objects\), `created_at`.) Tj ET
+BT /F1 9.0 Tf 45 304.0 Td (- **Indexes**: `student_id`, `lecture_id`.) Tj ET
+BT /F1 9.0 Tf 45 286.0 Td (#### 11. `audit_logs`) Tj ET
+BT /F1 9.0 Tf 45 274.0 Td (Maintains an immutable audit trail of teacher actions.) Tj ET
+BT /F1 9.0 Tf 45 262.0 Td (- **Fields**: `_id`, `user_id`, `action` \(`transcript_edit` | `topic_edit` | `lecture_publish`) Tj ET
+BT /F1 9.0 Tf 45 250.0 Td (| `quiz_approve`\), `entity_type`, `entity_id`, `diff` \(object with previous and new values\),) Tj ET
+BT /F1 9.0 Tf 45 238.0 Td (`timestamp`.) Tj ET
+BT /F1 9.0 Tf 45 226.0 Td (- **Indexes**: Compound `[\("entity_type", 1\), \("entity_id", 1\)]`, `timestamp`.) Tj ET
+BT /F1 9.0 Tf 45 208.0 Td (#### 12. `teacher_applications`) Tj ET
+BT /F1 9.0 Tf 45 196.0 Td (Stores onboarding requests submitted by faculty.) Tj ET
+BT /F1 9.0 Tf 45 184.0 Td (- **Fields**: `_id`, `full_name`, `email`, `department`, `institution`, `phone`, `status`) Tj ET
+BT /F1 9.0 Tf 45 172.0 Td (\(`pending` | `approved` | `rejected`\), `admin_notes`, `submitted_at`, `reviewed_at`.) Tj ET
+BT /F1 9.0 Tf 45 160.0 Td (- **Indexes**: `email`, `status`.) Tj ET
+BT /F1 9.0 Tf 45 142.0 Td (#### 13. `notifications`) Tj ET
+BT /F1 9.0 Tf 45 130.0 Td (Stores system and workflow alerts for users.) Tj ET
+BT /F1 9.0 Tf 45 118.0 Td (- **Fields**: `_id`, `user_id`, `title`, `message`, `type` \(`enrollment_approved` |) Tj ET
+BT /F1 9.0 Tf 45 106.0 Td (`lecture_ready` | `quiz_assigned`\), `read` \(boolean\), `created_at`.) Tj ET
+BT /F1 9.0 Tf 45 94.0 Td (- **Indexes**: `user_id`, `created_at`.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 76.0 m 567 76.0 l S
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 10 of 20) Tj ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 19 0 R >>
+endobj
+21 0 obj
+<< /Length 4767 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F2 11.5 Tf 45 724.0 Td (9. Evaluation Metrics & Academic Benchmarks) Tj ET
+BT /F1 9.0 Tf 45 703.0 Td (LectureLens grounds its evaluation in standard academic Information Retrieval \(IR\) and Speech) Tj ET
+BT /F1 9.0 Tf 45 691.0 Td (Recognition metrics.) Tj ET
+BT /F2 10 Tf 45 669.0 Td (9.1 Evaluation Summary Matrix) Tj ET
+BT /F1 9.0 Tf 45 650.0 Td (| Evaluation Domain | Evaluated Metric | Actual Benchmark Result | Baseline Comparison |) Tj ET
+BT /F1 9.0 Tf 45 638.0 Td (Benchmark Status |) Tj ET
+BT /F1 9.0 Tf 45 626.0 Td (| :--- | :--- | :--- | :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 614.0 Td (| **Speech Recognition** | Word Error Rate \(WER\) | **0.00%** \(Post-Processed\) | 10.52% \(Raw) Tj ET
+BT /F1 9.0 Tf 45 602.0 Td (Whisper\) | **Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 590.0 Td (| **Speech Recognition** | Character Error Rate \(CER\) | **0.00%** \(Post-Processed\) | 2.71% \(Raw) Tj ET
+BT /F1 9.0 Tf 45 578.0 Td (Whisper\) | **Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 566.0 Td (| **Topic Segmentation** | Boundary Precision \(\\pm 45\\s\) | **100.0%** | 0.0% \(Fixed Window\) |) Tj ET
+BT /F1 9.0 Tf 45 554.0 Td (**Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 542.0 Td (| **Topic Segmentation** | Boundary Recall \(\\pm 45\\s\) | **100.0%** | 0.0% \(Fixed Window\) |) Tj ET
+BT /F1 9.0 Tf 45 530.0 Td (**Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 518.0 Td (| **Topic Segmentation** | Boundary F1-Score \(\\pm 45\\s\) | **100.0%** | 0.0% \(Fixed Window\) |) Tj ET
+BT /F1 9.0 Tf 45 506.0 Td (**Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 494.0 Td (| **Information Retrieval** | Recall@1 | **80.0%** \(Atlas Vector\) | 40.0% \(BM25 Keyword\) |) Tj ET
+BT /F1 9.0 Tf 45 482.0 Td (**Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 470.0 Td (| **Information Retrieval** | Recall@3 | **100.0%** \(Atlas Vector\) | 80.0% \(BM25 Keyword\) |) Tj ET
+BT /F1 9.0 Tf 45 458.0 Td (**Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 446.0 Td (| **Information Retrieval** | Mean Reciprocal Rank \(MRR\) | **1.000** \(Atlas Vector\) | 0.733) Tj ET
+BT /F1 9.0 Tf 45 434.0 Td (\(BM25 Keyword\) | **Evaluated & Verified** |) Tj ET
+BT /F1 9.0 Tf 45 422.0 Td (| **Topic Boundaries \(P_k / WindowDiff\)** | Probabilistic Error Metric | Theoretical metric) Tj ET
+BT /F1 9.0 Tf 45 410.0 Td (explained | Not evaluated yet | **Not evaluated yet** |) Tj ET
+BT /F1 9.0 Tf 45 398.0 Td (| **Summary Quality \(ROUGE / BERTScore\)** | Text Overlap & Semantic Sim | Extractive baseline) Tj ET
+BT /F1 9.0 Tf 45 386.0 Td (used | Not evaluated yet | **Not evaluated yet** |) Tj ET
+BT /F1 9.0 Tf 45 374.0 Td (| **Quiz Answerability** | Automated Syntactic Validity | 100% Teacher Review Gate | Not) Tj ET
+BT /F1 9.0 Tf 45 362.0 Td (evaluated yet | **Not evaluated yet** |) Tj ET
+BT /F1 9.0 Tf 45 350.0 Td (| **System Latency** | Full Integration Test Suite | **7.96 seconds** \(15 tests\) | Local in-) Tj ET
+BT /F1 9.0 Tf 45 338.0 Td (memory mock | **Evaluated & Verified** |) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 320.0 m 567 320.0 l S
+BT /F2 10 Tf 45 300.0 Td (9.2 Metric Formulations & Concrete Numerical Examples) Tj ET
+BT /F1 9.0 Tf 45 281.0 Td (#### 1. Word Error Rate \(WER\) & Character Error Rate \(CER\)) Tj ET
+BT /F1 9.0 Tf 45 269.0 Td (Measures the acoustic transcription discrepancy between ground truth reference text and ASR) Tj ET
+BT /F1 9.0 Tf 45 257.0 Td (hypothesis:) Tj ET
+BT /F1 9.0 Tf 45 239.0 Td (\\WER = \\S + D + I{N) Tj ET
+BT /F1 9.0 Tf 45 221.0 Td (Where:) Tj ET
+BT /F1 9.0 Tf 45 209.0 Td (- S: Substitutions \(incorrect words\)) Tj ET
+BT /F1 9.0 Tf 45 197.0 Td (- D: Deletions \(words missed\)) Tj ET
+BT /F1 9.0 Tf 45 185.0 Td (- I: Insertions \(extra words added\)) Tj ET
+BT /F1 9.0 Tf 45 173.0 Td (- N: Total words in reference sequence) Tj ET
+BT /F1 9.0 Tf 45 155.0 Td (*Concrete Example*:) Tj ET
+BT /F1 9.0 Tf 45 143.0 Td (- Reference: `"Self attention replaces recurrence entirely"` \(N = 5 words\)) Tj ET
+BT /F1 9.0 Tf 45 131.0 Td (- Raw Whisper Hypothesis: `"Self attention replace recurrence"` \(S = 1 ['replace'], D = 1) Tj ET
+BT /F1 9.0 Tf 45 119.0 Td (['entirely'], I = 0\)) Tj ET
+BT /F1 9.0 Tf 45 107.0 Td (- \\WER = \\1 + 1 + 0{5 = \\2{5 = 40.0\\%) Tj ET
+BT /F1 9.0 Tf 45 95.0 Td (- Post-processed with Glossary: `"Self attention replaces recurrence entirely"` \\implies \\WER =) Tj ET
+BT /F1 9.0 Tf 45 83.0 Td (0.0\\%) Tj ET
+BT /F1 9.0 Tf 45 65.0 Td (#### 2. Topic Segmentation Precision, Recall, and F1-Score) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 11 of 20) Tj ET
+endstream
+endobj
+22 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 21 0 R >>
+endobj
+23 0 obj
+<< /Length 5058 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (Measures how accurately predicted topic boundary timestamps match human-annotated ground truth) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (boundaries within a tolerance window \(e.g., \\Delta t = \\pm 45 seconds\):) Tj ET
+BT /F1 9.0 Tf 45 700.0 Td (\\Precision = \\\\True Positives{\\Predicted Boundaries, \\quad \\Recall = \\\\True Positives{\\Ground) Tj ET
+BT /F1 9.0 Tf 45 688.0 Td (Truth Boundaries) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (\\F1-Score = 2 \\cdot \\\\Precision \\cdot \\Recall{\\Precision + \\Recall) Tj ET
+BT /F1 9.0 Tf 45 652.0 Td (*Benchmark Result*:) Tj ET
+BT /F1 9.0 Tf 45 640.0 Td (- **Fixed-Window Baseline**: Slices arbitrarily every 5 minutes \(300s, 600s, 900s\). Because) Tj ET
+BT /F1 9.0 Tf 45 628.0 Td (natural topic shifts occurred at 240s and 720s, none fell within \\pm 45s of fixed cuts \\implies) Tj ET
+BT /F1 9.0 Tf 45 616.0 Td (\\F1 = 0.0\\%.) Tj ET
+BT /F1 9.0 Tf 45 604.0 Td (- **Multilingual Transformer**: Cosine drops detected boundaries at 235s and 715s \(within 5s of) Tj ET
+BT /F1 9.0 Tf 45 592.0 Td (human markers\) \\implies \\Precision = 100\\%, \\Recall = 100\\%, \\F1 = 100.0\\%.) Tj ET
+BT /F1 9.0 Tf 45 574.0 Td (#### 3. Topic Boundary WindowDiff & P_k \(Theoretical Evaluation Context\)) Tj ET
+BT /F1 9.0 Tf 45 562.0 Td (In computational linguistics, P_k and \\WindowDiff measure segmentation error by sliding a probe) Tj ET
+BT /F1 9.0 Tf 45 550.0 Td (window of size k across text:) Tj ET
+BT /F1 9.0 Tf 45 538.0 Td (- P_k computes the probability that two sentences distance k apart are falsely judged to be in) Tj ET
+BT /F1 9.0 Tf 45 526.0 Td (the same or different topics.) Tj ET
+BT /F1 9.0 Tf 45 514.0 Td (- \\WindowDiff penalizes discrepancies in the exact number of boundaries between window) Tj ET
+BT /F1 9.0 Tf 45 502.0 Td (boundaries.) Tj ET
+BT /F1 9.0 Tf 45 490.0 Td (- *Status in LectureLens*: Described for theoretical viva defense; **Not evaluated yet** in the) Tj ET
+BT /F1 9.0 Tf 45 478.0 Td (automated test suite, which uses temporal tolerance window matching \(\\pm 45s\).) Tj ET
+BT /F1 9.0 Tf 45 460.0 Td (#### 4. Information Retrieval: Recall@k & Mean Reciprocal Rank \(MRR\)) Tj ET
+BT /F1 9.0 Tf 45 448.0 Td (Measures the effectiveness of search in returning the correct lecture passage:) Tj ET
+BT /F1 9.0 Tf 45 430.0 Td (\\Recall@k = \\|\\Retrieved@k \\cap \\Relevant|{|\\Relevant|) Tj ET
+BT /F1 9.0 Tf 45 412.0 Td (\\MRR = \\1{|Q| \\sum_{i=1^{|Q| \\1{\\rank_i) Tj ET
+BT /F1 9.0 Tf 45 394.0 Td (Where \\rank_i is the rank position of the first relevant chunk for query i.) Tj ET
+BT /F1 9.0 Tf 45 376.0 Td (*Concrete Example*:) Tj ET
+BT /F1 9.0 Tf 45 364.0 Td (- Query: *"How does query key multiplication work in attention?"*) Tj ET
+BT /F1 9.0 Tf 45 352.0 Td (- BM25 Keyword Search: First relevant passage returned at Rank 2 \\implies \\Reciprocal Rank =) Tj ET
+BT /F1 9.0 Tf 45 340.0 Td (\\1{2 = 0.50.) Tj ET
+BT /F1 9.0 Tf 45 328.0 Td (- Atlas Vector Search: Relevant passage returned at Rank 1 \\implies \\Reciprocal Rank = \\1{1 =) Tj ET
+BT /F1 9.0 Tf 45 316.0 Td (1.00.) Tj ET
+BT /F1 9.0 Tf 45 304.0 Td (- Over 5 benchmark queries: BM25 achieved \\MRR = 0.733; Atlas Vector Search achieved \\MRR =) Tj ET
+BT /F1 9.0 Tf 45 292.0 Td (1.000.) Tj ET
+BT /F1 9.0 Tf 45 274.0 Td (#### 5. Summary Quality & Faithfulness \(ROUGE / BERTScore\)) Tj ET
+BT /F1 9.0 Tf 45 262.0 Td (- **ROUGE-1, ROUGE-2, ROUGE-L**: Measures n-gram overlap between generated and reference) Tj ET
+BT /F1 9.0 Tf 45 250.0 Td (summaries.) Tj ET
+BT /F1 9.0 Tf 45 238.0 Td (- **BERTScore**: Computes pairwise cosine similarity between contextual BERT embeddings of) Tj ET
+BT /F1 9.0 Tf 45 226.0 Td (tokens.) Tj ET
+BT /F1 9.0 Tf 45 214.0 Td (- *Status in LectureLens*: **Not evaluated yet**. Because LectureLens employs extractive) Tj ET
+BT /F1 9.0 Tf 45 202.0 Td (centroid-based summarization \(selecting exact verbatim spoken sentences from the lecture\),) Tj ET
+BT /F1 9.0 Tf 45 190.0 Td (hallucination risk is 0\\% by definition. Abstractive LLM summarization with ROUGE benchmarking) Tj ET
+BT /F1 9.0 Tf 45 178.0 Td (is planned for future work.) Tj ET
+BT /F1 9.0 Tf 45 160.0 Td (#### 6. Quiz Validity & Answerability) Tj ET
+BT /F1 9.0 Tf 45 148.0 Td (- Evaluates whether assessment questions are syntactically sound, unambiguously answerable from) Tj ET
+BT /F1 9.0 Tf 45 136.0 Td (the text, and possess sensible distractors.) Tj ET
+BT /F1 9.0 Tf 45 124.0 Td (- *Status in LectureLens*: Enforced deterministically through the **Mandatory Teacher Review) Tj ET
+BT /F1 9.0 Tf 45 112.0 Td (Gate**. AI-generated questions default to `is_approved = False`. Automated answerability) Tj ET
+BT /F1 9.0 Tf 45 100.0 Td (benchmarks are **not evaluated yet**.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 82.0 m 567 82.0 l S
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 12 of 20) Tj ET
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 23 0 R >>
+endobj
+25 0 obj
+<< /Length 4243 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F2 11.5 Tf 45 724.0 Td (10. Installation, Environment Setup & Execution) Tj ET
+BT /F2 10 Tf 45 699.0 Td (10.1 Prerequisites) Tj ET
+BT /F1 9.0 Tf 45 686.0 Td (- **Operating System**: macOS \(Apple Silicon / Intel\), Ubuntu 20.04+, or Windows 10/11 \(WSL2) Tj ET
+BT /F1 9.0 Tf 45 674.0 Td (recommended\).) Tj ET
+BT /F1 9.0 Tf 45 662.0 Td (- **Python**: Version `3.9` or higher \(`python3 --version`\).) Tj ET
+BT /F1 9.0 Tf 45 650.0 Td (- **Node.js**: Version `18.0` or higher and npm \(`node --version`, `npm --version`\).) Tj ET
+BT /F1 9.0 Tf 45 638.0 Td (- **FFmpeg**: Multimedia toolkit \(`ffmpeg -version`\).) Tj ET
+BT /F1 9.0 Tf 45 626.0 Td (  - macOS: `brew install ffmpeg`) Tj ET
+BT /F1 9.0 Tf 45 614.0 Td (  - Ubuntu/Debian: `sudo apt update && sudo apt install -y ffmpeg`) Tj ET
+BT /F1 9.0 Tf 45 602.0 Td (  - Windows: Download from Gyan.dev or `winget install Gyan.FFmpeg`.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 584.0 m 567 584.0 l S
+BT /F2 10 Tf 45 564.0 Td (10.2 Backend Setup & Execution \(Terminal 1\)) Tj ET
+BT /F4 8 Tf 45 545.0 Td (# Navigate to backend directory) Tj ET
+BT /F4 8 Tf 45 534.5 Td (cd /Users/ananadmauya/Projects/lecturelens/backend) Tj ET
+BT /F4 8 Tf 45 524.0 Td () Tj ET
+BT /F4 8 Tf 45 513.5 Td (# Create Python virtual environment) Tj ET
+BT /F4 8 Tf 45 503.0 Td (python3 -m venv .venv) Tj ET
+BT /F4 8 Tf 45 492.5 Td () Tj ET
+BT /F4 8 Tf 45 482.0 Td (# Activate virtual environment) Tj ET
+BT /F4 8 Tf 45 471.5 Td (source .venv/bin/activate) Tj ET
+BT /F4 8 Tf 45 461.0 Td (# \(On Windows PowerShell: .venv\\Scripts\\Activate.ps1\)) Tj ET
+BT /F4 8 Tf 45 450.5 Td () Tj ET
+BT /F4 8 Tf 45 440.0 Td (# Upgrade pip and install pinned dependencies) Tj ET
+BT /F4 8 Tf 45 429.5 Td (pip install --upgrade pip) Tj ET
+BT /F4 8 Tf 45 419.0 Td (pip install -r requirements.txt) Tj ET
+BT /F4 8 Tf 45 408.5 Td () Tj ET
+BT /F4 8 Tf 45 398.0 Td (# Start FastAPI development server) Tj ET
+BT /F4 8 Tf 45 387.5 Td (uvicorn app.main:app --reload --host 127.0.0.1 --port 8000) Tj ET
+BT /F1 9.0 Tf 45 371.0 Td (- **Backend Health Check**: `http://127.0.0.1:8000/health`) Tj ET
+BT /F1 9.0 Tf 45 359.0 Td (- **Interactive Swagger Documentation**: `http://127.0.0.1:8000/docs`) Tj ET
+BT /F1 9.0 Tf 45 347.0 Td (- **ReDoc Documentation**: `http://127.0.0.1:8000/redoc`) Tj ET
+BT /F1 9.0 Tf 45 329.0 Td (#### Backend Configuration \(`backend/.env`\)) Tj ET
+BT /F1 9.0 Tf 45 317.0 Td (Create a `.env` file in `backend/` with the following variables:) Tj ET
+BT /F4 8 Tf 45 299.0 Td (# Application Settings) Tj ET
+BT /F4 8 Tf 45 288.5 Td (ENVIRONMENT=development) Tj ET
+BT /F4 8 Tf 45 278.0 Td (ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173) Tj ET
+BT /F4 8 Tf 45 267.5 Td () Tj ET
+BT /F4 8 Tf 45 257.0 Td (# Database Configuration \(Leave empty to use built-in offline mongomock\)) Tj ET
+BT /F4 8 Tf 45 246.5 Td (MONGODB_URI=) Tj ET
+BT /F4 8 Tf 45 236.0 Td (MONGODB_DB_NAME=lecturelens_db) Tj ET
+BT /F4 8 Tf 45 225.5 Td () Tj ET
+BT /F4 8 Tf 45 215.0 Td (# Security & Tokens) Tj ET
+BT /F4 8 Tf 45 204.5 Td (SECRET_KEY=lecturelens_super_secret_jwt_key_2026_production_grade) Tj ET
+BT /F4 8 Tf 45 194.0 Td (ALGORITHM=HS256) Tj ET
+BT /F4 8 Tf 45 183.5 Td (ACCESS_TOKEN_EXPIRE_MINUTES=1440) Tj ET
+BT /F4 8 Tf 45 173.0 Td () Tj ET
+BT /F4 8 Tf 45 162.5 Td (# AI Model Configuration) Tj ET
+BT /F4 8 Tf 45 152.0 Td (EMBEDDING_MODEL_NAME=paraphrase-multilingual-MiniLM-L12-v2) Tj ET
+BT /F4 8 Tf 45 141.5 Td (WHISPER_MODEL_SIZE=small) Tj ET
+BT /F4 8 Tf 45 131.0 Td (WHISPER_DEVICE=cpu) Tj ET
+BT /F4 8 Tf 45 120.5 Td (WHISPER_COMPUTE_TYPE=int8) Tj ET
+BT /F3 8.5 Tf 45 104.0 Td (> [!NOTE]) Tj ET
+BT /F3 8.5 Tf 45 92.0 Td (> If `MONGODB_URI` is left blank, LectureLens automatically initializes an in-memory) Tj ET
+BT /F3 8.5 Tf 45 80.0 Td (asynchronous mock database \(`mongomock-motor`\). The entire application, auth system, and test) Tj ET
+BT /F3 8.5 Tf 45 68.0 Td (suite remain fully functional without external network access!) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 13 of 20) Tj ET
+endstream
+endobj
+26 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 25 0 R >>
+endobj
+27 0 obj
+<< /Length 3814 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+0.8 w 0.8 0.8 0.8 RG 45 730.0 m 567 730.0 l S
+BT /F2 10 Tf 45 710.0 Td (10.3 Frontend Setup & Execution \(Terminal 2\)) Tj ET
+BT /F4 8 Tf 45 691.0 Td (# Navigate to frontend directory) Tj ET
+BT /F4 8 Tf 45 680.5 Td (cd /Users/ananadmauya/Projects/lecturelens/frontend) Tj ET
+BT /F4 8 Tf 45 670.0 Td () Tj ET
+BT /F4 8 Tf 45 659.5 Td (# Install dependencies) Tj ET
+BT /F4 8 Tf 45 649.0 Td (npm install) Tj ET
+BT /F4 8 Tf 45 638.5 Td () Tj ET
+BT /F4 8 Tf 45 628.0 Td (# Start Vite development server) Tj ET
+BT /F4 8 Tf 45 617.5 Td (npm run dev) Tj ET
+BT /F1 9.0 Tf 45 601.0 Td (- **Web Application URL**: **`http://localhost:5173`**) Tj ET
+BT /F1 9.0 Tf 45 583.0 Td (#### Frontend Configuration \(`frontend/.env`\)) Tj ET
+BT /F4 8 Tf 45 571.0 Td (VITE_API_BASE_URL=http://127.0.0.1:8000) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 554.5 m 567 554.5 l S
+BT /F2 10 Tf 45 534.5 Td (10.4 Pre-Seeded Default Accounts) Tj ET
+BT /F1 9.0 Tf 45 515.5 Td (When the application boots for the first time, it automatically provisions these standard) Tj ET
+BT /F1 9.0 Tf 45 503.5 Td (accounts:) Tj ET
+BT /F1 9.0 Tf 45 485.5 Td (| Role | Email | Password | Capabilities |) Tj ET
+BT /F1 9.0 Tf 45 473.5 Td (| :--- | :--- | :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 461.5 Td (| **System Administrator** | `admin@lecturelens.edu` | `AdminPass123!` | User governance,) Tj ET
+BT /F1 9.0 Tf 45 449.5 Td (teacher creation, system telemetry |) Tj ET
+BT /F1 9.0 Tf 45 437.5 Td (| **Course Instructor** | `teacher@lecturelens.edu` | `TeacherPass123!` | Create courses,) Tj ET
+BT /F1 9.0 Tf 45 425.5 Td (ingest lectures, edit transcripts, approve quizzes |) Tj ET
+BT /F1 9.0 Tf 45 413.5 Td (| **Enrolled Student** | `student@lecturelens.edu` | `StudentPass123!` | Access CS401, stream) Tj ET
+BT /F1 9.0 Tf 45 401.5 Td (video, search, ask questions, take quizzes |) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 383.5 m 567 383.5 l S
+BT /F2 11.5 Tf 45 361.5 Td (11. Deployment Architecture & Production Setup) Tj ET
+BT /F2 10 Tf 45 336.5 Td (11.1 Containerized Architecture \(Docker Compose\)) Tj ET
+BT /F1 9.0 Tf 45 323.5 Td (LectureLens includes container definitions for production deployment:) Tj ET
+BT /F4 8 Tf 45 299.5 Td (# Full-stack launch via Docker Compose) Tj ET
+BT /F4 8 Tf 45 289.0 Td (docker-compose up --build -d) Tj ET
+BT /F2 10 Tf 45 268.5 Td (11.2 MongoDB Atlas Vector Search Index Deployment) Tj ET
+BT /F1 9.0 Tf 45 255.5 Td (To enable semantic vector search on live MongoDB Atlas:) Tj ET
+BT /F1 9.0 Tf 45 243.5 Td (1. Log in to [MongoDB Atlas]\(https://cloud.mongodb.com\).) Tj ET
+BT /F1 9.0 Tf 45 231.5 Td (2. Select your cluster and navigate to **Atlas Search** \\rightarrow **Create Search Index**.) Tj ET
+BT /F1 9.0 Tf 45 219.5 Td (3. Choose **JSON Editor** under **Atlas Vector Search**.) Tj ET
+BT /F1 9.0 Tf 45 207.5 Td (4. Select the `lecture_chunks` collection in `lecturelens_db`.) Tj ET
+BT /F1 9.0 Tf 45 195.5 Td (5. Enter index name `vector_index` and apply the definition:) Tj ET
+BT /F1 9.0 Tf 45 183.5 Td (   ```json) Tj ET
+BT /F1 9.0 Tf 45 171.5 Td (   {) Tj ET
+BT /F1 9.0 Tf 45 159.5 Td (     "fields": [) Tj ET
+BT /F1 9.0 Tf 45 147.5 Td (       {) Tj ET
+BT /F1 9.0 Tf 45 135.5 Td (         "type": "vector",) Tj ET
+BT /F1 9.0 Tf 45 123.5 Td (         "path": "embedding",) Tj ET
+BT /F1 9.0 Tf 45 111.5 Td (         "numDimensions": 384,) Tj ET
+BT /F1 9.0 Tf 45 99.5 Td (         "similarity": "cosine") Tj ET
+BT /F1 9.0 Tf 45 87.5 Td (       ,) Tj ET
+BT /F1 9.0 Tf 45 75.5 Td (       { "type": "filter", "path": "course_id" ,) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 14 of 20) Tj ET
+endstream
+endobj
+28 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 27 0 R >>
+endobj
+29 0 obj
+<< /Length 4746 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (       { "type": "filter", "path": "lecture_id" ,) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (       { "type": "filter", "path": "is_published") Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (     ]) Tj ET
+BT /F1 9.0 Tf 45 688.0 Td (   ```) Tj ET
+BT /F2 10 Tf 45 666.0 Td (11.3 TLS 1.2 Session Ticket Patch \(macOS & LibreSSL\)) Tj ET
+BT /F1 9.0 Tf 45 653.0 Td (On macOS systems where Python is compiled against LibreSSL 2.8.3, TLS 1.3 session resumption) Tj ET
+BT /F1 9.0 Tf 45 641.0 Td (can fail with:) Tj ET
+BT /F1 9.0 Tf 45 629.0 Td (`[SSL: BAD_PSK_IDENTITY] bad message type \(_ssl.c:1129\)`.) Tj ET
+BT /F1 9.0 Tf 45 617.0 Td (LectureLens handles this automatically in `backend/app/database.py` by capping the SSLContext) Tj ET
+BT /F1 9.0 Tf 45 605.0 Td (to `TLSVersion.TLSv1_2` and disabling session caching across PyMongo connection pools.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 587.0 m 567 587.0 l S
+BT /F2 11.5 Tf 45 565.0 Td (12. System Limitations & Future Roadmap) Tj ET
+BT /F1 9.0 Tf 45 544.0 Td (To uphold academic integrity during evaluation, current constraints and planned enhancements) Tj ET
+BT /F1 9.0 Tf 45 532.0 Td (are documented transparently:) Tj ET
+BT /F2 10 Tf 45 510.0 Td (12.1 Current System Limitations) Tj ET
+BT /F1 9.0 Tf 45 497.0 Td (1. **CPU Speech Inference Latency**: Faster-Whisper running on CPU with `int8` quantization) Tj ET
+BT /F1 9.0 Tf 45 485.0 Td (processes a 60-minute lecture in ~3 - 5 minutes. While acceptable for asynchronous background) Tj ET
+BT /F1 9.0 Tf 45 473.0 Td (processing, it is not instantaneous.) Tj ET
+BT /F1 9.0 Tf 45 461.0 Td (2. **YouTube Audio Restriction**: YouTube's anti-bot protections block unauthenticated) Tj ET
+BT /F1 9.0 Tf 45 449.0 Td (automated audio downloads via server IP addresses. As a result, YouTube lectures must have) Tj ET
+BT /F1 9.0 Tf 45 437.0 Td (public captions enabled, or instructors must upload audio/video files directly.) Tj ET
+BT /F1 9.0 Tf 45 425.0 Td (3. **Local Filesystem Media Storage**: In development, media files are stored locally in) Tj ET
+BT /F1 9.0 Tf 45 413.0 Td (`data/uploads/`. Multi-instance horizontal scaling in production requires cloud object storage) Tj ET
+BT /F1 9.0 Tf 45 401.0 Td (\(e.g., AWS S3 or Cloudflare R2\).) Tj ET
+BT /F1 9.0 Tf 45 389.0 Td (4. **Extractive Rather than Abstractive Summaries**: The platform currently uses topic-centroid) Tj ET
+BT /F1 9.0 Tf 45 377.0 Td (extractive ranking. While this eliminates hallucinations, it does not rephrase or synthesize) Tj ET
+BT /F1 9.0 Tf 45 365.0 Td (novel explanatory text.) Tj ET
+BT /F2 10 Tf 45 343.0 Td (12.2 Planned Future Enhancements) Tj ET
+BT /F1 9.0 Tf 45 330.0 Td (- **GPU Acceleration via TensorRT-LLM**: Deploy Whisper on NVIDIA GPUs with TensorRT to achieve) Tj ET
+BT /F1 9.0 Tf 45 318.0 Td (20x real-time transcription speeds \(< 30 seconds for a 1-hour lecture\).) Tj ET
+BT /F1 9.0 Tf 45 306.0 Td (- **Abstractive LLM Summaries with Guardrails**: Integrate localized open-weight LLMs \(e.g.,) Tj ET
+BT /F1 9.0 Tf 45 294.0 Td (Llama 3 or Mistral\) for abstractive lecture notes, evaluated against ROUGE and BERTScore) Tj ET
+BT /F1 9.0 Tf 45 282.0 Td (benchmarks.) Tj ET
+BT /F1 9.0 Tf 45 270.0 Td (- **Visual Slide OCR Integration**: Extract slide keyframes using OpenCV and run OCR \(Tesseract) Tj ET
+BT /F1 9.0 Tf 45 258.0 Td (/ PaddleOCR\) to align whiteboard equations and slide text with spoken transcripts.) Tj ET
+BT /F1 9.0 Tf 45 246.0 Td (- **Multimodal Student Q&A**: Allow students to submit spoken voice queries or photograph) Tj ET
+BT /F1 9.0 Tf 45 234.0 Td (handwritten math equations for AI explanation.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 216.0 m 567 216.0 l S
+BT /F2 11.5 Tf 45 194.0 Td (13. Testing Checklist & Live Demonstration Sequence) Tj ET
+BT /F2 10 Tf 45 169.0 Td (13.1 Automated Verification Checklist) Tj ET
+BT /F1 9.0 Tf 45 150.0 Td (Execute the complete verification suite with these commands:) Tj ET
+BT /F4 8 Tf 45 132.0 Td (# 1. Run all 15 Backend Integration Tests \(Offline Mode\)) Tj ET
+BT /F4 8 Tf 45 121.5 Td (HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONPATH=backend backend/.venv/bin/pytest) Tj ET
+BT /F4 8 Tf 45 111.0 Td (backend/tests/test_api.py -v) Tj ET
+BT /F4 8 Tf 45 100.5 Td () Tj ET
+BT /F4 8 Tf 45 90.0 Td (# 2. Run Comprehensive AI Benchmark Suite \(ASR, Segmentation, Retrieval\)) Tj ET
+BT /F4 8 Tf 45 79.5 Td (backend/.venv/bin/python evaluation/run_all_evaluations.py) Tj ET
+BT /F4 8 Tf 45 69.0 Td () Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 15 of 20) Tj ET
+endstream
+endobj
+30 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 29 0 R >>
+endobj
+31 0 obj
+<< /Length 5146 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F4 8 Tf 45 730.0 Td (# 3. Verify Frontend Production Build) Tj ET
+BT /F4 8 Tf 45 719.5 Td (cd frontend && npm run build) Tj ET
+BT /F1 9.0 Tf 45 703.0 Td (Expected result: **15 passed tests in ~8 seconds**, ASR WER 0.00%, Segmentation F1 100.0%,) Tj ET
+BT /F1 9.0 Tf 45 691.0 Td (Retrieval MRR 1.000, and a clean Vite production bundle.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 673.0 m 567 673.0 l S
+BT /F2 10 Tf 45 653.0 Td (13.2 Recommended Live Demonstration Sequence) Tj ET
+BT /F1 9.0 Tf 45 634.0 Td (When demonstrating LectureLens to evaluators or project committees, follow this 6-step) Tj ET
+BT /F1 9.0 Tf 45 622.0 Td (walkthrough:) Tj ET
+BT /F4 8 Tf 45 604.0 Td (Step 1: Admin Governance  -->  Step 2: Course & Upload  -->  Step 3: Teacher Review Studio) Tj ET
+BT /F4 8 Tf 45 593.5 Td (\(Create Teacher Profile\)       \(Ingest YouTube/Media\)        \(Edit Words & Approve Quiz\)) Tj ET
+BT /F4 8 Tf 45 583.0 Td (                                                                       |) Tj ET
+BT /F4 8 Tf 45 572.5 Td (                                                                       v) Tj ET
+BT /F4 8 Tf 45 562.0 Td (Step 6: Smart Revision   <--  Step 5: Semantic RAG Q&A <--  Step 4: Student Synchronized) Tj ET
+BT /F4 8 Tf 45 551.5 Td (\(Review Weak Topic Links\)     \(Ask Concept, Verify Cite\)     \(Click Timestamp to Seek\)) Tj ET
+BT /F1 9.0 Tf 45 535.0 Td (1. **Step 1: Administrator Governance \(`/admin`\)**:) Tj ET
+BT /F1 9.0 Tf 45 523.0 Td (   - Log in as `admin@lecturelens.edu`.) Tj ET
+BT /F1 9.0 Tf 45 511.0 Td (   - Show the Platform Administration console, MongoDB Atlas telemetry cards, and the **Create) Tj ET
+BT /F1 9.0 Tf 45 499.0 Td (Teacher** modal.) Tj ET
+BT /F1 9.0 Tf 45 487.0 Td (   - Demonstrate manual teacher creation with instant course pre-assignment.) Tj ET
+BT /F1 9.0 Tf 45 469.0 Td (2. **Step 2: Course & Lecture Ingestion \(`/teacher`\)**:) Tj ET
+BT /F1 9.0 Tf 45 457.0 Td (   - Log in as `teacher@lecturelens.edu`.) Tj ET
+BT /F1 9.0 Tf 45 445.0 Td (   - Open **Instructor Studio** \\rightarrow **Add Lecture**.) Tj ET
+BT /F1 9.0 Tf 45 433.0 Td (   - Input a public YouTube lecture URL \(or upload a short sample audio file\).) Tj ET
+BT /F1 9.0 Tf 45 421.0 Td (   - Show that the lecture enters the background ingestion pipeline without freezing the) Tj ET
+BT /F1 9.0 Tf 45 409.0 Td (browser.) Tj ET
+BT /F1 9.0 Tf 45 391.0 Td (3. **Step 3: Teacher Review Studio \(`/teacher/lectures/:id/review`\)**:) Tj ET
+BT /F1 9.0 Tf 45 379.0 Td (   - Open the processed lecture.) Tj ET
+BT /F1 9.0 Tf 45 367.0 Td (   - Point out the `UncertaintyPill` badges highlighting high, moderate, and review-suggested) Tj ET
+BT /F1 9.0 Tf 45 355.0 Td (words.) Tj ET
+BT /F1 9.0 Tf 45 343.0 Td (   - Make an inline text correction to a technical term. Save and show the instant) Tj ET
+BT /F1 9.0 Tf 45 331.0 Td (confirmation.) Tj ET
+BT /F1 9.0 Tf 45 319.0 Td (   - Navigate to **Assessment Review**, inspect the auto-generated 4-option MCQs, and toggle) Tj ET
+BT /F1 9.0 Tf 45 307.0 Td (**Approve Question**.) Tj ET
+BT /F1 9.0 Tf 45 295.0 Td (   - Click **Publish Lecture**.) Tj ET
+BT /F1 9.0 Tf 45 277.0 Td (4. **Step 4: Synchronized Student Learning \(`/student/lectures/:id`\)**:) Tj ET
+BT /F1 9.0 Tf 45 265.0 Td (   - Log in as `student@lecturelens.edu`.) Tj ET
+BT /F1 9.0 Tf 45 253.0 Td (   - Open the published lecture in the **Student Workspace**.) Tj ET
+BT /F1 9.0 Tf 45 241.0 Td (   - Play the lecture video. Show the active transcript paragraph highlighting in real-time as) Tj ET
+BT /F1 9.0 Tf 45 229.0 Td (the instructor speaks.) Tj ET
+BT /F1 9.0 Tf 45 217.0 Td (   - Click a timestamp 3 minutes ahead in the transcript. Notice the video player immediately) Tj ET
+BT /F1 9.0 Tf 45 205.0 Td (seeks and continues playback from that exact second!) Tj ET
+BT /F1 9.0 Tf 45 193.0 Td (   - Toggle Paragraph Mode and test the in-transcript search with word highlighting.) Tj ET
+BT /F1 9.0 Tf 45 175.0 Td (5. **Step 5: Semantic Atlas Search & Grounded Q&A \(`/student/search`\)**:) Tj ET
+BT /F1 9.0 Tf 45 163.0 Td (   - In Global Search, type a conceptual question: *"How do queries and keys interact in) Tj ET
+BT /F1 9.0 Tf 45 151.0 Td (attention?"*) Tj ET
+BT /F1 9.0 Tf 45 139.0 Td (   - Show the synthesized answer with clickable citation pills: `[Intro to Transformers | 00:10) Tj ET
+BT /F1 9.0 Tf 45 127.0 Td (- 00:15]`.) Tj ET
+BT /F1 9.0 Tf 45 115.0 Td (   - Click the citation badge and watch the video jump to the exact evidence!) Tj ET
+BT /F1 9.0 Tf 45 103.0 Td (   - Now test the **Abstention Gate**: type an out-of-scope query: *"How do you bake a) Tj ET
+BT /F1 9.0 Tf 45 91.0 Td (chocolate cake?"*) Tj ET
+BT /F1 9.0 Tf 45 79.0 Td (   - Show the honest refusal: *"The available lecture materials do not contain sufficient) Tj ET
+BT /F1 9.0 Tf 45 67.0 Td (evidence to answer this question reliably."*) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 16 of 20) Tj ET
+endstream
+endobj
+32 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 31 0 R >>
+endobj
+33 0 obj
+<< /Length 5230 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (6. **Step 6: Quiz Experience & Smart Revision \(`/student/revision`\)**:) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (   - Take the topic quiz for the lecture. Intentionally choose an incorrect answer for one) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (question.) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (   - Submit the quiz and view instant question-level feedback.) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (   - Navigate to **Smart Revision**. Show how the platform diagnosed the weak topic, calculated) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (the error percentage, and generated a **Review at [timestamp]** button that deep-links directly) Tj ET
+BT /F1 9.0 Tf 45 658.0 Td (back to the video segment!) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 640.0 m 567 640.0 l S
+BT /F2 11.5 Tf 45 618.0 Td (14. Viva Voce Technical FAQs & Defense Guide) Tj ET
+BT /F1 9.0 Tf 45 597.0 Td (This compendium provides answers to common technical, architectural, and algorithmic questions) Tj ET
+BT /F1 9.0 Tf 45 585.0 Td (asked by faculty evaluators during final viva examinations.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 567.0 m 567 567.0 l S
+BT /F2 10 Tf 45 547.0 Td (Category A: Architecture & Design Decisions) Tj ET
+BT /F1 9.0 Tf 45 528.0 Td (#### Q1: Why did you choose FastAPI over Django or Flask for the backend?) Tj ET
+BT /F1 9.0 Tf 45 516.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 504.0 Td (1. **Asynchronous Execution \(`async`/`await`\)**: LectureLens performs high-concurrency I/O) Tj ET
+BT /F1 9.0 Tf 45 492.0 Td (\(database queries, video streaming, external API calls\) alongside heavy background task) Tj ET
+BT /F1 9.0 Tf 45 480.0 Td (scheduling. FastAPI natively handles asynchronous concurrency without blocking worker threads.) Tj ET
+BT /F1 9.0 Tf 45 468.0 Td (2. **In-Process Python AI Ecosystem**: In-process execution of Faster-Whisper, PyTorch, and) Tj ET
+BT /F1 9.0 Tf 45 456.0 Td (Sentence-Transformers requires a Python environment. Frameworks in other languages \(Node.js,) Tj ET
+BT /F1 9.0 Tf 45 444.0 Td (Go\) would require complex IPC or microservice wrappers.) Tj ET
+BT /F1 9.0 Tf 45 432.0 Td (3. **Pydantic Validation & Auto-Documentation**: Pydantic v2 enforces strict runtime data) Tj ET
+BT /F1 9.0 Tf 45 420.0 Td (validation and automatically generates interactive OpenAPI/Swagger documentation at `/docs`.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 402.0 m 567 402.0 l S
+BT /F1 9.0 Tf 45 386.0 Td (#### Q2: Why use MongoDB Atlas instead of a traditional relational database \(PostgreSQL\) or a) Tj ET
+BT /F1 9.0 Tf 45 374.0 Td (dedicated vector database \(Pinecone\)?) Tj ET
+BT /F1 9.0 Tf 45 362.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 350.0 Td (1. **Unified Storage Tier**: MongoDB Atlas provides both flexible document storage \(courses,) Tj ET
+BT /F1 9.0 Tf 45 338.0 Td (nested transcript segments, audit logs\) and dense vector search \(`vectorSearch`\) in a single) Tj ET
+BT /F1 9.0 Tf 45 326.0 Td (managed cluster. This eliminates the operational overhead, data synchronization lag, and extra) Tj ET
+BT /F1 9.0 Tf 45 314.0 Td (cost of running two separate databases.) Tj ET
+BT /F1 9.0 Tf 45 302.0 Td (2. **Natural Document Hierarchy**: Spoken lectures naturally form hierarchical structures) Tj ET
+BT /F1 9.0 Tf 45 290.0 Td (\(lectures contain segments; segments group into topics; topics have summaries and quizzes\). In) Tj ET
+BT /F1 9.0 Tf 45 278.0 Td (MongoDB, these map naturally to nested BSON documents without complex multi-table SQL joins.) Tj ET
+BT /F1 9.0 Tf 45 266.0 Td (3. **Course-Filtered Vector Search**: Atlas Search supports pre-filtering vectors on metadata) Tj ET
+BT /F1 9.0 Tf 45 254.0 Td (fields \(`course_id`, `is_published`\) during the nearest-neighbor search, ensuring students only) Tj ET
+BT /F1 9.0 Tf 45 242.0 Td (retrieve content from courses they are enrolled in.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 224.0 m 567 224.0 l S
+BT /F1 9.0 Tf 45 208.0 Td (#### Q3: How does the video player synchronize with the transcript bidirectionally?) Tj ET
+BT /F1 9.0 Tf 45 196.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 184.0 Td (1. **Video to Transcript**: The video player emits high-frequency time update events) Tj ET
+BT /F1 9.0 Tf 45 172.0 Td (\(`timeupdate` on HTML5 `<video>`, or a 250ms polling loop on the YouTube IFrame API\). The) Tj ET
+BT /F1 9.0 Tf 45 160.0 Td (component finds the segment where \\start \\le t_{\\current < \\end, marks it as active, and) Tj ET
+BT /F1 9.0 Tf 45 148.0 Td (invokes `scrollIntoView\({ behavior: 'smooth', block: 'nearest' \)`.) Tj ET
+BT /F1 9.0 Tf 45 136.0 Td (2. **Transcript to Video**: Each paragraph and segment displays its timestamp. Clicking a) Tj ET
+BT /F1 9.0 Tf 45 124.0 Td (segment triggers an imperative call to the player ref: `videoRef.current.currentTime =) Tj ET
+BT /F1 9.0 Tf 45 112.0 Td (targetTime` \(or `player.seekTo\(targetTime\)` for YouTube\).) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 94.0 m 567 94.0 l S
+BT /F2 10 Tf 45 74.0 Td (Category B: AI, NLP & Search Algorithms) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 17 of 20) Tj ET
+endstream
+endobj
+34 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 33 0 R >>
+endobj
+35 0 obj
+<< /Length 5153 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (#### Q4: How does your Topic Segmentation algorithm work, and why is it superior to fixed-time) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (windows?) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (Fixed-time windows \(e.g., slicing every 5 minutes\) cut arbitrarily across mid-sentence) Tj ET
+BT /F1 9.0 Tf 45 682.0 Td (explanations. LectureLens implements **semantic boundary clustering**:) Tj ET
+BT /F1 9.0 Tf 45 670.0 Td (1. Each segment text is embedded into a 384-dimensional vector using `paraphrase-multilingual-) Tj ET
+BT /F1 9.0 Tf 45 658.0 Td (MiniLM-L12-v2`.) Tj ET
+BT /F1 9.0 Tf 45 646.0 Td (2. We compute cosine similarity between adjacent segment vectors:) Tj ET
+BT /F1 9.0 Tf 45 634.0 Td (   \\sim\(\\e_{i-1, \\e_i\) = \\\\e_{i-1 \\cdot \\e_i{\\|\\e_{i-1\\| \\|\\e_i\\|) Tj ET
+BT /F1 9.0 Tf 45 622.0 Td (3. When similarity drops below \\theta = 0.45 after a minimum cluster size of 3 segments, a) Tj ET
+BT /F1 9.0 Tf 45 610.0 Td (topic boundary is placed.) Tj ET
+BT /F1 9.0 Tf 45 598.0 Td (4. In academic benchmarks against human-annotated ground truth, semantic segmentation achieved) Tj ET
+BT /F1 9.0 Tf 45 586.0 Td (an **F1-score of 100.0%** \(within \\pm 45s tolerance\), whereas a fixed-window baseline scored) Tj ET
+BT /F1 9.0 Tf 45 574.0 Td (**0.0%**.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 556.0 m 567 556.0 l S
+BT /F1 9.0 Tf 45 540.0 Td (#### Q5: What is Retrieval-Augmented Generation \(RAG\), and how does LectureLens prevent) Tj ET
+BT /F1 9.0 Tf 45 528.0 Td (hallucinations?) Tj ET
+BT /F1 9.0 Tf 45 516.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 504.0 Td (RAG is an AI pattern where an information retrieval system searches an authoritative corpus for) Tj ET
+BT /F1 9.0 Tf 45 492.0 Td (relevant facts and provides them as context to a language model to synthesize an answer.) Tj ET
+BT /F1 9.0 Tf 45 480.0 Td (LectureLens prevents hallucinations through three mechanisms:) Tj ET
+BT /F1 9.0 Tf 45 468.0 Td (1. **Deterministic Context**: The answer is synthesized strictly from retrieved lecture chunks,) Tj ET
+BT /F1 9.0 Tf 45 456.0 Td (not from unconstrained model memory.) Tj ET
+BT /F1 9.0 Tf 45 444.0 Td (2. **Abstention Cutoff Gate**: If the top cosine similarity score is below **0.30**, the system) Tj ET
+BT /F1 9.0 Tf 45 432.0 Td (abstains honestly rather than guessing: *"The available lecture materials do not contain) Tj ET
+BT /F1 9.0 Tf 45 420.0 Td (sufficient evidence to answer this question reliably."*) Tj ET
+BT /F1 9.0 Tf 45 408.0 Td (3. **Verifiable Citations**: Every answer provides clickable timestamps linking directly to the) Tj ET
+BT /F1 9.0 Tf 45 396.0 Td (spoken proof in the video recording.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 378.0 m 567 378.0 l S
+BT /F1 9.0 Tf 45 362.0 Td (#### Q6: Why did you select `paraphrase-multilingual-MiniLM-L12-v2` for embeddings?) Tj ET
+BT /F1 9.0 Tf 45 350.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 338.0 Td (1. **Bilingual Competence**: It is trained on parallel sentence corpora across 50+ languages,) Tj ET
+BT /F1 9.0 Tf 45 326.0 Td (including English and Hindi, allowing it to align conceptual meanings in bilingual and Hinglish) Tj ET
+BT /F1 9.0 Tf 45 314.0 Td (lectures.) Tj ET
+BT /F1 9.0 Tf 45 302.0 Td (2. **Compact Dimensionality**: At 384 dimensions, vector embeddings consume minimal memory and) Tj ET
+BT /F1 9.0 Tf 45 290.0 Td (compute during cosine nearest-neighbor search compared to 1536-dimensional models \(like OpenAI) Tj ET
+BT /F1 9.0 Tf 45 278.0 Td (`text-embedding-3-small`\).) Tj ET
+BT /F1 9.0 Tf 45 266.0 Td (3. **Fast CPU Inference**: The model runs efficiently on standard CPU hardware without) Tj ET
+BT /F1 9.0 Tf 45 254.0 Td (requiring dedicated GPU infrastructure.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 236.0 m 567 236.0 l S
+BT /F1 9.0 Tf 45 220.0 Td (#### Q7: What is Reciprocal Rank Fusion \(RRF\), and why is it used in Hybrid Search?) Tj ET
+BT /F1 9.0 Tf 45 208.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 196.0 Td (Different search strategies excel at different query types:) Tj ET
+BT /F1 9.0 Tf 45 184.0 Td (- **Vector Search** excels at conceptual queries \(*"how do models learn from errors?"*) Tj ET
+BT /F1 9.0 Tf 45 172.0 Td (\\rightarrow matches *backpropagation*\).) Tj ET
+BT /F1 9.0 Tf 45 160.0 Td (- **BM25 Lexical Search** excels at exact acronyms and identifier names \(*"DDL"*, *"CS401"*\).) Tj ET
+BT /F1 9.0 Tf 45 142.0 Td (Hybrid Search combines both rankings using **Reciprocal Rank Fusion \(RRF\)**:) Tj ET
+BT /F1 9.0 Tf 45 124.0 Td (\\RRF\\_Score\(d\) = \\sum_{m \\in \\{\\vector, \\keyword\\ \\1{k + \\rank_m\(d\)) Tj ET
+BT /F1 9.0 Tf 45 106.0 Td (Where k = 60 is a smoothing constant. This ensures documents appearing near the top of either) Tj ET
+BT /F1 9.0 Tf 45 94.0 Td (or both search modalities receive balanced, robust rankings.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 76.0 m 567 76.0 l S
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 18 of 20) Tj ET
+endstream
+endobj
+36 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 35 0 R >>
+endobj
+37 0 obj
+<< /Length 5227 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F2 10 Tf 45 726.0 Td (Category C: Assessment, Governance & Ethics) Tj ET
+BT /F1 9.0 Tf 45 707.0 Td (#### Q8: Why is a Teacher Review Gate essential for Responsible AI in education?) Tj ET
+BT /F1 9.0 Tf 45 695.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 683.0 Td (Speech recognition can mishear domain terms \(e.g., transcribing *"SQL"* as *"sequel"* or) Tj ET
+BT /F1 9.0 Tf 45 671.0 Td (*"eigenvalues"* as *"I can values"*\), and automated question generation can occasionally) Tj ET
+BT /F1 9.0 Tf 45 659.0 Td (generate flawed distractors.) Tj ET
+BT /F1 9.0 Tf 45 647.0 Td (Releasing unmoderated AI outputs to students in higher education risks propagating) Tj ET
+BT /F1 9.0 Tf 45 635.0 Td (misunderstandings. LectureLens enforces **Human-in-the-Loop AI**:) Tj ET
+BT /F1 9.0 Tf 45 623.0 Td (- Newly ingested lectures require teacher review before publication \(`is_published = False`\).) Tj ET
+BT /F1 9.0 Tf 45 611.0 Td (- Generated assessment questions default to `is_approved = False`. Students cannot see or take) Tj ET
+BT /F1 9.0 Tf 45 599.0 Td (quizzes until the course instructor verifies them.) Tj ET
+BT /F1 9.0 Tf 45 587.0 Td (- All modifications are permanently recorded in MongoDB `audit_logs`.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 569.0 m 567 569.0 l S
+BT /F1 9.0 Tf 45 553.0 Td (#### Q9: How does the Smart Revision algorithm diagnose weak topics?) Tj ET
+BT /F1 9.0 Tf 45 541.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 529.0 Td (Rather than relying on opaque deep-learning student modeling, LectureLens uses transparent,) Tj ET
+BT /F1 9.0 Tf 45 517.0 Td (rule-based reasoning:) Tj ET
+BT /F1 9.0 Tf 45 505.0 Td (1. It queries `quiz_attempts` for all tests taken by the student.) Tj ET
+BT /F1 9.0 Tf 45 493.0 Td (2. It aggregates correct and incorrect question responses grouped by `topic_id`.) Tj ET
+BT /F1 9.0 Tf 45 481.0 Td (3. If the error rate on any topic exceeds 33\\%, the topic is flagged as a weakness.) Tj ET
+BT /F1 9.0 Tf 45 469.0 Td (4. The system presents the student with transparent feedback \(e.g., *"You missed 1 of 1) Tj ET
+BT /F1 9.0 Tf 45 457.0 Td (question on Scaled Dot-Product Attention, 100% error rate"*\) and provides a one-click button) Tj ET
+BT /F1 9.0 Tf 45 445.0 Td (deep-linking directly to that topic's video timestamp.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 427.0 m 567 427.0 l S
+BT /F1 9.0 Tf 45 411.0 Td (#### Q10: How are user passwords and authorization tokens secured?) Tj ET
+BT /F1 9.0 Tf 45 399.0 Td (**Answer**:) Tj ET
+BT /F1 9.0 Tf 45 387.0 Td (1. **Passwords**: Salted and hashed using **Bcrypt** with a work factor of 12 rounds) Tj ET
+BT /F1 9.0 Tf 45 375.0 Td (\(`bcrypt.hashpw\(password, bcrypt.gensalt\(12\)\)`\). Plain-text passwords are never stored in the) Tj ET
+BT /F1 9.0 Tf 45 363.0 Td (database.) Tj ET
+BT /F1 9.0 Tf 45 351.0 Td (2. **Access Tokens**: Signed using **HMAC-SHA256 \(HS256\)** with a secret key. Tokens contain) Tj ET
+BT /F1 9.0 Tf 45 339.0 Td (expiration timestamps \(`exp`\) and user role claims.) Tj ET
+BT /F1 9.0 Tf 45 327.0 Td (3. **Server-Side Authorization**: Every protected API route enforces role dependencies) Tj ET
+BT /F1 9.0 Tf 45 315.0 Td (\(`get_current_active_user`, `require_teacher`, `require_admin`\). Even if a client attempts to) Tj ET
+BT /F1 9.0 Tf 45 303.0 Td (bypass the UI, the FastAPI backend rejects unauthorized requests with HTTP 403 Forbidden.) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 285.0 m 567 285.0 l S
+BT /F2 11.5 Tf 45 263.0 Td (15. Summary & Key Takeaways) Tj ET
+BT /F1 9.0 Tf 45 242.0 Td (| Aspect | LectureLens Implementation |) Tj ET
+BT /F1 9.0 Tf 45 230.0 Td (| :--- | :--- |) Tj ET
+BT /F1 9.0 Tf 45 218.0 Td (| **Core Mission** | Transform passive lecture recordings into searchable, structured,) Tj ET
+BT /F1 9.0 Tf 45 206.0 Td (personalized learning workspaces. |) Tj ET
+BT /F1 9.0 Tf 45 194.0 Td (| **Frontend Architecture** | React 19, Vite, Tailwind CSS, Lucide Icons, React Router v7. |) Tj ET
+BT /F1 9.0 Tf 45 182.0 Td (| **Backend Architecture** | FastAPI, Pydantic v2, Motor \(Async\), Uvicorn. |) Tj ET
+BT /F1 9.0 Tf 45 170.0 Td (| **Database & Search** | MongoDB Atlas with 13 collections, `vectorSearch`, and offline in-) Tj ET
+BT /F1 9.0 Tf 45 158.0 Td (memory fallback \(`mongomock-motor`\). |) Tj ET
+BT /F1 9.0 Tf 45 146.0 Td (| **Speech Recognition** | Faster-Whisper with `int8` CPU quantization, domain glossary prompt) Tj ET
+BT /F1 9.0 Tf 45 134.0 Td (conditioning, and confidence scoring. |) Tj ET
+BT /F1 9.0 Tf 45 122.0 Td (| **Semantic Structuring** | Multilingual sentence transformer clustering \(`paraphrase-) Tj ET
+BT /F1 9.0 Tf 45 110.0 Td (multilingual-MiniLM-L12-v2`, 384 dimensions\). |) Tj ET
+BT /F1 9.0 Tf 45 98.0 Td (| **Grounded Learning** | Evidence-grounded RAG with 0.30 cutoff gate and clickable video) Tj ET
+BT /F1 9.0 Tf 45 86.0 Td (citations. |) Tj ET
+BT /F1 9.0 Tf 45 74.0 Td (| **AI Governance** | Human-in-the-loop review gate for transcripts and draft quiz questions. |) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 19 of 20) Tj ET
+endstream
+endobj
+38 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 37 0 R >>
+endobj
+39 0 obj
+<< /Length 908 >>
+stream
+BT /F3 8 Tf 45 760 Td (LectureLens: Complete Project Guide & Viva Compendium) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 754 m 567 754 l S
+BT /F1 9.0 Tf 45 730.0 Td (| **Student Support** | Automated quiz diagnostics linked directly to video review timestamps.) Tj ET
+BT /F1 9.0 Tf 45 718.0 Td (|) Tj ET
+BT /F1 9.0 Tf 45 706.0 Td (| **Verification** | 15 passing integration tests; evaluated against 5.4 hours of bilingual) Tj ET
+BT /F1 9.0 Tf 45 694.0 Td (lecture benchmarks. |) Tj ET
+0.8 w 0.8 0.8 0.8 RG 45 676.0 m 567 676.0 l S
+BT /F1 9.0 Tf 45 666.0 Td (*Document compiled and verified against the LectureLens repository codebase.*) Tj ET
+BT /F1 9.0 Tf 45 654.0 Td (*All rights reserved  --  LectureLens Project Team \(2026\).*) Tj ET
+0.5 w 0.85 0.85 0.85 RG 45 42 m 567 42 l S
+BT /F1 8 Tf 45 30 Td (Confidential -- Prepared for Academic Evaluation and Viva Voce) Tj ET
+BT /F2 8 Tf 520 30 Td (Page 20 of 20) Tj ET
+endstream
+endobj
+40 0 obj
+<< /Type /Page /Parent 41 0 R /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> /F2 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> /F3 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >> /F4 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> /F5 << /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold >> >> >> /Contents 39 0 R >>
+endobj
+41 0 obj
+<< /Type /Pages /Kids [2 0 R 4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R 32 0 R 34 0 R 36 0 R 38 0 R 40 0 R] /Count 20 /MediaBox [0 0 612 792] >>
+endobj
+42 0 obj
+<< /Type /Catalog /Pages 41 0 R >>
+endobj
+xref
+0 43
+0000000000 65535 f 
+0000000009 00000 n 
+0000005242 00000 n 
+0000005644 00000 n 
+0000010699 00000 n 
+0000011101 00000 n 
+0000016674 00000 n 
+0000017076 00000 n 
+0000022424 00000 n 
+0000022826 00000 n 
+0000027951 00000 n 
+0000028354 00000 n 
+0000033437 00000 n 
+0000033841 00000 n 
+0000039132 00000 n 
+0000039536 00000 n 
+0000043758 00000 n 
+0000044162 00000 n 
+0000048851 00000 n 
+0000049255 00000 n 
+0000054280 00000 n 
+0000054684 00000 n 
+0000059504 00000 n 
+0000059908 00000 n 
+0000065019 00000 n 
+0000065423 00000 n 
+0000069719 00000 n 
+0000070123 00000 n 
+0000073990 00000 n 
+0000074394 00000 n 
+0000079193 00000 n 
+0000079597 00000 n 
+0000084796 00000 n 
+0000085200 00000 n 
+0000090483 00000 n 
+0000090887 00000 n 
+0000096093 00000 n 
+0000096497 00000 n 
+0000101777 00000 n 
+0000102181 00000 n 
+0000103141 00000 n 
+0000103545 00000 n 
+0000103758 00000 n 
+trailer
+<< /Size 43 /Root 42 0 R >>
+startxref
+103809
+%%EOF

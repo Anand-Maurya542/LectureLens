@@ -10,7 +10,13 @@ logger = logging.getLogger("lecturelens.segmentation")
 @lru_cache(maxsize=1)
 def get_embedding_model():
     logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL_NAME}")
-    return SentenceTransformer(settings.EMBEDDING_MODEL_NAME, device="cpu")
+    try:
+        import torch
+        torch.set_num_threads(1)
+        return SentenceTransformer(settings.EMBEDDING_MODEL_NAME, device="cpu")
+    except Exception as e:
+        logger.error(f"Failed to load SentenceTransformer model {settings.EMBEDDING_MODEL_NAME}: {e}")
+        return None
 
 
 def generate_topic_title(group: list[dict]) -> str:
@@ -56,8 +62,26 @@ def segment_topics(
         }]
 
     model = get_embedding_model()
+    if model is None:
+        logger.warning("SentenceTransformer unavailable. Partitioning topics using heuristic fallback.")
+        chunk_size = 6
+        topics = []
+        for idx, i in enumerate(range(0, len(valid_segments), chunk_size), start=1):
+            group = valid_segments[i : i + chunk_size]
+            topics.append({
+                "topic_id": idx,
+                "title": generate_topic_title(group),
+                "start": group[0]["start"],
+                "end": group[-1]["end"],
+                "segments": group,
+                "is_edited": False,
+            })
+        return topics
+
     texts = [s["text"] for s in valid_segments]
-    embeddings = model.encode(texts, normalize_embeddings=True)
+    import torch
+    with torch.no_grad():
+        embeddings = model.encode(texts, normalize_embeddings=True)
 
     groups = []
     current_group = [valid_segments[0]]

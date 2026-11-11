@@ -55,13 +55,28 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Collect all allowed origins, stripping any trailing slashes to prevent browser CORS mismatches
+cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://lecture-lens-five.vercel.app",
+    "https://lecturelens-five.vercel.app",
+]
+for origin_entry in settings.ALLOWED_ORIGINS:
+    cleaned = origin_entry.strip().rstrip("/")
+    if cleaned and cleaned not in cors_origins:
+        cors_origins.append(cleaned)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS or ["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_origin_regex=r"https?://.*",
+    allow_origins=cors_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com|https?://localhost.*|https?://127\.0\.0\.1.*|https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Register modular routers
@@ -80,22 +95,23 @@ app.include_router(admin_router)
 @app.exception_handler(ResponseValidationError)
 async def response_validation_exception_handler(request: Request, exc: ResponseValidationError):
     logger.error(f"Response validation error during {request.method} {request.url.path}: {exc}")
-    origin = request.headers.get("origin") or "*"
+    origin = request.headers.get("origin")
     response = JSONResponse(
         status_code=500,
         content={"detail": f"Response serialization error: {str(exc)}"},
     )
-    response.headers["Access-Control-Allow-Origin"] = origin
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "*"
     return response
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception(f"Unhandled exception during {request.method} {request.url.path}: {exc}")
-    origin = request.headers.get("origin") or "*"
+    origin = request.headers.get("origin")
     err_str = str(exc)
     is_db_conn_error = (
         "connection pool paused" in err_str
@@ -118,10 +134,11 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
     if is_db_conn_error:
         response.headers["Retry-After"] = "3"
-    response.headers["Access-Control-Allow-Origin"] = origin
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "*"
     return response
 
 ALLOWED_EXTENSIONS = {

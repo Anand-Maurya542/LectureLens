@@ -16,16 +16,30 @@ async def answer_question(
     """Answers a student question strictly grounded in retrieved lecture chunks.
     Abstains if retrieved context is insufficient or ungrounded.
     """
-    chunks = await search_chunks(
-        query=query,
-        course_id=course_id,
-        lecture_id=lecture_id,
-        search_mode="vector",
-        top_k=3,
-        only_published=only_published,
-    )
+    try:
+        chunks = await search_chunks(
+            query=query,
+            course_id=course_id,
+            lecture_id=lecture_id,
+            search_mode="vector",
+            top_k=3,
+            only_published=only_published,
+        )
+    except Exception as e:
+        logger.warning(f"Vector search failed in answer_question ({e}). Trying keyword search...")
+        try:
+            chunks = await search_chunks(
+                query=query,
+                course_id=course_id,
+                lecture_id=lecture_id,
+                search_mode="keyword",
+                top_k=3,
+                only_published=only_published,
+            )
+        except Exception:
+            chunks = []
 
-    if not chunks or chunks[0]["score"] < ABSTAIN_THRESHOLD:
+    if not chunks or chunks[0].get("score", 0.0) < ABSTAIN_THRESHOLD:
         return {
             "query": query,
             "answer": "The available lecture materials do not contain sufficient evidence to answer this question reliably.",
@@ -41,22 +55,22 @@ async def answer_question(
     for chunk in chunks:
         citations.append({
             "lecture_id": chunk["lecture_id"],
-            "lecture_title": chunk["lecture_title"],
-            "topic_title": chunk.get("topic_title"),
-            "start": chunk["start"],
-            "end": chunk["end"],
-            "text": chunk["text"],
+            "lecture_title": chunk.get("lecture_title", "Lecture"),
+            "topic_title": chunk.get("topic_title", "General"),
+            "start": chunk.get("start", 0.0),
+            "end": chunk.get("end", 0.0),
+            "text": chunk.get("text", ""),
             "timestamp_url": chunk.get("timestamp_url"),
         })
-        passages.append(chunk["text"])
+        passages.append(chunk.get("text", ""))
 
     # Synthesize a grounded answer based on the best matching evidence
-    primary_passage = passages[0]
+    primary_passage = passages[0] if passages else ""
     best_chunk = chunks[0]
     
     # Grounded synthesis: provide direct context with citation marker
     answer_text = (
-        f"Based on {best_chunk['lecture_title']} (Section: {best_chunk.get('topic_title', 'General')}), "
+        f"Based on {best_chunk.get('lecture_title', 'the lecture')} (Section: {best_chunk.get('topic_title', 'General')}): "
         f"{primary_passage.strip()}"
     )
 
@@ -68,6 +82,6 @@ async def answer_question(
         "answer": answer_text,
         "citations": citations,
         "is_grounded": True,
-        "confidence": float(best_chunk["score"]),
+        "confidence": float(best_chunk.get("score", 0.8)),
     }
 

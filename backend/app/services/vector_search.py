@@ -153,6 +153,39 @@ async def execute_keyword_search(
     cursor = db.lecture_chunks.find(query_filter)
     candidates = await cursor.to_list(length=100)
 
+    # Fallback to transcript_segments if lecture_chunks is empty
+    if not candidates:
+        lec_id = filter_dict.get("lecture_id")
+        if lec_id:
+            seg_cursor = db.transcript_segments.find({
+                "lecture_id": lec_id,
+                "text": {"$regex": pattern, "$options": "i"},
+            })
+            seg_list = await seg_cursor.to_list(length=50)
+            if not seg_list:
+                from bson import ObjectId
+                try:
+                    if ObjectId.is_valid(lec_id):
+                        seg_list = await db.transcript_segments.find({
+                            "lecture_id": ObjectId(lec_id),
+                            "text": {"$regex": pattern, "$options": "i"},
+                        }).to_list(length=50)
+                except Exception:
+                    pass
+            for s in seg_list:
+                s_id = str(s.get("_id", s.get("id", "")))
+                candidates.append({
+                    "id": s_id,
+                    "_id": s_id,
+                    "lecture_id": str(lec_id),
+                    "course_id": filter_dict.get("course_id", ""),
+                    "topic_id": 1,
+                    "topic_title": "Lecture Transcript",
+                    "start": s.get("start", 0.0),
+                    "end": s.get("end", 0.0),
+                    "text": s.get("text", ""),
+                })
+
     # Score by frequency of term occurrences
     scored = []
     for cand in candidates:
@@ -189,35 +222,54 @@ async def search_chunks(
         raw_results = await execute_keyword_search(query, filter_dict, top_k)
     elif search_mode == "hybrid":
         # Hybrid combines Vector and Keyword via Reciprocal Rank Fusion (RRF)
-        query_vec = generate_embedding(query)
-        vec_results = await execute_atlas_vector_search(query_vec, filter_dict, top_k * 2)
+        vec_results = []
+        try:
+            query_vec = generate_embedding(query)
+            if any(query_vec):
+                vec_results = await execute_atlas_vector_search(query_vec, filter_dict, top_k * 2)
+        except Exception as e:
+            logger.warning(f"Vector search failed during hybrid search ({e})")
+            vec_results = []
+
         kw_results = await execute_keyword_search(query, filter_dict, top_k * 2)
 
-        rrf_scores = {}
-        item_map = {}
-        k_const = 60
+        if vec_results or kw_results:
+            rrf_scores = {}
+            item_map = {}
+            k_const = 60
 
-        for rank, item in enumerate(vec_results, start=1):
-            cid = item["id"]
-            item_map[cid] = item
-            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_const + rank))
+            for rank, item in enumerate(vec_results, start=1):
+                cid = item.get("id") or str(item.get("_id"))
+                item_map[cid] = item
+                rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_const + rank))
 
-        for rank, item in enumerate(kw_results, start=1):
-            cid = item["id"]
-            item_map[cid] = item
-            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_const + rank))
+            for rank, item in enumerate(kw_results, start=1):
+                cid = item.get("id") or str(item.get("_id"))
+                item_map[cid] = item
+                rrf_scores[cid] = rrf_scores.get(cid, 0.0) + (1.0 / (k_const + rank))
 
-        combined = []
-        for cid, score in sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]:
-            it = item_map[cid]
-            it["score"] = round(score * 10, 4)
-            it["search_mode"] = "hybrid (vector+keyword)"
-            combined.append(it)
-        raw_results = combined
+            combined = []
+            for cid, score in sorted(rrf_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]:
+                it = item_map[cid]
+                it["score"] = round(score * 10, 4)
+                it["search_mode"] = "hybrid (vector+keyword)"
+                combined.append(it)
+            raw_results = combined
+        else:
+            raw_results = []
     else:
         # Default: vector search
-        query_vec = generate_embedding(query)
-        raw_results = await execute_atlas_vector_search(query_vec, filter_dict, top_k)
+        raw_results = []
+        try:
+            query_vec = generate_embedding(query)
+            if any(query_vec):
+                raw_results = await execute_atlas_vector_search(query_vec, filter_dict, top_k)
+        except Exception as e:
+            logger.warning(f"Vector search failed ({e}). Executing keyword search fallback.")
+            try:
+                raw_results = await execute_keyword_search(query, filter_dict, top_k)
+            except Exception:
+                raw_results = []
 
     # Hydrate with lecture and course titles and timestamp links
     results = []

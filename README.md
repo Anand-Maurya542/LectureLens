@@ -6,7 +6,11 @@
 [![MongoDB Atlas](https://img.shields.io/badge/Database-MongoDB_Atlas_Vector_Search-47A248.svg?logo=mongodb&logoColor=white)](https://www.mongodb.com/products/platform/atlas-vector-search)
 [![Faster-Whisper](https://img.shields.io/badge/ASR-Faster--Whisper-FF6F00.svg)](https://github.com/SYSTRAN/faster-whisper)
 [![Sentence-Transformers](https://img.shields.io/badge/Embeddings-MiniLM--L12--v2-blue.svg)](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
-[![Tests](https://img.shields.io/badge/Tests-8%20Passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-15%20Passing-brightgreen.svg)]()
+[![Documentation](https://img.shields.io/badge/Documentation-Complete_Guide-blueviolet.svg)](docs/LectureLens_Project_Guide.md)
+
+> 📘 **Complete Project Documentation & Viva Voce Guide**:  
+> For comprehensive academic evaluation, viva preparation, detailed architecture workflows, and metric formulations, consult the [LectureLens Project Guide (Markdown)](docs/LectureLens_Project_Guide.md) or download the printable [20-Page PDF Compendium](docs/LectureLens_Project_Guide.pdf).
 
 LectureLens transforms university lectures into an intelligent, searchable, and personalized learning workspace. It combines speech recognition (Faster-Whisper), multilingual topic segmentation, MongoDB Atlas Vector Search, evidence-grounded Q&A (RAG), and interactive assessments with an instructor-in-the-loop review gate.
 
@@ -182,7 +186,7 @@ The database automatically seeds these accounts on first startup:
 | **Student** | `student@lecturelens.edu` | `StudentPass123!` | Enrolled in CS401, view approved lectures, vector search, ask questions, take quizzes, revision |
 | **Admin** | `admin@lecturelens.edu` | `AdminPass123!` | System-wide administration |
 
-*1-click demo login buttons are provided on the login page.*
+*Demo credentials can be entered directly into the login form.*
 
 ---
 
@@ -190,9 +194,9 @@ The database automatically seeds these accounts on first startup:
 
 ### 1. Backend Integration Tests:
 ```bash
-PYTHONPATH=backend backend/.venv/bin/pytest backend/tests/test_api.py -v
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONPATH=backend backend/.venv/bin/pytest backend/tests/test_api.py -v
 ```
-All **8 integration tests pass** in 2.70 seconds.
+All **15 integration tests pass** in ~8 seconds (covering auth, RBAC, courses, YouTube/media ingestion, transcript editing, vector search, grounded Q&A, quiz approval, and admin creation).
 
 ### 2. Academic AI Benchmark Suite:
 ```bash
@@ -254,6 +258,8 @@ For presentations and reports, capture these key screens:
 
 ## 📚 Complete Documentation Index
 
+- **[⭐ Complete Project Guide & Viva Compendium (Markdown)](docs/LectureLens_Project_Guide.md)** — *Primary Reference for Evaluation & Defense*
+- **[📄 Complete Project Guide (Printable 20-Page PDF)](docs/LectureLens_Project_Guide.pdf)**
 - [Project Overview & Requirements](docs/project-overview.md)
 - [Feature Implementation & Verification Matrix](docs/features-and-status.md)
 - [System Architecture & Sequence Flows](docs/system-architecture.md)
