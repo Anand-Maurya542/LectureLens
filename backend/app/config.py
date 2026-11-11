@@ -44,10 +44,25 @@ class Settings:
     )
     EMBEDDING_DIMENSION: int = int(os.getenv("EMBEDDING_DIMENSION", "384"))
     
-    # Whisper ASR
-    WHISPER_MODEL_SIZE: str = os.getenv("WHISPER_MODEL_SIZE", "small")
+    # Whisper ASR & Processing Optimization
+    WHISPER_MODEL_SIZE: str = os.getenv("WHISPER_MODEL_SIZE", "base")
     WHISPER_DEVICE: str = os.getenv("WHISPER_DEVICE", "cpu")
     WHISPER_COMPUTE_TYPE: str = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+    WHISPER_CPU_THREADS: int = int(os.getenv("WHISPER_CPU_THREADS", "2"))
+    WHISPER_NUM_WORKERS: int = int(os.getenv("WHISPER_NUM_WORKERS", "1"))
+
+    # Concurrency & Memory Controls for Cloud Deployments (e.g. Render)
+    MAX_CONCURRENT_PIPELINE_JOBS: int = int(os.getenv("MAX_CONCURRENT_PIPELINE_JOBS", "1"))
+    TORCH_NUM_THREADS: int = int(os.getenv("TORCH_NUM_THREADS", "1"))
+    UNLOAD_WHISPER_AFTER_TRANSCRIPTION: bool = (
+        os.getenv("UNLOAD_WHISPER_AFTER_TRANSCRIPTION", "true").lower() in ("true", "1", "yes")
+    )
+    UNLOAD_EMBEDDINGS_AFTER_PIPELINE: bool = (
+        os.getenv("UNLOAD_EMBEDDINGS_AFTER_PIPELINE", "false").lower() in ("true", "1", "yes")
+    )
+    FFMPEG_EXTRACT_AUDIO: bool = (
+        os.getenv("FFMPEG_EXTRACT_AUDIO", "true").lower() in ("true", "1", "yes")
+    )
 
 
 settings = Settings()

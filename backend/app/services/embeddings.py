@@ -1,7 +1,8 @@
 import logging
 from typing import Union
 import numpy as np
-from app.services.segmentation import get_embedding_model
+from app.services.segmentation import get_embedding_model, unload_embedding_model
+from app.services.memory import cleanup_memory
 
 logger = logging.getLogger("lecturelens.embeddings")
 
@@ -35,7 +36,7 @@ def generate_embeddings_batch(texts: list[str]) -> list[list[float]]:
             return [[0.0] * 384 for _ in texts]
         import torch
         with torch.no_grad():
-            vecs = model.encode(texts, normalize_embeddings=True)
+            vecs = model.encode(texts, normalize_embeddings=True, batch_size=16)
             return vecs.tolist()
     except Exception as e:
         logger.warning(f"Failed to generate batch embeddings: {e}")

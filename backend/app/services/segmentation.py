@@ -1,22 +1,48 @@
 import logging
-from functools import lru_cache
+import threading
 from typing import Optional
 from sentence_transformers import SentenceTransformer
 from app.config import settings
+from app.services.memory import cleanup_memory
 
 logger = logging.getLogger("lecturelens.segmentation")
 
+_embedding_model: Optional[SentenceTransformer] = None
+_embedding_lock = threading.Lock()
 
-@lru_cache(maxsize=1)
-def get_embedding_model():
-    logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL_NAME}")
-    try:
-        import torch
-        torch.set_num_threads(1)
-        return SentenceTransformer(settings.EMBEDDING_MODEL_NAME, device="cpu")
-    except Exception as e:
-        logger.error(f"Failed to load SentenceTransformer model {settings.EMBEDDING_MODEL_NAME}: {e}")
-        return None
+
+def get_embedding_model() -> Optional[SentenceTransformer]:
+    """Thread-safe singleton loader for SentenceTransformer with controlled threads."""
+    global _embedding_model
+    with _embedding_lock:
+        if _embedding_model is None:
+            logger.info(f"Loading embedding model: {settings.EMBEDDING_MODEL_NAME}")
+            try:
+                import torch
+                torch.set_num_threads(settings.TORCH_NUM_THREADS)
+                try:
+                    _embedding_model = SentenceTransformer(
+                        settings.EMBEDDING_MODEL_NAME, device="cpu", local_files_only=True
+                    )
+                except Exception:
+                    _embedding_model = SentenceTransformer(
+                        settings.EMBEDDING_MODEL_NAME, device="cpu"
+                    )
+            except Exception as e:
+                logger.error(f"Failed to load SentenceTransformer model {settings.EMBEDDING_MODEL_NAME}: {e}")
+                return None
+        return _embedding_model
+
+
+def unload_embedding_model():
+    """Unloads the SentenceTransformer model to reclaim memory when required."""
+    global _embedding_model
+    with _embedding_lock:
+        if _embedding_model is not None:
+            logger.info("Unloading SentenceTransformer model to reclaim RAM...")
+            del _embedding_model
+            _embedding_model = None
+            cleanup_memory("embedding_unload")
 
 
 def generate_topic_title(group: list[dict]) -> str:
@@ -81,7 +107,7 @@ def segment_topics(
     texts = [s["text"] for s in valid_segments]
     import torch
     with torch.no_grad():
-        embeddings = model.encode(texts, normalize_embeddings=True)
+        embeddings = model.encode(texts, normalize_embeddings=True, batch_size=16)
 
     groups = []
     current_group = [valid_segments[0]]

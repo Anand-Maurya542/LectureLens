@@ -1,24 +1,98 @@
 import logging
-from functools import lru_cache
+import os
+import subprocess
+import tempfile
+import threading
+from pathlib import Path
 from typing import Optional
 from faster_whisper import WhisperModel
 from app.config import settings
+from app.services.memory import cleanup_memory
 
 logger = logging.getLogger("lecturelens.transcription")
 
+_whisper_model: Optional[WhisperModel] = None
+_model_lock = threading.Lock()
 
-@lru_cache(maxsize=1)
-def get_model():
+
+def get_model() -> WhisperModel:
     """Initializes and caches the Faster-Whisper model according to configuration."""
-    logger.info(
-        f"Loading Faster-Whisper model (size: {settings.WHISPER_MODEL_SIZE}, "
-        f"device: {settings.WHISPER_DEVICE}, compute: {settings.WHISPER_COMPUTE_TYPE})"
-    )
-    return WhisperModel(
-        settings.WHISPER_MODEL_SIZE,
-        device=settings.WHISPER_DEVICE,
-        compute_type=settings.WHISPER_COMPUTE_TYPE,
-    )
+    global _whisper_model
+    with _model_lock:
+        if _whisper_model is None:
+            logger.info(
+                f"Loading Faster-Whisper model (size: {settings.WHISPER_MODEL_SIZE}, "
+                f"device: {settings.WHISPER_DEVICE}, compute: {settings.WHISPER_COMPUTE_TYPE}, "
+                f"threads: {settings.WHISPER_CPU_THREADS}, workers: {settings.WHISPER_NUM_WORKERS})"
+            )
+            kwargs = {
+                "device": settings.WHISPER_DEVICE,
+                "compute_type": settings.WHISPER_COMPUTE_TYPE,
+                "cpu_threads": settings.WHISPER_CPU_THREADS,
+                "num_workers": settings.WHISPER_NUM_WORKERS,
+            }
+            try:
+                _whisper_model = WhisperModel(
+                    settings.WHISPER_MODEL_SIZE,
+                    local_files_only=True,
+                    **kwargs,
+                )
+            except Exception:
+                _whisper_model = WhisperModel(
+                    settings.WHISPER_MODEL_SIZE,
+                    **kwargs,
+                )
+        return _whisper_model
+
+
+def unload_whisper_model():
+    """Explicitly deletes the Faster-Whisper model instance and triggers memory cleanup."""
+    global _whisper_model
+    with _model_lock:
+        if _whisper_model is not None:
+            logger.info("Unloading Faster-Whisper model to reclaim RAM...")
+            del _whisper_model
+            _whisper_model = None
+            cleanup_memory("whisper_unload")
+
+
+def extract_audio_for_transcription(input_path: str) -> str:
+    """Uses FFmpeg to extract lightweight 16kHz mono 16-bit PCM WAV.
+    This prevents Faster-Whisper's PyAV reader from loading and decoding
+    entire video streams or high-bitrate media in memory.
+    """
+    if not settings.FFMPEG_EXTRACT_AUDIO:
+        return input_path
+
+    # If it is already a small 16kHz mono wav file, use directly
+    try:
+        temp_wav = tempfile.NamedTemporaryFile(suffix="_16k.wav", delete=False)
+        temp_wav_path = temp_wav.name
+        temp_wav.close()
+
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-i", str(input_path),
+            "-vn",
+            "-acodec", "pcm_s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            "-f", "wav",
+            temp_wav_path,
+        ]
+        res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        if res.returncode == 0 and os.path.exists(temp_wav_path) and os.path.getsize(temp_wav_path) > 0:
+            logger.info(f"Extracted lightweight 16kHz mono audio ({os.path.getsize(temp_wav_path)} bytes) for Whisper")
+            return temp_wav_path
+        else:
+            logger.warning(f"FFmpeg audio extraction exited with {res.returncode}. Using original file.")
+            if os.path.exists(temp_wav_path):
+                os.remove(temp_wav_path)
+            return input_path
+    except Exception as e:
+        logger.warning(f"FFmpeg execution unavailable or failed ({e}). Using original media file.")
+        return input_path
 
 
 def transcribe_file(
@@ -58,38 +132,49 @@ def transcribe_file(
     if hallucination_silence_threshold:
         transcribe_kwargs["hallucination_silence_threshold"] = hallucination_silence_threshold
 
-    segments, info = model.transcribe(file_path, **transcribe_kwargs)
+    effective_audio_path = extract_audio_for_transcription(file_path)
+    is_temp = (effective_audio_path != file_path)
 
-    transcript = []
+    try:
+        segments, info = model.transcribe(effective_audio_path, **transcribe_kwargs)
 
-    # Consume the generator and collect all segments with uncertainty indicators
-    for idx, segment in enumerate(segments):
-        # Calculate a normalized uncertainty score based on avg_logprob
-        logprob = getattr(segment, "avg_logprob", None)
-        no_speech = getattr(segment, "no_speech_prob", None)
-        compression = getattr(segment, "compression_ratio", None)
-        cleaned_text = segment.text.strip()
+        transcript = []
 
-        transcript.append({
-            "segment_index": idx,
-            "start": round(segment.start, 2),
-            "end": round(segment.end, 2),
-            "text": cleaned_text,
-            "original_text": cleaned_text,
-            "avg_logprob": round(logprob, 3) if logprob is not None else None,
-            "no_speech_prob": round(no_speech, 3) if no_speech is not None else None,
-            "compression_ratio": round(compression, 3) if compression is not None else None,
-            "is_edited": False,
-        })
+        # Consume the generator and collect all segments with uncertainty indicators
+        for idx, segment in enumerate(segments):
+            # Calculate a normalized uncertainty score based on avg_logprob
+            logprob = getattr(segment, "avg_logprob", None)
+            no_speech = getattr(segment, "no_speech_prob", None)
+            compression = getattr(segment, "compression_ratio", None)
+            cleaned_text = segment.text.strip()
 
-    logger.info(f"Transcription completed: language={info.language} ({info.language_probability:.2f}), segments={len(transcript)}")
+            transcript.append({
+                "segment_index": idx,
+                "start": round(segment.start, 2),
+                "end": round(segment.end, 2),
+                "text": cleaned_text,
+                "original_text": cleaned_text,
+                "avg_logprob": round(logprob, 3) if logprob is not None else None,
+                "no_speech_prob": round(no_speech, 3) if no_speech is not None else None,
+                "compression_ratio": round(compression, 3) if compression is not None else None,
+                "is_edited": False,
+            })
 
-    return {
-        "language": info.language,
-        "language_probability": round(info.language_probability, 3) if info.language_probability else 1.0,
-        "duration": round(info.duration, 2) if hasattr(info, "duration") and info.duration else 0.0,
-        "segments": transcript,
-    }
+        logger.info(f"Transcription completed: language={info.language} ({info.language_probability:.2f}), segments={len(transcript)}")
+
+        return {
+            "language": info.language,
+            "language_probability": round(info.language_probability, 3) if info.language_probability else 1.0,
+            "duration": round(info.duration, 2) if hasattr(info, "duration") and info.duration else 0.0,
+            "segments": transcript,
+        }
+    finally:
+        if is_temp and os.path.exists(effective_audio_path):
+            try:
+                os.remove(effective_audio_path)
+                logger.debug(f"Removed temporary extracted audio: {effective_audio_path}")
+            except Exception as e:
+                logger.debug(f"Failed to delete temp wav {effective_audio_path}: {e}")
 
 
 def group_segments_into_paragraphs(segments: list[dict]) -> list[dict]:

@@ -751,6 +751,23 @@ On macOS systems where Python is compiled against LibreSSL 2.8.3, TLS 1.3 sessio
 `[SSL: BAD_PSK_IDENTITY] bad message type (_ssl.c:1129)`.  
 LectureLens handles this automatically in `backend/app/database.py` by capping the SSLContext to `TLSVersion.TLSv1_2` and disabling session caching across PyMongo connection pools.
 
+### 11.4 Render Cloud Deployment & Out-Of-Memory (OOM) Architecture
+
+Deploying dual-model AI pipelines (ASR + Transformer Embeddings) on constrained cloud tiers like Render's 512MB Starter plan can cause container termination if unoptimized (`Ran out of memory (used over 512MB)`). LectureLens incorporates architectural safeguards for memory-constrained hosting:
+
+1. **Strict Concurrency Control**: A global `asyncio.Semaphore(MAX_CONCURRENT_PIPELINE_JOBS=1)` ensures background processing queues execute sequentially, preventing simultaneous multi-task memory spikes.
+2. **Model Sequencing & Lazy Lifecycles**: Faster-Whisper and Sentence-Transformers are never loaded concurrently during ingestion. Faster-Whisper transcribes the media, unloads from RAM, and executes garbage collection (`gc.collect()` + `malloc_trim(0)`) *before* Sentence-Transformers initializes for topic segmentation and vector indexing.
+3. **FFmpeg Pre-Extraction**: Rather than allowing PyAV to buffer large raw MP4/MOV video files in RAM, an automatic FFmpeg pipeline extracts a lightweight 16kHz mono 16-bit WAV stream, transcribes it, and immediately removes the temporary file.
+4. **glibc Heap Reclaiming**: Under Linux glibc (Render's Debian runtime), freed Python heap blocks are retained in virtual memory pages unless trimmed. LectureLens calls `ctypes.CDLL('libc.so.6').malloc_trim(0)` post-job to return unused memory to the Linux kernel immediately.
+5. **Lean Connection Pooling**: MongoDB Atlas connection parameters are tuned (`minPoolSize=1`, `maxPoolSize=10`, `maxIdleTimeMS=30000`) to minimize socket buffer overhead.
+6. **Single Process Worker**: Uvicorn is pinned to `--workers 1` in production container definitions, preventing duplicate model weight allocations.
+
+| Hosting Tier | Recommended RAM | Configured Whisper Size | Supported Concurrency | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Render Free / Starter** | 512 MB | `tiny` or `base` (INT8) | 1 Job (Sequential) | Fully Supported with Sequencing |
+| **Render Standard** *(Recommended)* | 2 GB | `base` or `small` (INT8) | 1–2 Jobs | **Recommended for Production** |
+| **Render Pro** | 4 GB | `small` or `medium` (INT8) | 2–4 Jobs | Enterprise / High Concurrency |
+
 ---
 
 ## 12. System Limitations & Future Roadmap

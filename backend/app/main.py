@@ -14,7 +14,8 @@ from app.config import settings
 from app.database import connect_to_mongo, close_mongo_connection, db
 from app.dependencies.auth import seed_default_users
 from app.services.segmentation import segment_topics
-from app.services.transcription import transcribe_file
+from app.services.transcription import transcribe_file, unload_whisper_model
+from app.services.memory import cleanup_memory, get_current_rss_mb, get_peak_rss_mb
 
 # Routers
 from app.routers.auth import router as auth_router
@@ -172,6 +173,10 @@ def health():
     return {
         "status": "ok",
         "database_mode": "mock_development" if db.is_mock else "mongodb_atlas",
+        "memory": {
+            "current_rss_mb": get_current_rss_mb(),
+            "peak_rss_mb": get_peak_rss_mb(),
+        },
     }
 
 
@@ -235,3 +240,6 @@ async def transcribe_lecture(file: UploadFile = File(...)):
                 os.remove(temp_path)
             except Exception:
                 pass
+        if settings.UNLOAD_WHISPER_AFTER_TRANSCRIPTION:
+            unload_whisper_model()
+        cleanup_memory("direct_transcribe")
