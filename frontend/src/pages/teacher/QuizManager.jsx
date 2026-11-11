@@ -177,7 +177,7 @@ export default function QuizManager() {
   if (loading) {
     return (
       <div className="page-loading">
-        <div className="spinner" /> Loading quiz review center...
+        <div className="spinner" /> Loading quiz manager...
       </div>
     );
   }
@@ -186,10 +186,9 @@ export default function QuizManager() {
     <div className="dashboard-page max-w-5xl">
       <div className="dashboard-header">
         <div>
-          <h1>Quiz Review & Assessment Gate</h1>
+          <h1>Manage Lecture Quizzes</h1>
           <p>
-            Verify, edit, and approve AI-generated test questions. Unapproved questions remain hidden
-            from students to ensure pedagogical validity.
+            Review, edit, and approve quiz questions. Only approved questions are visible to students.
           </p>
         </div>
         <div className="header-actions">
@@ -200,7 +199,7 @@ export default function QuizManager() {
             title="Generate questions from lecture topics"
           >
             <Sparkles size={16} />
-            {generating ? "Generating..." : "Generate AI Drafts"}
+            {generating ? "Generating..." : "Generate Quizzes"}
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -208,7 +207,7 @@ export default function QuizManager() {
             className="btn-primary"
           >
             <PlusCircle size={16} />
-            Create Question
+            Add Question
           </button>
         </div>
       </div>
@@ -220,7 +219,7 @@ export default function QuizManager() {
       <div className="card-box mb-6">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div className="flex-1 min-w-[260px]">
-            <label className="font-semibold block mb-1">Select Lecture to Review Quizzes:</label>
+            <label className="font-semibold block mb-1">Select Lecture:</label>
             <select
               value={selectedLectureId}
               onChange={(e) => setSelectedLectureId(e.target.value)}
@@ -235,10 +234,10 @@ export default function QuizManager() {
           </div>
           <div className="flex items-center gap-3">
             <span className="badge badge-success">
-              {approvedCount} Approved (Student Visible)
+              {approvedCount} Approved (Visible to Students)
             </span>
             <span className="badge badge-warning">
-              {quizzes.length - approvedCount} Draft (Hidden)
+              {quizzes.length - approvedCount} Drafts (Hidden)
             </span>
           </div>
         </div>
@@ -248,7 +247,7 @@ export default function QuizManager() {
         <div className="empty-state">
           <HelpCircle size={48} />
           <h3>No quiz questions for this lecture yet</h3>
-          <p>Click "Generate AI Drafts" to create candidate questions from segmented topics, or "Create Question" to add your own.</p>
+          <p>Click "Generate Quizzes" to create draft questions from lecture topics, or "Add Question" to write your own.</p>
           <div className="flex gap-3 justify-center mt-4">
             <button
               onClick={handleGenerateAIQuizzes}
@@ -256,7 +255,7 @@ export default function QuizManager() {
               className="btn-primary"
             >
               <Sparkles size={16} />
-              {generating ? "Generating..." : "Generate AI Questions"}
+              {generating ? "Generating..." : "Generate Quizzes"}
             </button>
             <button onClick={() => setShowCreateModal(true)} className="btn-secondary">
               <PlusCircle size={16} />

@@ -70,10 +70,9 @@ export default function GlobalSearch() {
     <div className="dashboard-page max-w-5xl">
       <div className="dashboard-header">
         <div>
-          <h1>Atlas Vector Search & Grounded Q&A</h1>
+          <h1>Search Lectures & Ask Questions</h1>
           <p>
-            Perform semantic neural retrieval across all your enrolled lectures using MongoDB Atlas
-            Vector Search, keyword lexical matching, or ask questions grounded strictly in transcripts.
+            Find relevant moments across all your enrolled lectures or ask questions to get answers directly from lecture material.
           </p>
         </div>
       </div>
@@ -88,7 +87,7 @@ export default function GlobalSearch() {
             onClick={() => setActiveView("search")}
           >
             <Search size={16} />
-            <span>Semantic Passage Retrieval</span>
+            <span>Search by Topic or Meaning</span>
           </button>
           <button
             type="button"
@@ -96,7 +95,7 @@ export default function GlobalSearch() {
             onClick={() => setActiveView("qa")}
           >
             <Brain size={16} />
-            <span>Evidence-Grounded Q&A (RAG)</span>
+            <span>Ask Questions About Lectures</span>
           </button>
         </div>
 
@@ -110,21 +109,21 @@ export default function GlobalSearch() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={
                   activeView === "search"
-                    ? "Enter concept, formula, or phrase to retrieve passages..."
-                    : "Ask any academic question across your lectures..."
+                    ? "Search for any topic, term, or concept..."
+                    : "Ask any question about your lectures..."
                 }
                 required
               />
             </div>
             <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? "Retrieving..." : activeView === "search" ? "Search" : "Ask AI"}
+              {loading ? "Searching..." : activeView === "search" ? "Search" : "Ask Question"}
             </button>
           </div>
 
           {/* Filters Bar */}
           <div className="search-filters-row mt-4">
             <div className="filter-item">
-              <label>Course Scope:</label>
+              <label>Filter by Course:</label>
               <select
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
@@ -140,14 +139,14 @@ export default function GlobalSearch() {
 
             {activeView === "search" && (
               <div className="filter-item">
-                <label>Retrieval Mode:</label>
+                <label>Search Method:</label>
                 <select
                   value={searchMode}
                   onChange={(e) => setSearchMode(e.target.value)}
                 >
-                  <option value="vector">Atlas Vector Search (Semantic Cosine)</option>
-                  <option value="hybrid">Hybrid Search (Vector + Keyword RRF)</option>
-                  <option value="keyword">Keyword Lexical Search (Exact match)</option>
+                  <option value="vector">Search by Meaning (Recommended)</option>
+                  <option value="hybrid">Combined (Meaning + Exact Words)</option>
+                  <option value="keyword">Exact Words Only</option>
                 </select>
               </div>
             )}
@@ -159,7 +158,7 @@ export default function GlobalSearch() {
       {loading && (
         <div className="page-loading">
           <div className="spinner" />
-          <span>Executing {searchMode} search across 384-d embeddings...</span>
+          <span>Searching across lecture material...</span>
         </div>
       )}
 
@@ -168,11 +167,11 @@ export default function GlobalSearch() {
         <div className="qa-grounded-result-card">
           <div className="qa-badge-row">
             <span className={`grounded-badge ${qaResult.is_grounded ? "grounded" : "abstain"}`}>
-              {qaResult.is_grounded ? "Grounded in Lecture Evidence" : "Abstained / Insufficient Context"}
+              {qaResult.is_grounded ? "Answer from Lecture Material" : "Topic Not Covered in Lectures"}
             </span>
             {qaResult.confidence > 0 && (
               <span className="confidence-pill">
-                Relevance: {(qaResult.confidence * 100).toFixed(1)}%
+                Relevance: {(qaResult.confidence * 100).toFixed(0)}%
               </span>
             )}
           </div>
@@ -181,7 +180,7 @@ export default function GlobalSearch() {
 
           {qaResult.citations?.length > 0 && (
             <div className="qa-citations-section mt-5">
-              <h4>Supporting Lecture Citations:</h4>
+              <h4>Where this is explained in your lectures:</h4>
               <div className="citations-grid mt-2">
                 {qaResult.citations.map((c, i) => (
                   <div key={i} className="citation-box">
@@ -207,13 +206,13 @@ export default function GlobalSearch() {
         <div className="search-results-section">
           <div className="section-header">
             <h3>Search Results ({results.length})</h3>
-            <span className="text-muted">Ranked by relevance score</span>
+            <span className="text-muted">Ranked by relevance</span>
           </div>
 
           {results.length === 0 ? (
             <div className="empty-state">
               <Search size={40} />
-              <p>No matching lecture passages found. Try adjusting your query or filters.</p>
+              <p>No matching lecture sections found. Try adjusting your search words or course filter.</p>
             </div>
           ) : (
             <div className="results-list">
@@ -223,18 +222,18 @@ export default function GlobalSearch() {
                     <div className="lecture-info">
                       <span className="lecture-title">{item.lecture_title}</span>
                       {item.topic_title && (
-                        <span className="topic-pill">Section: {item.topic_title}</span>
+                        <span className="topic-pill">Topic: {item.topic_title}</span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-2">
                       <span className="score-pill">
-                        Score: {item.score?.toFixed(3)}
+                        Match: {Math.min(100, Math.round((item.score || 0) * 100))}%
                       </span>
                       <Link
                         to={item.timestamp_url}
                         className="btn-jump-player"
-                        title="Jump video to this timestamp"
+                        title="Play video from this timestamp"
                       >
                         <Clock size={13} />
                         <span>{formatSeconds(item.start)}</span>

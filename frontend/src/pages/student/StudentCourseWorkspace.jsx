@@ -49,7 +49,7 @@ export default function StudentCourseWorkspace() {
   if (loading) {
     return (
       <div className="page-loading">
-        <div className="spinner" /> Loading course learning workspace...
+        <div className="spinner" /> Loading course...
       </div>
     );
   }
@@ -62,7 +62,7 @@ export default function StudentCourseWorkspace() {
         </div>
         <div className="flex gap-3">
           <Link to="/student/courses" className="btn-primary">
-            Browse Available Courses
+            Explore Courses
           </Link>
           <Link to="/student" className="btn-secondary">
             Back to Dashboard
@@ -100,12 +100,12 @@ export default function StudentCourseWorkspace() {
             </span>
           </div>
           <p className="mt-1">
-            Instructor: <strong>{course.teacher_name || "Faculty"}</strong> · {course.description || "Course materials & quizzes."}
+            Teacher: <strong>{course.teacher_name || "Faculty"}</strong> · {course.description || "Course materials & quizzes."}
           </p>
         </div>
         <div className="header-actions">
           <Link to="/student/search" className="btn-secondary">
-            <Search size={16} /> Search Transcripts
+            <Search size={16} /> Search Course Lectures
           </Link>
         </div>
       </div>
@@ -117,14 +117,14 @@ export default function StudentCourseWorkspace() {
           className={`tab-btn ${activeTab === "lectures" ? "active" : ""}`}
         >
           <Video size={17} />
-          Published Lectures ({lectures.length})
+          Lectures ({lectures.length})
         </button>
         <button
           onClick={() => setActiveTab("quizzes")}
           className={`tab-btn ${activeTab === "quizzes" ? "active" : ""}`}
         >
           <HelpCircle size={17} />
-          Assessments & Quizzes ({quizzes.length})
+          Quizzes ({quizzes.length})
         </button>
       </div>
 
@@ -133,15 +133,15 @@ export default function StudentCourseWorkspace() {
         <div className="admin-tab-content">
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>Course Video Lectures</h2>
-              <span className="badge-count">{lectures.length} Approved Lectures</span>
+              <h2>Course Lectures</h2>
+              <span className="badge-count">{lectures.length} Lectures</span>
             </div>
 
             {lectures.length === 0 ? (
               <div className="empty-state">
                 <Video size={44} style={{ opacity: 0.4 }} />
-                <h3>No published lectures yet</h3>
-                <p>Your instructor will publish lectures as course topics progress.</p>
+                <h3>No lectures available yet</h3>
+                <p>Your teacher will add lectures here as the course progresses.</p>
               </div>
             ) : (
               <div className="lectures-student-grid">
@@ -156,7 +156,7 @@ export default function StudentCourseWorkspace() {
 
                     <h3 className="lecture-title">{lec.title}</h3>
                     <p className="lecture-desc">
-                      {lec.description || "Interactive transcript, semantic vector search, and topic segments."}
+                      {lec.description || "Interactive transcript, lecture topics, and quizzes."}
                     </p>
 
                     <div className="lecture-card-stats">
@@ -172,7 +172,7 @@ export default function StudentCourseWorkspace() {
                         style={{ textDecoration: "none" }}
                       >
                         <PlayCircle size={17} />
-                        <span>Open Learning Workspace</span>
+                        <span>Watch Lecture</span>
                       </Link>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export default function StudentCourseWorkspace() {
         <div className="admin-tab-content">
           <div className="dashboard-section mb-6">
             <div className="section-header">
-              <h2>Assigned Lecture Quizzes</h2>
+              <h2>Lecture Quizzes</h2>
               <span className="badge-count">{quizzes.length} Questions Available</span>
             </div>
 
@@ -196,7 +196,7 @@ export default function StudentCourseWorkspace() {
               <div className="empty-state">
                 <HelpCircle size={44} style={{ opacity: 0.4 }} />
                 <h3>No quizzes available yet</h3>
-                <p>Quizzes will appear as lectures are reviewed and published by your instructor.</p>
+                <p>Quizzes will appear as lectures are published by your teacher.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -214,7 +214,7 @@ export default function StudentCourseWorkspace() {
                       <div>
                         <h4 className="font-semibold text-main mb-1">{lec.title} Quiz</h4>
                         <div className="text-xs text-muted">
-                          {lecQuizzes.length} approved question(s) · Instant evaluation & grounded explanations
+                          {lecQuizzes.length} question(s) · Instant feedback & explanations
                         </div>
                       </div>
                       <Link
@@ -223,7 +223,7 @@ export default function StudentCourseWorkspace() {
                         style={{ textDecoration: "none" }}
                       >
                         <Sparkles size={16} />
-                        <span>Take Assessment</span>
+                        <span>Take Quiz</span>
                         <ArrowRight size={14} />
                       </Link>
                     </div>
@@ -236,21 +236,21 @@ export default function StudentCourseWorkspace() {
           {/* Previous Attempts & Performance */}
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>My Assessment History</h2>
-              <span className="badge-count">{myAttempts.length} Completed Attempts</span>
+              <h2>My Quiz Results</h2>
+              <span className="badge-count">{myAttempts.length} Attempts</span>
             </div>
 
             {myAttempts.length === 0 ? (
               <div className="empty-state">
                 <Award size={36} style={{ opacity: 0.4 }} />
-                <p>You haven't completed any assessments in this course yet.</p>
+                <p>You haven't taken any quizzes in this course yet.</p>
               </div>
             ) : (
               <div className="table-responsive">
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Assessment</th>
+                      <th>Quiz</th>
                       <th>Score</th>
                       <th>Correct / Total</th>
                       <th>Date</th>

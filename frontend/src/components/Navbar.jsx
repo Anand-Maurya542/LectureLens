@@ -40,7 +40,7 @@ export default function Navbar() {
     badgeClass = "role-admin";
   } else if (isTeacher) {
     rootPath = "/teacher";
-    badgeLabel = "Instructor Portal";
+    badgeLabel = "Teacher Portal";
     badgeClass = "role-teacher";
   }
 
@@ -71,14 +71,14 @@ export default function Navbar() {
                 className={`nav-link ${isActive("/admin") ? "active" : ""}`}
               >
                 <Shield size={18} />
-                Admin Console
+                Admin Dashboard
               </Link>
               <Link
                 to="/teacher"
                 className={`nav-link ${isActive("/teacher") ? "active" : ""}`}
               >
                 <LayoutDashboard size={18} />
-                Instructor Studio
+                Teacher Workspace
               </Link>
               <Link
                 to="/teacher/courses"
@@ -147,21 +147,21 @@ export default function Navbar() {
                 className={`nav-link ${isActive("/student/courses") ? "active" : ""}`}
               >
                 <BookOpen size={18} />
-                Course Catalog
+                Explore Courses
               </Link>
               <Link
                 to="/student/search"
                 className={`nav-link ${isActive("/student/search") ? "active" : ""}`}
               >
                 <Search size={18} />
-                Atlas Search & Q&A
+                Search & Ask Questions
               </Link>
               <Link
                 to="/student/revision"
                 className={`nav-link ${isActive("/student/revision") ? "active" : ""}`}
               >
                 <Brain size={18} />
-                Smart Revision
+                My Study Plan
               </Link>
             </>
           )}

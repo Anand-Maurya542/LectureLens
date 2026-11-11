@@ -45,12 +45,12 @@ export default function AddLecture() {
     setError("");
 
     if (!consent) {
-      setError("Please confirm student and speaker consent before processing.");
+      setError("Please confirm that you have permission to share this lecture recording.");
       return;
     }
 
     if (!courseId) {
-      setError("Please select a target course.");
+      setError("Please select a course for this lecture.");
       return;
     }
 
@@ -60,7 +60,7 @@ export default function AddLecture() {
       let createdLecture;
       if (sourceType === "youtube") {
         if (!youtubeUrl.trim()) {
-          throw new Error("Please enter a valid YouTube lecture URL.");
+          throw new Error("Please enter a valid YouTube link.");
         }
         createdLecture = await api.createYouTubeLecture({
           title,
@@ -71,7 +71,7 @@ export default function AddLecture() {
         });
       } else {
         if (!file) {
-          throw new Error("Please select an audio or video file.");
+          throw new Error("Please select an audio or video recording file.");
         }
         const formData = new FormData();
         formData.append("title", title);
@@ -82,10 +82,10 @@ export default function AddLecture() {
         createdLecture = await api.uploadLecture(formData);
       }
 
-      // Redirect immediately to the review page where real-time pipeline status is displayed
+      // Redirect immediately to the review page where preparation status is displayed
       navigate(`/teacher/lectures/${createdLecture.id}/review`);
     } catch (err) {
-      setError(err.message || "Failed to initiate lecture ingestion.");
+      setError(err.message || "We couldn't prepare the lecture. Please try again.");
       setSubmitting(false);
     }
   };
@@ -94,8 +94,8 @@ export default function AddLecture() {
     <div className="dashboard-page max-w-4xl">
       <div className="dashboard-header">
         <div>
-          <h1>Add New Lecture</h1>
-          <p>Ingest lecture recordings via YouTube video or direct audio/video upload.</p>
+          <h1>Add a New Lecture</h1>
+          <p>Add a YouTube video or upload a recording to create learning material.</p>
         </div>
       </div>
 
@@ -108,7 +108,7 @@ export default function AddLecture() {
             onClick={() => setSourceType("youtube")}
           >
             <Video size={20} />
-            <span>YouTube Lecture URL</span>
+            <span>Add from YouTube</span>
           </button>
           <button
             type="button"
@@ -116,7 +116,7 @@ export default function AddLecture() {
             onClick={() => setSourceType("upload")}
           >
             <UploadCloud size={20} />
-            <span>Upload Audio / Video</span>
+            <span>Upload Audio or Video</span>
           </button>
         </div>
 
@@ -130,12 +130,13 @@ export default function AddLecture() {
         <form onSubmit={handleSubmit} className="mt-6">
           <div className="form-grid">
             <div className="form-group">
-              <label>Target Course *</label>
+              <label>Select Course *</label>
               <select
                 value={courseId}
                 onChange={(e) => setCourseId(e.target.value)}
                 required
               >
+                {courses.length === 0 && <option value="">No active courses found</option>}
                 {courses.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title} ({c.code})
@@ -151,25 +152,25 @@ export default function AddLecture() {
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Lecture 4: Attention Mechanisms and Transformers"
+                placeholder="e.g. Introduction to Database Normalization"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>Description & Notes</label>
+            <label>About This Lecture</label>
             <textarea
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Key lecture overview, covered chapters, or prerequisite reading..."
+              placeholder="Briefly describe what this lecture covers..."
             />
           </div>
 
           {sourceType === "youtube" ? (
             <div className="form-group highlight-box">
               <label>
-                <Video size={16} /> YouTube Video Link *
+                <Video size={16} /> Paste YouTube Link *
               </label>
               <input
                 type="url"
@@ -179,8 +180,11 @@ export default function AddLecture() {
                 placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
               />
               <small className="help-text">
-                The pipeline will automatically ingest authorized caption transcripts and generate semantic topics.
+                We will prepare the transcript and organise your lecture into topics. This may take a few minutes.
               </small>
+              <div style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "6px" }}>
+                💡 Tip: Make sure the YouTube video has English or Hindi subtitles enabled. If not, you can upload subtitles or a recording directly after adding.
+              </div>
             </div>
           ) : (
             <div className="upload-dropzone">
@@ -200,19 +204,19 @@ export default function AddLecture() {
                   </div>
                 ) : (
                   <div>
-                    <strong>Click to select audio or video file</strong>
-                    <p>Supported: MP4, MP3, WAV, M4A, MOV, WebM (up to 500MB)</p>
+                    <strong>Click to select audio or video recording</strong>
+                    <p>Supported formats: MP4, MP3, WAV, M4A, MOV, WebM (up to 500MB)</p>
                   </div>
                 )}
               </label>
 
               <div className="form-group mt-4">
-                <label>Audio Language Hint</label>
+                <label>Spoken Language</label>
                 <select
                   value={languageHint}
                   onChange={(e) => setLanguageHint(e.target.value)}
                 >
-                  <option value="auto">Auto-detect Language</option>
+                  <option value="auto">Automatic detection</option>
                   <option value="en">English</option>
                   <option value="hi">Hindi (हिंदी)</option>
                 </select>
@@ -231,9 +235,8 @@ export default function AddLecture() {
               />
               <span>
                 <ShieldCheck size={16} className="inline-icon" />
-                <strong>Institutional & Recording Consent:</strong> I confirm that this lecture recording
-                complies with institutional privacy guidelines, speaker permission has been recorded, and
-                materials are intended strictly for educational use within enrolled courses.
+                <strong>Recording Permission:</strong> I confirm that I have permission to share this lecture
+                recording for educational use within this course.
               </span>
             </label>
           </div>
@@ -244,7 +247,7 @@ export default function AddLecture() {
               disabled={submitting}
               className="btn-primary w-full justify-center"
             >
-              <span>{submitting ? "Initiating AI Pipeline..." : "Process Lecture & Generate Transcripts"}</span>
+              <span>{submitting ? "Preparing Lecture..." : "Prepare Lecture"}</span>
               <ArrowRight size={18} />
             </button>
           </div>

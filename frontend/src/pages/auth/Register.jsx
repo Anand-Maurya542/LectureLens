@@ -46,7 +46,7 @@ export default function Register() {
         <div className="auth-header">
           <div className="auth-logo">🎓</div>
           <h2>Join LectureLens</h2>
-          <p>Create a Student account to access courses, grounded AI search & interactive quizzes</p>
+          <p>Create a Student account to access courses, lecture transcripts, search & quizzes</p>
         </div>
 
         {error && (

@@ -57,35 +57,35 @@ export default function StudentDashboard() {
     setEnrollMessage("");
     try {
       await api.enrollCourse(code);
-      setEnrollMessage(`Enrollment request for ${code} submitted! Awaiting administrator approval.`);
+      setEnrollMessage(`Course joining request for ${code} submitted! Waiting for administrator approval.`);
       setEnrollCode("");
       await loadData();
     } catch (err) {
-      setEnrollMessage(err.message || "Invalid course code");
+      setEnrollMessage(err.message || "Invalid course code. Please check and try again.");
     } finally {
       setEnrolling(false);
     }
   };
 
   if (loading) {
-    return <div className="page-loading"><div className="spinner" /> Loading student learning hub...</div>;
+    return <div className="page-loading"><div className="spinner" /> Loading your learning hub...</div>;
   }
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
         <div>
-          <h1>Student Learning Workspace</h1>
-          <p>Access your enrolled courses, searchable lecture transcripts, and smart revision guides.</p>
+          <h1>Student Learning Hub</h1>
+          <p>Access your courses, watch lectures with interactive transcripts, and ask questions.</p>
         </div>
         <div className="header-actions">
           <Link to="/student/courses" className="btn-secondary">
             <BookOpen size={16} />
-            Course Catalog & Requests
+            Explore Courses
           </Link>
           <Link to="/student/search" className="btn-secondary">
             <Search size={16} />
-            Atlas Vector Search
+            Search & Ask Questions
           </Link>
         </div>
       </div>
@@ -109,10 +109,10 @@ export default function StudentDashboard() {
             <Clock size={22} style={{ color: "#d97706" }} />
             <div>
               <strong style={{ display: "block", color: "var(--text-main, #0f172a)" }}>
-                Enrollment Request Pending Review
+                Course Joining Request Pending Review
               </strong>
               <span style={{ fontSize: "0.84rem", color: "var(--text-muted, #64748b)" }}>
-                You have {myEnrollments.filter((e) => e.status === "pending").length} course request(s) awaiting administrative approval.
+                You have {myEnrollments.filter((e) => e.status === "pending").length} course joining request(s) waiting for approval.
               </span>
             </div>
           </div>
@@ -129,8 +129,8 @@ export default function StudentDashboard() {
             <Plus size={22} />
           </div>
           <div>
-            <h4>Quick Course Enrollment</h4>
-            <p>Have an enrollment code from your instructor? Enter it to request access.</p>
+            <h4>Join a Course</h4>
+            <p>Enter the course code shared by your teacher to request access.</p>
           </div>
         </div>
         <form onSubmit={handleEnroll} className="quick-enroll-form">
@@ -149,7 +149,7 @@ export default function StudentDashboard() {
             className="btn-primary"
             style={{ whiteSpace: "nowrap" }}
           >
-            {enrolling ? "Enrolling..." : "Enroll"}
+            {enrolling ? "Joining..." : "Join Course"}
           </button>
         </form>
       </div>
@@ -170,7 +170,7 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* Smart Revision Recommendations Banner */}
+      {/* Study Recommendations Banner */}
       {recommendations.length > 0 && (
         <div className="revision-highlight-card">
           <div className="revision-header">
@@ -190,14 +190,14 @@ export default function StudentDashboard() {
                 <Brain size={20} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Personalized Revision Focus</h3>
+                <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Recommended Study Focus</h3>
                 <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
-                  AI-recommended topics based on your quiz activity and syllabus progress
+                  Topics recommended for you based on your quiz practice
                 </p>
               </div>
             </div>
             <Link to="/student/revision" className="btn-link" style={{ fontWeight: 600, fontSize: "0.88rem" }}>
-              View Full Plan →
+              View Study Plan →
             </Link>
           </div>
           <div className="recommendations-row">
@@ -210,7 +210,7 @@ export default function StudentDashboard() {
                 </div>
                 <Link to={rec.timestamp_url} className="btn-rec-action">
                   <PlayCircle size={15} />
-                  <span>Review Video at {Math.floor(rec.suggested_start_time / 60)}m</span>
+                  <span>Watch Explanation at {Math.floor(rec.suggested_start_time / 60)}m</span>
                 </Link>
               </div>
             ))}
@@ -221,17 +221,17 @@ export default function StudentDashboard() {
       {/* Enrolled Courses */}
       <div className="dashboard-section">
         <div className="section-header">
-          <h2>My Enrolled Courses</h2>
+          <h2>My Courses</h2>
         </div>
 
         {courses.length === 0 ? (
           <div className="empty-state">
             <BookOpen size={48} />
-            <h3>No enrolled courses yet</h3>
-            <p>Enter an enrollment code above (e.g. <code>CS401</code>) or browse active university courses to request enrollment.</p>
+            <h3>You haven't joined any courses yet</h3>
+            <p>Enter a course code above (e.g. <code>CS401</code>) or explore available courses to join.</p>
             <Link to="/student/courses" className="btn-primary" style={{ marginTop: "14px", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
               <BookOpen size={16} />
-              Browse Course Catalog
+              Explore Courses
             </Link>
           </div>
         ) : (
@@ -242,8 +242,8 @@ export default function StudentDashboard() {
                 <h3 className="course-title">{c.title}</h3>
                 <p className="course-desc">{c.description || "Course materials & lectures."}</p>
                 <div className="course-card-footer">
-                  <span>Instructor: {c.teacher_name || "Faculty"}</span>
-                  <span className="font-semibold">{c.lecture_count} Published Lectures</span>
+                  <span>Teacher: {c.teacher_name || "Faculty"}</span>
+                  <span className="font-semibold">{c.lecture_count} Lectures</span>
                 </div>
                 <div className="mt-3 pt-3 border-t">
                   <Link
@@ -251,7 +251,7 @@ export default function StudentDashboard() {
                     className="btn-primary w-full justify-center flex items-center gap-2"
                     style={{ textDecoration: "none", fontSize: "0.85rem", padding: "8px 12px" }}
                   >
-                    <span>Open Course Workspace</span>
+                    <span>Open Course</span>
                     <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -264,14 +264,14 @@ export default function StudentDashboard() {
       {/* Available Published Lectures */}
       <div className="dashboard-section mt-8">
         <div className="section-header">
-          <h2>Available Approved Lectures</h2>
+          <h2>Recent Lectures</h2>
         </div>
 
         {lectures.length === 0 ? (
           <div className="empty-state">
             <Video size={48} />
-            <h3>No published lectures available yet</h3>
-            <p>Your instructors will publish lectures once transcript review and quiz verification are complete.</p>
+            <h3>No lectures available yet</h3>
+            <p>Your teachers will publish lectures here once they are ready.</p>
           </div>
         ) : (
           <div className="lectures-student-grid">
@@ -286,7 +286,7 @@ export default function StudentDashboard() {
 
                 <h3 className="lecture-title">{lec.title}</h3>
                 <p className="lecture-desc">
-                  {lec.description || "Interactive transcript, semantic search, and section quizzes."}
+                  {lec.description || "Interactive transcript, lecture topics, and practice questions."}
                 </p>
 
                 <div className="lecture-card-stats">
@@ -298,7 +298,7 @@ export default function StudentDashboard() {
                 <div className="lecture-card-actions">
                   <Link to={`/student/lectures/${lec.id}`} className="btn-primary w-full justify-center">
                     <PlayCircle size={17} />
-                    <span>Open Learning Workspace</span>
+                    <span>Watch Lecture</span>
                   </Link>
                 </div>
               </div>

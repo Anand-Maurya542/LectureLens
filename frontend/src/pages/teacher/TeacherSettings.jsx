@@ -85,7 +85,7 @@ export default function TeacherSettings() {
       await api.updateProfile({ name: name.trim(), bio: bio.trim() });
       await refreshUser();
       setIsEditingProfile(false);
-      showFeedback("Instructor profile updated successfully.");
+      showFeedback("Profile updated successfully.");
     } catch (err) {
       showFeedback(err.message || "Failed to update profile", true);
     } finally {
@@ -128,7 +128,7 @@ export default function TeacherSettings() {
   if (loading) {
     return (
       <div className="page-loading">
-        <div className="spinner" /> Loading instructor profile...
+        <div className="spinner" /> Loading profile...
       </div>
     );
   }
@@ -137,8 +137,8 @@ export default function TeacherSettings() {
     <div className="dashboard-page max-w-4xl">
       <div className="dashboard-header">
         <div>
-          <h1>Instructor Profile & Settings</h1>
-          <p>Manage personal faculty credentials, department profile, and security preferences.</p>
+          <h1>Teacher Profile & Settings</h1>
+          <p>Manage your profile details and security settings.</p>
         </div>
       </div>
 

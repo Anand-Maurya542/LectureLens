@@ -78,10 +78,10 @@ export default function TeacherDashboard() {
     setRetryingId(lectureId);
     try {
       await api.retryLecture(lectureId);
-      showMsg("Pipeline restarted successfully. Status will update automatically.");
+      showMsg("Lecture preparation restarted. Status will update automatically.");
       await loadData();
     } catch (err) {
-      showMsg(err.message || "Failed to retry pipeline", true);
+      showMsg(err.message || "Failed to restart lecture preparation", true);
     } finally {
       setRetryingId(null);
     }
@@ -138,11 +138,11 @@ export default function TeacherDashboard() {
       <div className="dashboard-header">
         <div>
           <div className="flex items-center gap-3">
-            <h1>Instructor Studio</h1>
-            <span className="role-badge role-teacher">Faculty</span>
+            <h1>Teacher Workspace</h1>
+            <span className="role-badge role-teacher">Teacher</span>
           </div>
           <p>
-            Manage curriculum, review AI transcriptions, approve assessments & publish student material.
+            Add lectures, review transcripts, approve quizzes, and share learning materials with your students.
           </p>
         </div>
         <div className="header-actions">
@@ -155,11 +155,11 @@ export default function TeacherDashboard() {
             title="Refresh status"
           >
             <RefreshCw size={16} className={refreshing ? "spin" : ""} />
-            Sync
+            Refresh
           </button>
           <Link to="/teacher/add-lecture" className="btn-primary">
             <PlusCircle size={18} />
-            Add Lecture
+            Add a Lecture
           </Link>
         </div>
       </div>
@@ -185,7 +185,7 @@ export default function TeacherDashboard() {
           </div>
           <div>
             <div className="metric-value">{totalLectures}</div>
-            <div className="metric-label">Total Ingested</div>
+            <div className="metric-label">Total Lectures</div>
           </div>
         </div>
 
@@ -205,7 +205,7 @@ export default function TeacherDashboard() {
           </div>
           <div>
             <div className="metric-value">{processedLectures - publishedLectures}</div>
-            <div className="metric-label">Awaiting Approval</div>
+            <div className="metric-label">Ready for Your Review</div>
           </div>
         </div>
       </div>
@@ -215,11 +215,11 @@ export default function TeacherDashboard() {
           <div className="flex items-center gap-2">
             <AlertCircle size={18} />
             <span>
-              {failedLectures} lecture(s) failed automated processing. Click "Retry" to run the pipeline again.
+              {failedLectures} lecture(s) need your attention. You can add subtitles or retry preparation.
             </span>
           </div>
           <button onClick={() => setStatusFilter("failed")} className="btn-secondary btn-sm">
-            View Failed
+            View Lectures
           </button>
         </div>
       )}
@@ -275,7 +275,7 @@ export default function TeacherDashboard() {
                 <tr>
                   <th>Title & Course</th>
                   <th>Source</th>
-                  <th>Pipeline Status</th>
+                  <th>Status</th>
                   <th>Publication</th>
                   <th>Segments / Topics</th>
                   <th>Actions</th>
@@ -334,7 +334,7 @@ export default function TeacherDashboard() {
                               onClick={() => handleRetryPipeline(lec.id)}
                               disabled={retryingId === lec.id}
                               className="btn-action"
-                              title="Restart pipeline"
+                              title="Retry lecture preparation"
                             >
                               <RefreshCw
                                 size={15}

@@ -38,22 +38,51 @@ def fetch_youtube_transcript(
         detected_language = languages[0] if languages else "en"
         preferred = list(languages) + ["en-US", "en-GB", "hi-Latn"]
 
+        # Setup HTTP session with browser user-agent to avoid automated request blocks
+        session = None
+        try:
+            import requests
+            session = requests.Session()
+            session.headers.update({
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9,hi;q=0.8",
+            })
+        except Exception:
+            session = None
+
         # Check API version: v1.2+ uses instance methods .fetch() or .list()
         try:
-            api_instance = YouTubeTranscriptApi()
-            if hasattr(api_instance, "fetch"):
+            api_instance = YouTubeTranscriptApi(http_client=session) if session else YouTubeTranscriptApi()
+            if hasattr(api_instance, "list"):
+                try:
+                    transcript_list = api_instance.list(video_id)
+                    # 1. Try finding preferred language transcript
+                    try:
+                        t = transcript_list.find_transcript(preferred)
+                        raw_snippets = t.fetch()
+                        detected_language = getattr(t, "language_code", detected_language)
+                    except Exception:
+                        # 2. Try translating any translatable transcript to English
+                        for candidate in transcript_list:
+                            try:
+                                if getattr(candidate, "is_translatable", False):
+                                    raw_snippets = candidate.translate("en").fetch()
+                                    detected_language = "en"
+                                    break
+                                else:
+                                    raw_snippets = candidate.fetch()
+                                    detected_language = getattr(candidate, "language_code", detected_language)
+                                    break
+                            except Exception:
+                                continue
+                except Exception as list_err:
+                    logger.info(f"Listing transcripts returned: {list_err}")
+
+            if raw_snippets is None and hasattr(api_instance, "fetch"):
                 try:
                     raw_snippets = api_instance.fetch(video_id, languages=preferred)
                 except Exception:
-                    # Fallback to list() to find any available transcript
-                    if hasattr(api_instance, "list"):
-                        transcript_list = api_instance.list(video_id)
-                        try:
-                            t = transcript_list.find_transcript(preferred)
-                        except Exception:
-                            t = next(iter(transcript_list))
-                        detected_language = getattr(t, "language_code", detected_language)
-                        raw_snippets = t.fetch()
+                    pass
         except Exception:
             pass
 

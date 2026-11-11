@@ -2,11 +2,11 @@ import React from "react";
 
 export function StatusBadge({ status, isPublished }) {
   const configs = {
-    queued: { label: "Queued", color: "#3b82f6", bg: "#eff6ff" },
-    processing: { label: "Processing AI Pipeline...", color: "#d97706", bg: "#fffbeb" },
-    review_required: { label: "Review Required", color: "#8b5cf6", bg: "#f5f3ff" },
+    queued: { label: "Waiting to Start", color: "#3b82f6", bg: "#eff6ff" },
+    processing: { label: "Preparing Lecture...", color: "#d97706", bg: "#fffbeb" },
+    review_required: { label: "Ready for Review", color: "#8b5cf6", bg: "#f5f3ff" },
     published: { label: "Published", color: "#10b981", bg: "#ecfdf5" },
-    failed: { label: "Processing Failed", color: "#ef4444", bg: "#fef2f2" },
+    failed: { label: "Needs Attention", color: "#ef4444", bg: "#fef2f2" },
   };
 
   const current = configs[status] || { label: status, color: "#6b7280", bg: "#f3f4f6" };
@@ -46,27 +46,23 @@ export function StatusBadge({ status, isPublished }) {
 export function UncertaintyPill({ avgLogprob }) {
   if (avgLogprob === undefined || avgLogprob === null) return null;
 
-  // Faster-Whisper avg_logprob is logarithmic.
-  // >= -0.2: high confidence
-  // -0.2 to -0.5: moderate
-  // < -0.5: low confidence / needs review
-  let label = "High Confidence";
+  let label = "Clear";
   let color = "#10b981";
   let bg = "#ecfdf5";
 
   if (avgLogprob < -0.5) {
-    label = "Review Suggested";
+    label = "Needs Review";
     color = "#ef4444";
     bg = "#fef2f2";
   } else if (avgLogprob < -0.2) {
-    label = "Moderate";
+    label = "Listen & Check";
     color = "#f59e0b";
     bg = "#fffbeb";
   }
 
   return (
     <span
-      title={`Model log-probability: ${avgLogprob}`}
+      title={`Audio clarity: ${label}`}
       style={{
         display: "inline-block",
         padding: "2px 8px",

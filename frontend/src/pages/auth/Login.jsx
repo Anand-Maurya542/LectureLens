@@ -46,7 +46,7 @@ export default function Login() {
         <div className="auth-header">
           <div className="auth-logo">🎓</div>
           <h2>Sign in to LectureLens</h2>
-          <p>Intelligent Lecture Transcription, Atlas Search & Learning</p>
+          <p>Interactive Lecture Transcripts, Smart Search & Learning</p>
         </div>
 
         {error && (
@@ -89,7 +89,7 @@ export default function Login() {
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
             <LogIn size={18} />
-            {loading ? "Authenticating..." : "Sign In"}
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
@@ -98,7 +98,7 @@ export default function Login() {
             Need a student account? <Link to="/register">Create one here</Link>
           </p>
           <p style={{ fontSize: "0.82rem", color: "var(--text-muted, #64748b)" }}>
-            Faculty & Instructors: Teacher accounts are provisioned exclusively by Platform Administrators.
+            Teachers: Teacher accounts are created by Platform Administrators.
           </p>
         </div>
       </div>

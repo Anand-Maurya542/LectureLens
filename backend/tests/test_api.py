@@ -300,6 +300,13 @@ async def test_quiz_lifecycle_and_analytics(client):
     assert s_quiz_early.status_code == 200
     assert len(s_quiz_early.json()) == 0
 
+    # Teacher triggers on-demand quiz generation
+    gen_res = await client.post(f"/api/lectures/{lecture_id}/quizzes/generate", headers=t_headers)
+    assert gen_res.status_code == 200
+    assert "count" in gen_res.json()
+    assert gen_res.json()["count"] >= 1
+    assert "Generated" in gen_res.json()["message"]
+
     # Teacher inserts a draft question and approves it
     from app.database import get_db
     db = get_db()
@@ -1275,6 +1282,90 @@ async def test_advanced_transcript_and_glossary_features(client):
             assert "SELECT all columns" in exp_res.text
         elif fmt == "json":
             assert "segments" in exp_res.json()
+
+
+@pytest.mark.asyncio
+async def test_subtitles_upload_and_custom_transcript_resolution(client):
+    from app.database import get_db
+    db = get_db()
+    # 1. Login teacher
+    t_res = await client.post("/api/auth/login", json={"email": "teacher@lecturelens.edu", "password": "TeacherPass123!"})
+    assert t_res.status_code == 200
+    t_token = t_res.json()["access_token"]
+    t_headers = {"Authorization": f"Bearer {t_token}"}
+
+    # 2. Get course
+    courses = await client.get("/api/courses", headers=t_headers)
+    course_id = courses.json()[0]["id"]
+
+    # 3. Create a lecture that fails caption extraction
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    failed_lec = {
+        "title": "Integrity Constraints in DBMS",
+        "description": "Relational constraints and key mechanisms.",
+        "course_id": course_id,
+        "teacher_id": str(t_res.json()["user"]["id"]),
+        "source_type": "youtube",
+        "youtube_url": "https://www.youtube.com/watch?v=mock_no_caps",
+        "youtube_video_id": "mock_no_caps",
+        "media_url": "https://www.youtube.com/embed/mock_no_caps",
+        "status": "failed",
+        "failure_reason": "Captions unavailable for this YouTube video (No transcript could be retrieved for this video.).",
+        "is_published": False,
+        "segments": [],
+        "topics": [],
+        "summaries": [],
+        "created_at": now,
+        "updated_at": now,
+    }
+    insert_res = await db.lectures.insert_one(failed_lec)
+    failed_lec_id = str(insert_res.inserted_id)
+
+    # 4. Teacher uploads custom SRT subtitles to resolve missing transcript
+    srt_content = (
+        "1\n00:00:01,000 --> 00:00:08,000\nRelational model constraints specify rules for valid states.\n\n"
+        "2\n00:00:09,000 --> 00:00:18,000\nDomain constraints require each attribute value to be atomic from the domain.\n\n"
+        "3\n00:00:19,000 --> 00:00:28,000\nKey constraints ensure entity integrity and uniqueness of tuples.\n\n"
+        "4\n00:00:29,000 --> 00:00:40,000\nForeign keys enforce referential integrity across related relations.\n"
+    )
+
+    upload_res = await client.post(
+        f"/api/lectures/{failed_lec_id}/subtitles",
+        files={"file": ("subtitles.srt", srt_content.encode("utf-8"), "text/plain")},
+        headers=t_headers,
+    )
+    assert upload_res.status_code == 200
+    lec_data = upload_res.json()
+    assert lec_data["status"] == "review_required"
+    assert lec_data.get("failure_reason") is None
+    assert len(lec_data["segments"]) == 4
+    assert "referential integrity" in lec_data["segments"][3]["text"]
+    assert len(lec_data["topics"]) >= 1
+    assert len(lec_data["summaries"]) >= 1
+
+    # Verify lecture_chunks were indexed
+    chunk_count = await db.lecture_chunks.count_documents({"lecture_id": failed_lec_id})
+    assert chunk_count >= 1
+
+    # 5. Teacher tests direct transcript text submission
+    text_payload = {
+        "text": (
+            "[00:00] First segment discussing database tables.\n"
+            "[00:15] Second segment explaining primary keys.\n"
+            "[00:30] Third segment explaining foreign key references."
+        )
+    }
+    text_res = await client.post(
+        f"/api/lectures/{failed_lec_id}/transcript-text",
+        json=text_payload,
+        headers=t_headers,
+    )
+    assert text_res.status_code == 200
+    text_data = text_res.json()
+    assert text_data["status"] == "review_required"
+    assert len(text_data["segments"]) == 3
+    assert "primary keys" in text_data["segments"][1]["text"]
+
 
 
 

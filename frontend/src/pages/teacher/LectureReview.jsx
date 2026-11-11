@@ -33,6 +33,10 @@ import {
   BookOpen,
   ChevronDown,
   ShieldCheck,
+  Upload,
+  Video,
+  FileUp,
+  X,
 } from "lucide-react";
 
 export default function LectureReview() {
@@ -62,6 +66,18 @@ export default function LectureReview() {
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [courseGlossary, setCourseGlossary] = useState([]);
+
+  // Transcript / Subtitle supply modal & actions
+  const [supplyModalOpen, setSupplyModalOpen] = useState(false);
+  const [supplyTab, setSupplyTab] = useState("file"); // "file" | "paste" | "media"
+  const [selectedSubFile, setSelectedSubFile] = useState(null);
+  const [selectedMediaFile, setSelectedMediaFile] = useState(null);
+  const [pastedTranscriptText, setPastedTranscriptText] = useState("");
+  const [uploadError, setUploadError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const subFileInputRef = useRef(null);
+  const mediaFileInputRef = useRef(null);
 
   const playerRef = useRef(null);
   const activeItemRef = useRef(null);
@@ -228,7 +244,81 @@ export default function LectureReview() {
       await api.retryLecture(id);
       await fetchLecture();
     } catch (err) {
-      alert(err.message || "Failed to retry pipeline");
+      alert(err.message || "Failed to retry lecture preparation");
+    }
+  };
+
+  const handleUploadSubtitles = async (fileToUpload) => {
+    const file = fileToUpload || selectedSubFile;
+    if (!file) {
+      alert("Please select a subtitle or transcript file first (.srt, .vtt, .txt, .json).");
+      return;
+    }
+    setIsUploading(true);
+    setUploadError("");
+    try {
+      const updated = await api.uploadSubtitles(id, file);
+      setLecture(updated);
+      setSaveMessage("Subtitles imported successfully! Transcript segments, topics, and summaries generated.");
+      setSupplyModalOpen(false);
+      setSelectedSubFile(null);
+      setTimeout(() => setSaveMessage(""), 5000);
+      await fetchLecture();
+    } catch (err) {
+      const msg = err.message || "Failed to upload subtitles";
+      setUploadError(msg);
+      alert(msg);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmitPastedText = async () => {
+    if (!pastedTranscriptText.trim()) {
+      alert("Please enter or paste transcript text.");
+      return;
+    }
+    setIsUploading(true);
+    setUploadError("");
+    try {
+      const updated = await api.submitTranscriptText(id, pastedTranscriptText.trim());
+      setLecture(updated);
+      setSaveMessage("Transcript text parsed and applied! Topics, summaries, and quizzes generated.");
+      setSupplyModalOpen(false);
+      setPastedTranscriptText("");
+      setTimeout(() => setSaveMessage(""), 5000);
+      await fetchLecture();
+    } catch (err) {
+      const msg = err.message || "Failed to parse and submit transcript text";
+      setUploadError(msg);
+      alert(msg);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAttachMediaRecording = async (fileToUpload) => {
+    const file = fileToUpload || selectedMediaFile;
+    if (!file) {
+      alert("Please select an audio or video file first.");
+      return;
+    }
+    setIsUploading(true);
+    setUploadError("");
+    try {
+      const updated = await api.attachMedia(id, file);
+      setLecture(updated);
+      setSaveMessage("Media recording attached! Lecture preparation started.");
+      setSupplyModalOpen(false);
+      setSelectedMediaFile(null);
+      setTimeout(() => setSaveMessage(""), 5000);
+      await fetchLecture();
+    } catch (err) {
+      const msg = err.message || "Failed to attach media recording";
+      setUploadError(msg);
+      alert(msg);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -303,12 +393,28 @@ export default function LectureReview() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="flex items-center gap-2" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           {lecture.status === "failed" && (
             <button onClick={handleRetry} className="btn-secondary">
-              <RefreshCw size={16} /> Retry Pipeline
+              <RefreshCw size={16} /> Retry Preparation
             </button>
           )}
+
+          {/* Supply Subtitles / Script Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setSupplyTab("file");
+              setUploadError("");
+              setSupplyModalOpen(true);
+            }}
+            disabled={isProcessing || isUploading}
+            className="btn-secondary"
+            title="Upload subtitle file (.srt/.vtt) or paste transcript text"
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Upload size={16} /> Add Subtitles or Notes
+          </button>
 
           {/* Transcript Approval Buttons */}
           {transcriptStatus !== "approved" && !isProcessing && (
@@ -354,26 +460,200 @@ export default function LectureReview() {
         </div>
       </div>
 
+      {/* Hidden file inputs for direct selection */}
+      <input
+        ref={subFileInputRef}
+        type="file"
+        accept=".srt,.vtt,.txt,.json,text/plain"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setSelectedSubFile(file);
+            handleUploadSubtitles(file);
+          }
+          e.target.value = "";
+        }}
+      />
+      <input
+        ref={mediaFileInputRef}
+        type="file"
+        accept="audio/*,video/*,.mp4,.mp3,.wav,.m4a,.webm,.mov"
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setSelectedMediaFile(file);
+            handleAttachMediaRecording(file);
+          }
+          e.target.value = "";
+        }}
+      />
+
       {lecture.status === "failed" && (
         <div
-          className="alert-error my-3"
           style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "0.75rem",
-            padding: "1rem",
-            borderRadius: "8px",
-            background: "#fef2f2",
+            margin: "1rem 0",
+            padding: "1.25rem",
+            borderRadius: "10px",
+            background: "#fff",
             border: "1px solid #fecaca",
-            color: "#991b1b",
+            boxShadow: "0 2px 8px rgba(239, 68, 68, 0.08)",
           }}
         >
-          <AlertCircle size={20} style={{ flexShrink: 0, marginTop: "2px" }} />
-          <div>
-            <strong>Processing Failure: </strong>
-            <span>{lecture.failure_reason || "An error occurred during audio processing/transcription."}</span>
-            <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#b91c1c" }}>
-              Click <strong>Retry Pipeline</strong> above to restart audio extraction.
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", marginBottom: "1rem" }}>
+            <AlertCircle size={22} style={{ color: "#dc2626", flexShrink: 0, marginTop: "2px" }} />
+            <div>
+              <h4 style={{ margin: "0 0 4px", color: "#991b1b", fontSize: "1.05rem", fontWeight: 700 }}>
+                Automatic Captions Unavailable for this Video
+              </h4>
+              <p style={{ margin: 0, fontSize: "0.875rem", color: "#7f1d1d" }}>
+                {lecture.failure_reason || "Captions unavailable for this YouTube video (No transcript could be retrieved for this video.)."}
+              </p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              padding: "1rem",
+            }}
+          >
+            <p style={{ margin: "0 0 0.75rem", fontWeight: 600, fontSize: "0.875rem", color: "#1e293b" }}>
+              Provide the lecture transcript or recording using one of these options to finish course preparation:
+            </p>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+                gap: "12px",
+              }}
+            >
+              {/* Option 1: Subtitle file */}
+              <div
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  padding: "14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, color: "#4338ca", fontSize: "0.9rem", marginBottom: "6px" }}>
+                    <FileText size={18} /> Option 1: Subtitle File
+                  </div>
+                  <p style={{ fontSize: "0.8rem", color: "#64748b", margin: "0 0 12px" }}>
+                    Upload <strong>.srt</strong>, <strong>.vtt</strong>, or <strong>.txt</strong> subtitles. LectureLens will parse timestamps, topics, and summaries automatically.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => subFileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="btn-primary"
+                  style={{ width: "100%", fontSize: "0.82rem", padding: "7px 12px", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px" }}
+                >
+                  <Upload size={14} /> {isUploading ? "Uploading..." : "Upload .srt / .vtt File"}
+                </button>
+              </div>
+
+              {/* Option 2: Paste text */}
+              <div
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  padding: "14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, color: "#047857", fontSize: "0.9rem", marginBottom: "6px" }}>
+                    <Edit2 size={18} /> Option 2: Paste Transcript / Notes
+                  </div>
+                  <p style={{ fontSize: "0.8rem", color: "#64748b", margin: "0 0 12px" }}>
+                    Paste raw text or timestamped notes copied from YouTube, Notion, or your slides. Sentence timing and paragraphs will be synthesized.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSupplyTab("paste");
+                    setUploadError("");
+                    setSupplyModalOpen(true);
+                  }}
+                  disabled={isUploading}
+                  className="btn-secondary"
+                  style={{ width: "100%", fontSize: "0.82rem", padding: "7px 12px", borderColor: "#059669", color: "#059669", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px" }}
+                >
+                  <FileText size={14} /> Paste Transcript Text
+                </button>
+              </div>
+
+              {/* Option 3: Attach Media Recording */}
+              <div
+                style={{
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  padding: "14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 600, color: "#b45309", fontSize: "0.9rem", marginBottom: "6px" }}>
+                    <Video size={18} /> Option 3: Upload Recording
+                  </div>
+                  <p style={{ fontSize: "0.8rem", color: "#64748b", margin: "0 0 12px" }}>
+                    Attach an audio/video recording (.mp4, .mp3, .wav) to transcribe speech using your course key terms.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => mediaFileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="btn-secondary"
+                  style={{ width: "100%", fontSize: "0.82rem", padding: "7px 12px", borderColor: "#d97706", color: "#b45309", display: "flex", justifyContent: "center", alignItems: "center", gap: "6px" }}
+                >
+                  <Upload size={14} /> {isUploading ? "Uploading..." : "Attach Audio / Video"}
+                </button>
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: "12px",
+                paddingTop: "10px",
+                borderTop: "1px solid #e2e8f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "8px",
+              }}
+            >
+              <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                Or retry the automated YouTube caption extractor with updated browser headers:
+              </span>
+              <button
+                type="button"
+                onClick={handleRetry}
+                disabled={isUploading}
+                className="btn-secondary"
+                style={{ fontSize: "0.8rem", padding: "5px 12px", display: "flex", alignItems: "center", gap: "5px" }}
+              >
+                <RefreshCw size={13} /> Retry Preparation
+              </button>
             </div>
           </div>
         </div>
@@ -384,10 +664,9 @@ export default function LectureReview() {
       {isProcessing ? (
         <div className="pipeline-processing-card">
           <div className="spinner large" />
-          <h3>AI Processing Pipeline Running...</h3>
+          <h3>Preparing Your Lecture...</h3>
           <p>
-            Faster-Whisper is transcribing audio with glossary vocabulary, generating multilingual
-            embeddings, segmenting semantic topic boundaries, and creating search vectors.
+            We are generating the transcript, organising into topics, and preparing key summaries and quizzes.
           </p>
           <small>Status refreshes automatically.</small>
         </div>
@@ -418,12 +697,12 @@ export default function LectureReview() {
                   <strong>{paragraphs.length}</strong>
                 </div>
                 <div className="meta-row">
-                  <span>Semantic Topics</span>
+                  <span>Lecture Topics</span>
                   <strong>{lecture.topics?.length || 0}</strong>
                 </div>
                 {courseGlossary.length > 0 && (
                   <div className="meta-row" style={{ borderTop: "1px solid #e2e8f0", paddingTop: "8px" }}>
-                    <span>Active Technical Terms</span>
+                    <span>Course Key Terms</span>
                     <strong style={{ color: "#6366f1" }}>{courseGlossary.length} terms</strong>
                   </div>
                 )}
@@ -589,7 +868,41 @@ export default function LectureReview() {
                   {viewMode === "segments" && (
                     <div className="segments-review-stream">
                       {filteredSegments.length === 0 ? (
-                        <p className="p-4 text-muted text-center">No segments found matching filter.</p>
+                        segments.length === 0 ? (
+                          <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+                            <FileText size={40} color="#94a3b8" style={{ margin: "0 auto 10px", display: "block" }} />
+                            <h4 style={{ margin: "0 0 6px", color: "#334155", fontSize: "1.05rem" }}>No Transcript Available</h4>
+                            <p style={{ fontSize: "0.85rem", color: "#64748b", maxWidth: "440px", margin: "0 auto 16px" }}>
+                              Supply a subtitle file or paste transcript text to generate interactive segments, topics, summaries, and quizzes.
+                            </p>
+                            <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+                              <button
+                                type="button"
+                                onClick={() => subFileInputRef.current?.click()}
+                                disabled={isUploading}
+                                className="btn-primary"
+                                style={{ fontSize: "0.82rem", padding: "7px 14px", display: "flex", alignItems: "center", gap: "6px" }}
+                              >
+                                <Upload size={14} /> Upload Subtitles (.srt/.vtt)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSupplyTab("paste");
+                                  setUploadError("");
+                                  setSupplyModalOpen(true);
+                                }}
+                                disabled={isUploading}
+                                className="btn-secondary"
+                                style={{ fontSize: "0.82rem", padding: "7px 14px", display: "flex", alignItems: "center", gap: "6px" }}
+                              >
+                                <Edit2 size={14} /> Paste Transcript / Notes
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="p-4 text-muted text-center">No segments found matching "{searchFilter}".</p>
+                        )
                       ) : (
                         filteredSegments.map((seg, idx) => {
                           const isCurrent = activeSegmentIndex === idx;
@@ -721,7 +1034,17 @@ export default function LectureReview() {
                   {viewMode === "paragraphs" && (
                     <div className="paragraphs-stream">
                       {filteredParagraphs.length === 0 ? (
-                        <p className="p-4 text-muted text-center">No paragraphs found matching filter.</p>
+                        segments.length === 0 ? (
+                          <div style={{ padding: "3rem 1.5rem", textAlign: "center" }}>
+                            <FileText size={40} color="#94a3b8" style={{ margin: "0 auto 10px", display: "block" }} />
+                            <h4 style={{ margin: "0 0 6px", color: "#334155", fontSize: "1.05rem" }}>No Paragraphs Available</h4>
+                            <p style={{ fontSize: "0.85rem", color: "#64748b", maxWidth: "440px", margin: "0 auto 16px" }}>
+                              Supply a subtitle file or paste transcript text to generate student readable paragraphs.
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="p-4 text-muted text-center">No paragraphs found matching "{searchFilter}".</p>
+                        )
                       ) : (
                         filteredParagraphs.map((para, pIdx) => {
                           const isCurrent = activeParagraphIndex === pIdx;
@@ -888,6 +1211,223 @@ export default function LectureReview() {
               >
                 Submit Flag
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUPPLY TRANSCRIPT / SUBTITLES MODAL */}
+      {supplyModalOpen && (
+        <div className="modal-backdrop">
+          <div className="modal-card" style={{ maxWidth: "620px", width: "95%" }}>
+            <div className="modal-header">
+              <h3 className="flex items-center gap-2" style={{ color: "#3730a3", fontSize: "1.2rem", fontWeight: 700 }}>
+                <Upload size={20} /> Supply Subtitles or Transcript
+              </h3>
+              <button
+                onClick={() => {
+                  setSupplyModalOpen(false);
+                  setUploadError("");
+                }}
+                className="btn-close"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Subtabs */}
+            <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid #e2e8f0", paddingBottom: "10px", marginBottom: "16px" }}>
+              <button
+                type="button"
+                className={`sub-tab ${supplyTab === "file" ? "active" : ""}`}
+                onClick={() => setSupplyTab("file")}
+                style={{ fontSize: "0.85rem", padding: "6px 14px", display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <FileText size={15} /> Subtitle File (.srt/.vtt)
+              </button>
+              <button
+                type="button"
+                className={`sub-tab ${supplyTab === "paste" ? "active" : ""}`}
+                onClick={() => setSupplyTab("paste")}
+                style={{ fontSize: "0.85rem", padding: "6px 14px", display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <Edit2 size={15} /> Paste Transcript / Notes
+              </button>
+              <button
+                type="button"
+                className={`sub-tab ${supplyTab === "media" ? "active" : ""}`}
+                onClick={() => setSupplyTab("media")}
+                style={{ fontSize: "0.85rem", padding: "6px 14px", display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <Video size={15} /> Audio/Video File
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ maxHeight: "65vh", overflowY: "auto" }}>
+              {uploadError && (
+                <div className="alert-error mb-3" style={{ padding: "8px 12px", fontSize: "0.85rem" }}>
+                  {uploadError}
+                </div>
+              )}
+
+              {/* TAB 1: FILE UPLOAD */}
+              {supplyTab === "file" && (
+                <div>
+                  <p style={{ margin: "0 0 12px", fontSize: "0.875rem", color: "#475569" }}>
+                    Select a subtitle or transcript file from your computer. Supported formats: <strong>.srt</strong>, <strong>.vtt</strong>, <strong>.txt</strong>, or <strong>.json</strong>.
+                  </p>
+
+                  <div
+                    style={{
+                      border: "2px dashed #cbd5e1",
+                      borderRadius: "8px",
+                      padding: "24px 16px",
+                      textAlign: "center",
+                      background: "#f8fafc",
+                      cursor: "pointer",
+                      marginBottom: "14px",
+                    }}
+                    onClick={() => subFileInputRef.current?.click()}
+                  >
+                    <FileUp size={36} color="#6366f1" style={{ margin: "0 auto 10px", display: "block" }} />
+                    <p style={{ margin: "0 0 4px", fontWeight: 600, color: "#1e293b", fontSize: "0.95rem" }}>
+                      {selectedSubFile ? selectedSubFile.name : "Click to select a subtitle file"}
+                    </p>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                      {selectedSubFile
+                        ? `${(selectedSubFile.size / 1024).toFixed(1)} KB`
+                        : "Browse SubRip (.srt), WebVTT (.vtt), or raw text (.txt)"}
+                    </span>
+                  </div>
+
+                  <div style={{ background: "#f1f5f9", padding: "10px 14px", borderRadius: "6px", fontSize: "0.8rem", color: "#475569" }}>
+                    💡 <strong>Pro Tip:</strong> Subtitle files preserve exact video playback timestamps, allowing students to click transcript segments and jump directly to key concepts in the video.
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: PASTE TEXT */}
+              {supplyTab === "paste" && (
+                <div>
+                  <p style={{ margin: "0 0 8px", fontSize: "0.875rem", color: "#475569" }}>
+                    Paste your lecture transcript, speaker notes, or YouTube auto-captions text below:
+                  </p>
+                  <textarea
+                    rows={8}
+                    value={pastedTranscriptText}
+                    onChange={(e) => setPastedTranscriptText(e.target.value)}
+                    placeholder={`Paste transcript text here...
+
+Supported styles:
+1. Timestamped lines:
+   [00:00] In this lecture we discuss integrity constraints.
+   [01:15] Domain constraints ensure column data integrity...
+
+2. Raw text:
+   Relational model constraints specify restrictions on database states. We explore domain constraints, key constraints, and foreign key integrity.`}
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #cbd5e1",
+                      fontFamily: "monospace",
+                      fontSize: "0.85rem",
+                      lineHeight: "1.5",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                  <small style={{ color: "#64748b", display: "block", marginTop: "4px" }}>
+                    {pastedTranscriptText.trim().split(/\s+/).filter(Boolean).length} words detected.
+                  </small>
+                </div>
+              )}
+
+              {/* TAB 3: MEDIA RECORDING */}
+              {supplyTab === "media" && (
+                <div>
+                  <p style={{ margin: "0 0 12px", fontSize: "0.875rem", color: "#475569" }}>
+                    Upload an audio or video recording file. LectureLens will transcribe the audio, recognise course key terms, and organise the lecture into topics.
+                  </p>
+
+                  <div
+                    style={{
+                      border: "2px dashed #cbd5e1",
+                      borderRadius: "8px",
+                      padding: "24px 16px",
+                      textAlign: "center",
+                      background: "#f8fafc",
+                      cursor: "pointer",
+                      marginBottom: "14px",
+                    }}
+                    onClick={() => mediaFileInputRef.current?.click()}
+                  >
+                    <Video size={36} color="#d97706" style={{ margin: "0 auto 10px", display: "block" }} />
+                    <p style={{ margin: "0 0 4px", fontWeight: 600, color: "#1e293b", fontSize: "0.95rem" }}>
+                      {selectedMediaFile ? selectedMediaFile.name : "Click to select audio / video file"}
+                    </p>
+                    <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
+                      {selectedMediaFile
+                        ? `${(selectedMediaFile.size / (1024 * 1024)).toFixed(2)} MB`
+                        : "Supports .mp4, .mp3, .wav, .m4a, .webm, .mov"}
+                    </span>
+                  </div>
+
+                  {courseGlossary.length > 0 && (
+                    <div style={{ background: "#f1f5f9", padding: "10px 14px", borderRadius: "6px", fontSize: "0.8rem", color: "#475569" }}>
+                      <strong>Active Course Key Terms:</strong>{" "}
+                      {courseGlossary.map((g) => g.term).slice(0, 8).join(", ")}
+                      {courseGlossary.length > 8 && ` (+${courseGlossary.length - 8} more)`}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer" style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #e2e8f0", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSupplyModalOpen(false);
+                  setUploadError("");
+                }}
+                disabled={isUploading}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+
+              {supplyTab === "file" && (
+                <button
+                  type="button"
+                  onClick={() => handleUploadSubtitles()}
+                  disabled={isUploading || !selectedSubFile}
+                  className="btn-primary"
+                >
+                  {isUploading ? "Uploading & Processing..." : "Upload Subtitles"}
+                </button>
+              )}
+
+              {supplyTab === "paste" && (
+                <button
+                  type="button"
+                  onClick={handleSubmitPastedText}
+                  disabled={isUploading || !pastedTranscriptText.trim()}
+                  className="btn-primary"
+                >
+                  {isUploading ? "Parsing & Generating..." : "Apply Transcript"}
+                </button>
+              )}
+
+              {supplyTab === "media" && (
+                <button
+                  type="button"
+                  onClick={() => handleAttachMediaRecording()}
+                  disabled={isUploading || !selectedMediaFile}
+                  className="btn-primary"
+                >
+                  {isUploading ? "Uploading..." : "Upload Recording & Transcribe"}
+                </button>
+              )}
             </div>
           </div>
         </div>

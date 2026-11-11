@@ -1,7 +1,7 @@
 import datetime
 import logging
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.database import get_db, serialize_doc, serialize_list
 from app.dependencies.auth import get_current_user, require_student, require_teacher
 from app.schemas.quiz import (
@@ -137,6 +137,7 @@ async def create_quiz_question(
 @router.post("/lectures/{lecture_id}/quizzes/generate")
 async def generate_quizzes_endpoint(
     lecture_id: str,
+    force: bool = Query(True, description="Regenerate unapproved draft quizzes"),
     teacher: dict = Depends(require_teacher),
 ):
     """Triggers on-demand AI quiz generation from lecture topics."""
@@ -144,6 +145,8 @@ async def generate_quizzes_endpoint(
     lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
     if not lec:
         raise HTTPException(status_code=404, detail="Lecture not found")
+
+    course_id = str(lec.get("course_id", ""))
 
     topics = lec.get("topics", [])
     if not topics:
@@ -153,10 +156,10 @@ async def generate_quizzes_endpoint(
     if not topics:
         raise HTTPException(status_code=400, detail="Cannot generate quizzes: lecture has no segmented topics.")
 
-    created = await save_draft_quizzes(lecture_id=str(lecture_id), topics=topics)
+    count = await save_draft_quizzes(lecture_id=str(lecture_id), topics=topics, course_id=course_id, force=force)
     return {
-        "message": f"Generated {len(created)} draft quiz questions.",
-        "count": len(created),
+        "message": f"Generated {count} draft quiz questions.",
+        "count": count,
     }
 
 

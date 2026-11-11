@@ -112,6 +112,12 @@ async def execute_atlas_vector_search(
         results = await cursor.to_list(length=top_k)
         if results:
             for r in results:
+                raw_score = float(r.get("score", 0.0))
+                # Atlas vectorSearchScore with cosine metric is mapped to (1 + cosine_similarity) / 2
+                # We normalize it back to standard cosine similarity in range [-1.0, 1.0]
+                cosine_sim = (raw_score * 2.0) - 1.0
+                r["score"] = round(cosine_sim, 4)
+                r["raw_atlas_score"] = round(raw_score, 4)
                 r["search_mode"] = "atlas_vector_search"
             return serialize_list(results)
     except Exception as e:
@@ -135,6 +141,16 @@ async def execute_atlas_vector_search(
     return serialize_list(scored[:top_k])
 
 
+STOP_WORDS = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "with",
+    "by", "of", "from", "up", "about", "into", "over", "after", "is", "am", "are",
+    "was", "were", "be", "been", "being", "have", "has", "had", "do", "does", "did",
+    "how", "what", "why", "when", "where", "which", "who", "whom", "this", "that",
+    "these", "those", "can", "could", "will", "would", "shall", "should", "may",
+    "might", "must", "it", "its", "you", "your", "he", "she", "they", "we", "i",
+}
+
+
 async def execute_keyword_search(
     query: str,
     filter_dict: dict,
@@ -142,7 +158,9 @@ async def execute_keyword_search(
 ) -> list[dict]:
     """Performs keyword lexical retrieval over chunks matching query terms."""
     db = get_db()
-    terms = [re.escape(t.strip().lower()) for t in query.split() if len(t.strip()) > 1]
+    raw_tokens = [re.escape(t.strip().lower()) for t in re.findall(r"\b[A-Za-z0-9_-]+\b", query) if len(t.strip()) > 1]
+    content_tokens = [t for t in raw_tokens if t.lower() not in STOP_WORDS]
+    terms = content_tokens if content_tokens else raw_tokens
     if not terms:
         terms = [re.escape(query.strip().lower())]
 
@@ -190,8 +208,10 @@ async def execute_keyword_search(
     scored = []
     for cand in candidates:
         text_lower = cand.get("text", "").lower()
-        matches = sum(text_lower.count(t.lower()) for t in query.split() if len(t) > 1)
-        cand["score"] = round(min(1.0, 0.2 * matches + 0.1), 3)
+        matches = sum(1 for t in terms if re.search(r"\b" + t + r"\b", text_lower))
+        if content_tokens and matches == 0:
+            continue
+        cand["score"] = round(min(1.0, 0.25 * matches), 3)
         cand["search_mode"] = "keyword"
         scored.append(cand)
 

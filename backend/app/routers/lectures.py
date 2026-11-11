@@ -368,6 +368,114 @@ async def retry_lecture_processing(
     return serialize_doc(lec)
 
 
+from pydantic import BaseModel
+from app.services.subtitles import parse_subtitles, apply_subtitles_to_lecture
+
+
+class TranscriptTextPayload(BaseModel):
+    text: str
+
+
+@router.post("/{lecture_id}/subtitles", response_model=LectureOut)
+async def upload_lecture_subtitles(
+    lecture_id: str,
+    file: UploadFile = File(...),
+    teacher: dict = Depends(require_teacher),
+):
+    """Uploads subtitles or transcript file (.srt, .vtt, .txt, .json) to populate or replace lecture transcripts."""
+    db = get_db()
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    content_bytes = await file.read()
+    try:
+        content_text = content_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        content_text = content_bytes.decode("latin-1", errors="ignore")
+
+    segments = parse_subtitles(content_text, default_duration=lec.get("duration", 600.0))
+    if not segments:
+        raise HTTPException(status_code=400, detail="Could not parse any transcript segments from the provided file.")
+
+    updated_lec = await apply_subtitles_to_lecture(str(lecture_id), segments)
+    return updated_lec
+
+
+@router.post("/{lecture_id}/transcript-text", response_model=LectureOut)
+async def submit_lecture_transcript_text(
+    lecture_id: str,
+    payload: TranscriptTextPayload,
+    teacher: dict = Depends(require_teacher),
+):
+    """Submits raw or timestamped transcript text to populate or replace lecture transcripts."""
+    db = get_db()
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    if not payload.text or not payload.text.strip():
+        raise HTTPException(status_code=400, detail="Transcript text cannot be empty.")
+
+    segments = parse_subtitles(payload.text, default_duration=lec.get("duration", 600.0))
+    if not segments:
+        raise HTTPException(status_code=400, detail="Could not parse any transcript segments from the provided text.")
+
+    updated_lec = await apply_subtitles_to_lecture(str(lecture_id), segments)
+    return updated_lec
+
+
+@router.post("/{lecture_id}/attach-media", response_model=LectureOut)
+async def attach_media_to_lecture(
+    lecture_id: str,
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    teacher: dict = Depends(require_teacher),
+):
+    """Attaches an audio/video recording file to an existing lecture and triggers the Faster-Whisper pipeline."""
+    db = get_db()
+    lec = await db.lectures.find_one({"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id})
+    if not lec:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    filename = file.filename or "recording.mp4"
+    ext = Path(filename).suffix.lower()
+    if ext not in ALLOWED_AUDIO_VIDEO_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"Unsupported format {ext}. Upload audio or video.")
+
+    storage_filename = f"{lecture_id}_{int(datetime.datetime.now().timestamp())}{ext}"
+    storage_path = settings.MEDIA_UPLOAD_DIR / storage_filename
+
+    with open(storage_path, "wb") as f:
+        while chunk := await file.read(1024 * 1024):
+            f.write(chunk)
+
+    media_url = f"/api/media/{storage_filename}"
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    await db.lectures.update_one(
+        {"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id},
+        {
+            "$set": {
+                "storage_path": str(storage_path),
+                "media_url": media_url,
+                "status": "queued",
+                "failure_reason": None,
+                "updated_at": now,
+            }
+        },
+    )
+
+    background_tasks.add_task(
+        run_lecture_processing_pipeline,
+        lecture_id=str(lecture_id),
+        media_path=str(storage_path),
+    )
+
+    lec["status"] = "queued"
+    lec["media_url"] = media_url
+    return serialize_doc(lec)
+
+
 @router.delete("/{lecture_id}")
 async def delete_lecture(
     lecture_id: str,

@@ -1,6 +1,8 @@
+import datetime
 import logging
 import random
 from typing import Optional
+from bson import ObjectId
 from app.database import get_db
 
 logger = logging.getLogger("lecturelens.quiz_gen")
@@ -9,12 +11,14 @@ logger = logging.getLogger("lecturelens.quiz_gen")
 def generate_draft_quiz_questions(
     lecture_id: str,
     topics: list[dict],
+    course_id: Optional[str] = None,
 ) -> list[dict]:
     """Generates candidate multiple-choice quiz questions from lecture topics.
     Crucially, all questions are marked with `is_approved = False` so they
     remain hidden from students until explicit teacher review.
     """
     drafts = []
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
     for topic in topics:
         topic_id = topic.get("topic_id", 1)
@@ -41,6 +45,7 @@ def generate_draft_quiz_questions(
 
         drafts.append({
             "lecture_id": str(lecture_id),
+            "course_id": str(course_id) if course_id else "",
             "topic_id": topic_id,
             "question_type": "mcq",
             "question": question_text,
@@ -49,6 +54,8 @@ def generate_draft_quiz_questions(
             "explanation": f"Refer to the lecture discussion around {sample_seg.get('start', 0.0)}s: '{sample_seg['text']}'",
             "difficulty": "medium",
             "is_approved": False,  # Teacher must approve!
+            "created_at": now,
+            "updated_at": now,
         })
 
         # If topic has multiple segments, generate a secondary factual question
@@ -65,6 +72,7 @@ def generate_draft_quiz_questions(
             random.shuffle(opts2)
             drafts.append({
                 "lecture_id": str(lecture_id),
+                "course_id": str(course_id) if course_id else "",
                 "topic_id": topic_id,
                 "question_type": "mcq",
                 "question": q2_text,
@@ -73,22 +81,45 @@ def generate_draft_quiz_questions(
                 "explanation": f"Discussed at {sec_seg.get('start', 0.0)}s: '{sec_seg['text']}'",
                 "difficulty": "easy",
                 "is_approved": False,
+                "created_at": now,
+                "updated_at": now,
             })
 
     return drafts
 
 
-async def save_draft_quizzes(lecture_id: str, topics: list[dict]) -> int:
+async def save_draft_quizzes(
+    lecture_id: str,
+    topics: list[dict],
+    course_id: Optional[str] = None,
+    force: bool = False,
+) -> int:
     """Generates and saves quiz drafts to database."""
     db = get_db()
+    
+    if not course_id:
+        try:
+            lec = await db.lectures.find_one(
+                {"_id": ObjectId(lecture_id) if ObjectId.is_valid(lecture_id) else lecture_id}
+            )
+            if lec:
+                course_id = str(lec.get("course_id", ""))
+        except Exception:
+            pass
+
     # Check if quizzes already exist for this lecture
     existing_count = await db.quizzes.count_documents({"lecture_id": str(lecture_id)})
-    if existing_count > 0:
+    if existing_count > 0 and not force:
         return existing_count
 
-    drafts = generate_draft_quiz_questions(lecture_id, topics)
+    drafts = generate_draft_quiz_questions(lecture_id, topics, course_id=course_id)
     if drafts:
+        if force and existing_count > 0:
+            # Delete only unapproved draft quizzes, preserving any approved questions
+            await db.quizzes.delete_many({"lecture_id": str(lecture_id), "is_approved": False})
         await db.quizzes.insert_many(drafts)
         logger.info(f"Generated {len(drafts)} draft quiz questions for lecture {lecture_id}")
-    return len(drafts)
+        return len(drafts)
+
+    return existing_count
 

@@ -31,7 +31,7 @@ export default function RevisionPlan() {
   }, []);
 
   if (loading) {
-    return <div className="page-loading"><div className="spinner" /> Generating smart revision plan...</div>;
+    return <div className="page-loading"><div className="spinner" /> Preparing your study plan...</div>;
   }
 
   return (
@@ -40,11 +40,10 @@ export default function RevisionPlan() {
         <div>
           <div className="flex items-center gap-2">
             <Brain size={28} className="text-purple-600" />
-            <h1>Personalized Smart Revision</h1>
+            <h1>My Study Plan</h1>
           </div>
           <p>
-            Transparent, rule-based recommendations derived from your quiz performance. Focus your
-            study time on concepts where you missed questions.
+            Personalised review suggestions based on your quiz results. Focus your study time on topics where you need more practice.
           </p>
         </div>
       </div>
@@ -52,10 +51,10 @@ export default function RevisionPlan() {
       {recommendations.length === 0 ? (
         <div className="empty-state">
           <Sparkles size={48} />
-          <h3>All Caught Up!</h3>
-          <p>No weak topics detected. Take more quizzes to generate targeted review guides.</p>
+          <h3>You are all caught up!</h3>
+          <p>No review topics needed right now. Take quizzes after lectures to get personalised revision suggestions.</p>
           <Link to="/student" className="btn-primary mt-4">
-            Browse Lectures
+            Explore Lectures
           </Link>
         </div>
       ) : (
@@ -65,7 +64,7 @@ export default function RevisionPlan() {
               <div className="revision-card-top">
                 <span className="badge-lecture-title">{rec.lecture_title}</span>
                 <span className="badge-weakness">
-                  Weakness Priority: {Math.round(rec.weakness_score * 100)}%
+                  Review Priority: {Math.round(rec.weakness_score * 100)}%
                 </span>
               </div>
 
@@ -82,7 +81,7 @@ export default function RevisionPlan() {
                 <Link to={rec.timestamp_url} className="btn-primary">
                   <PlayCircle size={16} />
                   <span>
-                    Study Video at {formatSeconds(rec.suggested_start_time)}
+                    Watch Explanation at {formatSeconds(rec.suggested_start_time)}
                   </span>
                   <ArrowRight size={14} />
                 </Link>

@@ -138,6 +138,27 @@ export const api = {
     apiRequest(`/api/lectures/${lectureId}`, {
       method: "DELETE",
     }),
+  uploadSubtitles: (lectureId, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiRequest(`/api/lectures/${lectureId}/subtitles`, {
+      method: "POST",
+      body: formData,
+    });
+  },
+  submitTranscriptText: (lectureId, text) =>
+    apiRequest(`/api/lectures/${lectureId}/transcript-text`, {
+      method: "POST",
+      body: JSON.stringify({ text }),
+    }),
+  attachMedia: (lectureId, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiRequest(`/api/lectures/${lectureId}/attach-media`, {
+      method: "POST",
+      body: formData,
+    });
+  },
 
   // Review & Transcript Management
   getLectureTranscript: (lectureId) =>
@@ -201,6 +222,10 @@ export const api = {
       body: JSON.stringify(data),
     }),
   generateQuizDrafts: (lectureId) =>
+    apiRequest(`/api/lectures/${lectureId}/quizzes/generate`, {
+      method: "POST",
+    }),
+  generateQuizzes: (lectureId) =>
     apiRequest(`/api/lectures/${lectureId}/quizzes/generate`, {
       method: "POST",
     }),

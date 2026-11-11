@@ -168,12 +168,12 @@ export default function CourseManager() {
     setSavingGlossary(true);
     try {
       await api.updateCourseGlossary(selectedCourseForGlossary.id, glossaryTerms);
-      setActionMsg(`Technical vocabulary saved for ${selectedCourseForGlossary.title} (${glossaryTerms.length} terms).`);
+      setActionMsg(`Course key terms saved for ${selectedCourseForGlossary.title} (${glossaryTerms.length} terms).`);
       setTimeout(() => setActionMsg(""), 4000);
       setSelectedCourseForGlossary(null);
       await loadData();
     } catch (err) {
-      setError(err.message || "Failed to update glossary");
+      setError(err.message || "Failed to update key terms");
       setTimeout(() => setError(""), 4500);
     } finally {
       setSavingGlossary(false);
@@ -192,7 +192,7 @@ export default function CourseManager() {
   if (loading) {
     return (
       <div className="page-loading">
-        <div className="spinner" /> Loading instructor course workspaces...
+        <div className="spinner" /> Loading courses...
       </div>
     );
   }
@@ -201,9 +201,9 @@ export default function CourseManager() {
     <div className="dashboard-page max-w-5xl">
       <div className="dashboard-header">
         <div>
-          <h1>Faculty Course Workspaces</h1>
+          <h1>Manage Courses</h1>
           <p>
-            Manage course materials, review AI transcripts, create quizzes, and monitor student performance.
+            Manage course lectures, key terms, review transcripts, and create quizzes for your students.
           </p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary">
@@ -222,14 +222,14 @@ export default function CourseManager() {
           className={`tab-btn ${activeTab === "my" ? "active" : ""}`}
         >
           <BookOpen size={17} />
-          My Approved Courses ({myCourses.length})
+          My Courses ({myCourses.length})
         </button>
         <button
           onClick={() => setActiveTab("catalog")}
           className={`tab-btn ${activeTab === "catalog" ? "active" : ""}`}
         >
           <Layers size={17} />
-          Browse Course Catalog ({catalogCourses.length})
+          All Courses ({catalogCourses.length})
         </button>
       </div>
 
@@ -293,17 +293,17 @@ export default function CourseManager() {
                       onClick={() => openGlossaryModal(course)}
                       className="btn-secondary w-full justify-center flex items-center gap-2"
                       style={{ fontSize: "0.85rem", padding: "6px 12px" }}
-                      title="Manage course-specific technical vocabulary and Whisper hotwords"
+                      title="Manage course-specific key terms and vocabulary"
                     >
                       <Sparkles size={14} className="text-primary" />
-                      <span>Technical Vocabulary ({course.glossary?.length || 0})</span>
+                      <span>Course Key Terms ({course.glossary?.length || 0})</span>
                     </button>
                     <Link
                       to={`/teacher/courses/${course.id}`}
                       className="btn-primary w-full justify-center flex items-center gap-2"
                       style={{ textDecoration: "none" }}
                     >
-                      <span>Open Course Workspace</span>
+                      <span>Open Course</span>
                       <ArrowRight size={16} />
                     </Link>
                   </div>
@@ -461,10 +461,10 @@ export default function CourseManager() {
               <div>
                 <h2 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <Sparkles size={20} className="text-primary" />
-                  Technical Vocabulary & Glossaries
+                  Course Key Terms (Glossary)
                 </h2>
                 <p className="text-muted text-sm mt-1">
-                  Configure domain-specific keywords and jargon for <strong>{selectedCourseForGlossary.title}</strong> ({selectedCourseForGlossary.code}).
+                  Add important subject terms and vocabulary for <strong>{selectedCourseForGlossary.title}</strong> ({selectedCourseForGlossary.code}).
                 </p>
               </div>
               <button
@@ -486,13 +486,13 @@ export default function CourseManager() {
                   border: "1px solid var(--border-color, #e2e8f0)",
                 }}
               >
-                💡 <strong>ASR Prompt Conditioning:</strong> These terms are passed directly to the Faster-Whisper ASR model as context prompts and hotwords during lecture ingestion. This biases decoding towards correct technical jargon without blindly substituting unrecognized words.
+                💡 <strong>How this helps:</strong> These terms help the system accurately recognise technical words and subject-specific vocabulary in your lecture recordings.
               </div>
 
               {/* Add Custom Term */}
               <div>
                 <label style={{ fontSize: "0.88rem", fontWeight: 600, marginBottom: "6px", display: "block" }}>
-                  Add Custom Technical Terms
+                  Add Key Terms
                 </label>
                 <div style={{ display: "flex", gap: "8px" }}>
                   <input
@@ -505,7 +505,7 @@ export default function CourseManager() {
                         handleAddTerm();
                       }
                     }}
-                    placeholder="e.g. Backpropagation, Normalization, DDL (comma-separated)..."
+                    placeholder="e.g. Backpropagation, Normalization, Primary Key (comma-separated)..."
                     style={{ flex: 1 }}
                   />
                   <button
@@ -543,7 +543,7 @@ export default function CourseManager() {
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                   <label style={{ fontSize: "0.88rem", fontWeight: 600 }}>
-                    Active Course Vocabulary ({glossaryTerms.length} terms)
+                    Saved Course Terms ({glossaryTerms.length})
                   </label>
                   {glossaryTerms.length > 0 && (
                     <button
@@ -564,7 +564,7 @@ export default function CourseManager() {
 
                 {loadingGlossary ? (
                   <div style={{ padding: "16px", textAlign: "center", color: "var(--text-muted, #64748b)" }}>
-                    Loading glossary...
+                    Loading terms...
                   </div>
                 ) : glossaryTerms.length === 0 ? (
                   <div
@@ -577,7 +577,7 @@ export default function CourseManager() {
                       fontSize: "0.88rem",
                     }}
                   >
-                    No technical terms defined yet. Add keywords or choose a preset above to prime AI speech recognition.
+                    No key terms defined yet. Add keywords or choose a preset above to help recognise terms in lectures.
                   </div>
                 ) : (
                   <div

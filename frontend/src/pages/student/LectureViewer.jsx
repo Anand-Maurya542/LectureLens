@@ -293,7 +293,7 @@ export default function LectureViewer() {
               onClick={() => setActiveTab("qa")}
             >
               <MessageSquare size={16} />
-              Ask AI (Grounded)
+              Ask Questions
             </button>
           </div>
 
@@ -536,7 +536,7 @@ export default function LectureViewer() {
             <div className="summaries-scroll">
               {lecture.summaries?.map((summ, idx) => (
                 <div key={idx} className="summary-card">
-                  <div className="summary-badge">Section {summ.topic_id} Synthesis</div>
+                  <div className="summary-badge">Topic {summ.topic_id} Summary</div>
                   <p className="summary-text">{summ.summary_text}</p>
                   <ul className="key-points-list mt-2">
                     {summ.key_points?.map((kp, kIdx) => (
@@ -559,20 +559,29 @@ export default function LectureViewer() {
                   onChange={(e) => setQaQuery(e.target.value)}
                 />
                 <button type="submit" disabled={qaLoading} className="btn-primary">
-                  {qaLoading ? "Searching..." : "Ask"}
+                  {qaLoading ? "Searching..." : "Ask Question"}
                 </button>
               </form>
 
               {qaResponse && (
                 <div className="qa-response-box mt-4">
-                  <div className="qa-answer">
-                    <strong>Grounded Response:</strong>
-                    <p>{qaResponse.answer}</p>
+                  <div className={`qa-answer ${!qaResponse.is_grounded ? "unsupported" : ""}`}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <strong style={{ color: qaResponse.is_grounded ? "#4f46e5" : "#b45309" }}>
+                        {qaResponse.is_grounded ? "Answer from Lecture:" : "Not Covered in this Lecture:"}
+                      </strong>
+                      {qaResponse.confidence > 0 && (
+                        <span style={{ fontSize: "0.75rem", color: "#64748b", background: "#f1f5f9", padding: "2px 8px", borderRadius: "12px" }}>
+                          Match: {Math.round(qaResponse.confidence * 100)}%
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ whiteSpace: "pre-line", margin: 0, lineHeight: 1.55 }}>{qaResponse.answer}</p>
                   </div>
 
                   {qaResponse.citations?.length > 0 && (
                     <div className="qa-citations mt-3">
-                      <strong>Citations from Lecture:</strong>
+                      <strong>Mentions in Lecture Video:</strong>
                       {qaResponse.citations.map((c, cIdx) => (
                         <div key={cIdx} className="qa-citation-item">
                           <button

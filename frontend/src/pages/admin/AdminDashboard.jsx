@@ -196,7 +196,7 @@ export default function AdminDashboard() {
           errMsg.includes("timed out") ||
           errMsg.includes("SSL")
         ) {
-          setActionError("Re-establishing connection with MongoDB Atlas. Data will sync automatically.");
+          setActionError("Reconnecting to the database. Data will refresh automatically.");
           // Auto-clear transient Atlas reconnect message after 5 seconds
           setTimeout(() => setActionError(""), 5000);
         } else {
@@ -661,17 +661,17 @@ export default function AdminDashboard() {
       <div className="dashboard-header">
         <div>
           <div className="flex items-center gap-3">
-            <h1>Platform Administration</h1>
-            <span className="role-badge role-admin">Root Admin</span>
+            <h1>Admin Dashboard</h1>
+            <span className="role-badge role-admin">Administrator</span>
           </div>
           <p>
-            System-wide user governance, course catalog management, enrollment request approval, and MongoDB telemetry.
+            Manage teachers, students, courses, joining requests, and platform status.
           </p>
         </div>
         <div className="header-actions">
-          <button onClick={handleRefresh} className="btn-secondary" title="Sync live MongoDB state">
+          <button onClick={handleRefresh} className="btn-secondary" title="Refresh platform data">
             <RefreshCw size={16} className={refreshing ? "spin" : ""} />
-            Sync Platform
+            Refresh Data
           </button>
         </div>
       </div>
@@ -756,7 +756,7 @@ export default function AdminDashboard() {
           className={`tab-btn ${activeTab === "enrollments" ? "active" : ""}`}
         >
           <CheckSquare size={17} />
-          Enrollment Requests
+          Course Joining Requests
           {stats?.pending_enrollment_requests > 0 && (
             <span
               style={{
@@ -809,7 +809,7 @@ export default function AdminDashboard() {
           className={`tab-btn ${activeTab === "system" ? "active" : ""}`}
         >
           <Server size={17} />
-          System Health
+          Platform Status
         </button>
       </div>
 
@@ -843,7 +843,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <div className="metric-value">{stats.total_teachers}</div>
-                <div className="metric-label">Active Instructors</div>
+                <div className="metric-label">Active Teachers</div>
               </div>
             </div>
 
@@ -853,7 +853,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <div className="metric-value">{stats.total_lectures}</div>
-                <div className="metric-label">Ingested Lectures</div>
+                <div className="metric-label">Total Lectures</div>
               </div>
             </div>
           </div>
@@ -865,7 +865,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <div className="metric-value">{stats.total_processed}</div>
-                <div className="metric-label">Processed Lectures</div>
+                <div className="metric-label">Ready Lectures</div>
               </div>
             </div>
 
@@ -875,7 +875,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <div className="metric-value">{stats.total_pending}</div>
-                <div className="metric-label">Queued / Processing</div>
+                <div className="metric-label">Preparing Lectures</div>
               </div>
             </div>
 
@@ -885,7 +885,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <div className="metric-value">{stats.total_failed}</div>
-                <div className="metric-label">Failed Ingestions</div>
+                <div className="metric-label">Needs Attention</div>
               </div>
             </div>
 
@@ -930,10 +930,10 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h4 style={{ margin: "0 0 3px", color: "var(--text-main, #0f172a)", fontSize: "0.98rem" }}>
-                    {stats.pending_enrollment_requests} Course Enrollment Request{stats.pending_enrollment_requests > 1 ? "s" : ""} Pending Review
+                    {stats.pending_enrollment_requests} Course Joining Request{stats.pending_enrollment_requests > 1 ? "s" : ""} Pending Review
                   </h4>
                   <p style={{ margin: 0, fontSize: "0.84rem", color: "var(--text-muted, #64748b)" }}>
-                    Students and teachers requesting access to active course workspaces.
+                    Students and teachers requesting to join courses.
                   </p>
                 </div>
               </div>
@@ -979,10 +979,10 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h4 style={{ margin: "0 0 3px", color: "var(--text-main, #0f172a)", fontSize: "0.98rem" }}>
-                    {stats.pending_teacher_applications} Faculty Registration Request{stats.pending_teacher_applications > 1 ? "s" : ""} Pending
+                    {stats.pending_teacher_applications} Teacher Application{stats.pending_teacher_applications > 1 ? "s" : ""} Pending
                   </h4>
                   <p style={{ margin: 0, fontSize: "0.84rem", color: "var(--text-muted, #64748b)" }}>
-                    Educators awaiting institutional verification and teacher account activation.
+                    Teachers awaiting verification and account activation.
                   </p>
                 </div>
               </div>
@@ -1003,7 +1003,7 @@ export default function AdminDashboard() {
           <div className="dashboard-section mt-6">
             <div className="section-header">
               <h2>Recent Platform Activity</h2>
-              <span className="badge-count">Audit Trail (Live MongoDB)</span>
+              <span className="badge-count">Activity Log</span>
             </div>
             {stats.recent_activity.length === 0 ? (
               <div className="empty-state">
@@ -1594,9 +1594,9 @@ export default function AdminDashboard() {
           <div className="dashboard-section">
             <div className="section-header">
               <div>
-                <h2>Teacher Registration Requests</h2>
+                <h2>Teacher Applications</h2>
                 <p className="text-muted text-sm mt-1">
-                  Manage faculty applications and institutional onboarding. Approving provisions an active teacher account in MongoDB.
+                  Review teacher applications. Approving provisions an active teacher account with course access.
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -1837,9 +1837,9 @@ export default function AdminDashboard() {
           <div className="dashboard-section">
             <div className="section-header">
               <div>
-                <h2>Lecture Corpus & Ingestion Monitor</h2>
+                <h2>All Lectures</h2>
                 <p className="text-muted text-sm mt-1">
-                  Audit AI transcription jobs, inspect failures, and remove unwanted lectures.
+                  Browse all course lectures, check preparation status, and manage content.
                 </p>
               </div>
               <span className="badge-count">
@@ -1879,9 +1879,9 @@ export default function AdminDashboard() {
                 <thead>
                   <tr>
                     <th>Title & Course</th>
-                    <th>Instructor</th>
+                    <th>Teacher</th>
                     <th>Source</th>
-                    <th>Pipeline State</th>
+                    <th>Status</th>
                     <th>Published</th>
                     <th>Actions</th>
                   </tr>
@@ -1916,7 +1916,7 @@ export default function AdminDashboard() {
                           <Link
                             to={`/teacher/lectures/${l.id}/review`}
                             className="btn-action"
-                            title="Inspect pipeline artifacts"
+                            title="Review lecture and transcript"
                           >
                             <ExternalLink size={15} /> Review
                           </Link>
@@ -1938,7 +1938,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* TAB 7: SYSTEM TELEMETRY */}
+      {/* TAB 7: PLATFORM STATUS */}
       {activeTab === "system" && systemStatus && (
         <div className="admin-tab-content">
           <div className="settings-grid">
@@ -1946,8 +1946,8 @@ export default function AdminDashboard() {
               <div className="flex items-center gap-3 mb-4">
                 <Database size={24} className="text-primary" />
                 <div>
-                  <h3 className="text-lg font-semibold">MongoDB Atlas Status</h3>
-                  <p className="text-muted text-sm">Cluster connection & live collection telemetry</p>
+                  <h3 className="text-lg font-semibold">Database Status</h3>
+                  <p className="text-muted text-sm">Storage and data health</p>
                 </div>
               </div>
               <div className="info-list">
@@ -1967,12 +1967,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <h4 className="mt-4 mb-2 text-sm font-semibold uppercase text-muted">Collections Volume</h4>
+              <h4 className="mt-4 mb-2 text-sm font-semibold uppercase text-muted">Stored Items</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 {Object.entries(systemStatus.collections || {}).map(([col, count]) => (
                   <div key={col} className="p-2 bg-slate-50 rounded flex justify-between">
                     <span className="text-muted">{col}:</span>
-                    <strong>{count} docs</strong>
+                    <strong>{count} items</strong>
                   </div>
                 ))}
               </div>
@@ -1982,30 +1982,26 @@ export default function AdminDashboard() {
               <div className="flex items-center gap-3 mb-4">
                 <Cpu size={24} className="text-primary" />
                 <div>
-                  <h3 className="text-lg font-semibold">AI Models & Hardware Configuration</h3>
-                  <p className="text-muted text-sm">Speech recognition & multilingual embedding engine</p>
+                  <h3 className="text-lg font-semibold">Speech & Learning Services</h3>
+                  <p className="text-muted text-sm">Audio transcription and search service status</p>
                 </div>
               </div>
               <div className="info-list">
                 <div className="info-item">
-                  <span className="info-label">Whisper Engine</span>
-                  <strong>Faster-Whisper ({systemStatus.whisper_config?.model_size})</strong>
+                  <span className="info-label">Speech Recognition</span>
+                  <strong>Speech-to-Text ({systemStatus.whisper_config?.model_size})</strong>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Inference Hardware</span>
+                  <span className="info-label">Processing Hardware</span>
                   <code>{systemStatus.whisper_config?.device} ({systemStatus.whisper_config?.compute_type})</code>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Embedding Model</span>
+                  <span className="info-label">Search Matching Engine</span>
                   <strong>{systemStatus.embedding_config?.model_name}</strong>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Vector Dimension</span>
-                  <code>{systemStatus.embedding_config?.dimension} dims</code>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Atlas Vector Index</span>
-                  <code>{systemStatus.embedding_config?.vector_index_name}</code>
+                  <span className="info-label">Search Index</span>
+                  <code>Active ({systemStatus.embedding_config?.vector_index_name})</code>
                 </div>
               </div>
             </div>
@@ -2100,7 +2096,7 @@ export default function AdminDashboard() {
           <div className="modal-card">
             <div className="modal-header">
               <h3 className="text-danger flex items-center gap-2">
-                <AlertTriangle size={20} /> Delete Lecture & AI Assets
+                <AlertTriangle size={20} /> Delete Lecture
               </h3>
               <button onClick={() => setLectureToDelete(null)} className="btn-close">
                 <X size={18} />
@@ -2111,7 +2107,7 @@ export default function AdminDashboard() {
                 Are you sure you want to delete <strong>"{lectureToDelete.title}"</strong>?
               </p>
               <p className="text-sm text-danger mt-2">
-                This will delete all timestamped transcripts, topics, summaries, quizzes, and Atlas vector embeddings.
+                This will permanently remove this lecture, including its transcripts, topics, summaries, and quizzes.
               </p>
             </div>
             <div className="modal-footer">
@@ -3040,7 +3036,7 @@ export default function AdminDashboard() {
                 <div>Department: <strong>{selectedAppForApprove.department || "General"}</strong></div>
               </div>
               <p className="text-sm text-muted">
-                This provisions an active teacher account in MongoDB with the role <code>teacher</code>.
+                This activates the teacher account and gives them access to upload lectures and manage course quizzes.
               </p>
             </div>
             <div className="modal-footer">

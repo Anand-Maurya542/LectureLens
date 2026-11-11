@@ -126,7 +126,7 @@ export default function TeacherCourseWorkspace() {
         await api.uploadLecture(formData);
       }
 
-      showNotification("Lecture added! Processing pipeline initiated.");
+      showNotification("Lecture added! Lecture preparation started.");
       setShowAddLectureModal(false);
       setLectureTitle("");
       setLectureDesc("");
@@ -144,10 +144,10 @@ export default function TeacherCourseWorkspace() {
     setGeneratingForLectureId(lectureId);
     try {
       const res = await api.generateQuizzes(lectureId);
-      showNotification(res.message || "AI draft quizzes generated!");
+      showNotification(res.message || "Draft quizzes generated!");
       await loadWorkspace();
     } catch (err) {
-      showNotification(err.message || "Failed to generate AI quizzes", true);
+      showNotification(err.message || "Failed to generate quizzes", true);
     } finally {
       setGeneratingForLectureId(null);
     }
@@ -252,7 +252,7 @@ export default function TeacherCourseWorkspace() {
               {course.status?.toUpperCase() || "ACTIVE"}
             </span>
           </div>
-          <p className="mt-1">{course.description || "Course lecture repository, transcript review, and assessment center."}</p>
+          <p className="mt-1">{course.description || "Add lectures, review transcripts, and manage quizzes for your students."}</p>
         </div>
         <div className="header-actions">
           <button onClick={() => setShowAddLectureModal(true)} className="btn-primary">
@@ -278,7 +278,7 @@ export default function TeacherCourseWorkspace() {
           className={`tab-btn ${activeTab === "quizzes" ? "active" : ""}`}
         >
           <HelpCircle size={17} />
-          Quizzes & Assignments ({quizzes.length})
+          Quizzes ({quizzes.length})
         </button>
         <button
           onClick={() => setActiveTab("students")}
@@ -321,7 +321,7 @@ export default function TeacherCourseWorkspace() {
                     <tr>
                       <th>Lecture Title</th>
                       <th>Source</th>
-                      <th>AI Pipeline State</th>
+                      <th>Status</th>
                       <th>Published</th>
                       <th style={{ textAlign: "right" }}>Actions</th>
                     </tr>
@@ -361,11 +361,11 @@ export default function TeacherCourseWorkspace() {
                               onClick={() => handleGenerateAIQuiz(l.id)}
                               disabled={generatingForLectureId === l.id}
                               className="btn-action"
-                              title="Generate AI Draft Quizzes"
+                              title="Generate Quizzes from Lecture"
                               style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
                             >
                               <Sparkles size={14} color="#8b5cf6" />
-                              <span>{generatingForLectureId === l.id ? "Drafting..." : "AI Quiz"}</span>
+                              <span>{generatingForLectureId === l.id ? "Drafting..." : "Generate Quiz"}</span>
                             </button>
                             <Link
                               to={`/teacher/lectures/${l.id}/review`}
@@ -393,9 +393,9 @@ export default function TeacherCourseWorkspace() {
           <div className="dashboard-section mb-6">
             <div className="section-header">
               <div>
-                <h2>Course Quizzes & Assessments</h2>
+                <h2>Course Quizzes</h2>
                 <p className="text-muted text-sm mt-1">
-                  Create assessment questions or generate AI drafts based on lecture content. Only approved questions are visible to students.
+                  Create questions or generate quizzes from lecture content. Only approved questions are visible to students.
                 </p>
               </div>
               <button
@@ -403,7 +403,7 @@ export default function TeacherCourseWorkspace() {
                 disabled={lectures.length === 0}
                 className="btn-primary btn-sm"
               >
-                <PlusCircle size={15} /> Add Custom Question
+                <PlusCircle size={15} /> Add Question
               </button>
             </div>
 

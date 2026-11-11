@@ -66,7 +66,7 @@ export default function QuizExperience() {
   };
 
   if (loading) {
-    return <div className="page-loading"><div className="spinner" /> Loading quiz module...</div>;
+    return <div className="page-loading"><div className="spinner" /> Loading quiz...</div>;
   }
 
   if (questions.length === 0) {
@@ -77,8 +77,8 @@ export default function QuizExperience() {
         </Link>
         <div className="empty-state">
           <HelpCircle size={48} />
-          <h3>No approved quizzes available</h3>
-          <p>Your instructor has not approved test questions for this lecture yet.</p>
+          <h3>No quiz questions available yet</h3>
+          <p>Your teacher has not published quiz questions for this lecture yet.</p>
         </div>
       </div>
     );
@@ -87,13 +87,13 @@ export default function QuizExperience() {
   return (
     <div className="dashboard-page max-w-3xl">
       <Link to={`/student/lectures/${id}`} className="btn-link mb-4 inline-flex items-center gap-1">
-        <ArrowLeft size={16} /> Back to Lecture Workspace
+        <ArrowLeft size={16} /> Back to Lecture
       </Link>
 
       <div className="dashboard-header">
         <div>
-          <h1>Lecture Knowledge Check</h1>
-          <p>Test your understanding of core concepts from this lecture.</p>
+          <h1>Lecture Quiz</h1>
+          <p>Answer the questions below to test your understanding of this lecture.</p>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default function QuizExperience() {
           </div>
           <div className="result-text">
             <h3>
-              {attemptResult.percentage >= 70 ? "Excellent Mastery! 🎉" : "Review Recommended 💡"}
+              {attemptResult.percentage >= 70 ? "Great job! 🎉" : "Review Recommended 💡"}
             </h3>
             <p>
               You got <strong>{attemptResult.correct_count}</strong> out of{" "}
@@ -114,7 +114,7 @@ export default function QuizExperience() {
             </p>
             {attemptResult.weak_topics?.length > 0 && (
               <Link to="/student/revision" className="btn-secondary btn-sm mt-2 inline-flex">
-                View Revision Recommendations
+                View My Study Plan
               </Link>
             )}
           </div>
@@ -200,7 +200,7 @@ export default function QuizExperience() {
               disabled={submitting}
               className="btn-primary w-full justify-center"
             >
-              {submitting ? "Evaluating Responses..." : "Submit Answers"}
+              {submitting ? "Checking Answers..." : "Submit Answers"}
             </button>
           )}
         </div>

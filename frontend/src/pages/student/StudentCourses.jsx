@@ -68,7 +68,7 @@ export default function StudentCourses() {
     setEnrollingCode(true);
     try {
       await api.enrollCourse(code);
-      showNotification(`Enrollment request for ${code} submitted! Awaiting administrator approval.`);
+      showNotification(`Joining request for ${code} submitted! Waiting for approval.`);
       setEnrollCode("");
       await loadData();
     } catch (err) {
@@ -82,10 +82,10 @@ export default function StudentCourses() {
     setRequestingCourseId(courseId);
     try {
       await api.requestCourseEnrollment(courseId);
-      showNotification(`Enrollment request for "${courseTitle}" submitted. Awaiting administrative review.`);
+      showNotification(`Joining request for "${courseTitle}" submitted. Waiting for approval.`);
       await loadData();
     } catch (err) {
-      showNotification(err.message || "Failed to request enrollment", true);
+      showNotification(err.message || "Failed to submit joining request", true);
     } finally {
       setRequestingCourseId(null);
     }
@@ -105,7 +105,7 @@ export default function StudentCourses() {
   if (loading) {
     return (
       <div className="page-loading">
-        <div className="spinner" /> Loading course catalog...
+        <div className="spinner" /> Loading courses...
       </div>
     );
   }
@@ -114,9 +114,9 @@ export default function StudentCourses() {
     <div className="dashboard-page max-w-5xl">
       <div className="dashboard-header">
         <div>
-          <h1>Available Courses & Registration</h1>
+          <h1>Explore Courses</h1>
           <p>
-            Explore available university courses, submit enrollment requests, and track your approval status.
+            Browse available courses, join with a code or submit a request, and check your joining status.
           </p>
         </div>
       </div>
@@ -130,12 +130,12 @@ export default function StudentCourses() {
           <BookOpen size={18} className="text-primary" />
           <input
             type="text"
-            placeholder="Have a direct enrollment code (e.g. CS401)? Enter here..."
+            placeholder="Have a course code (e.g. CS401)? Enter here to join..."
             value={enrollCode}
             onChange={(e) => setEnrollCode(e.target.value)}
           />
           <button type="submit" disabled={enrollingCode} className="btn-primary btn-sm">
-            {enrollingCode ? "Enrolling..." : "Enroll with Code"}
+            {enrollingCode ? "Joining..." : "Join with Code"}
           </button>
         </form>
       </div>
@@ -147,14 +147,14 @@ export default function StudentCourses() {
           className={`tab-btn ${activeTab === "catalog" ? "active" : ""}`}
         >
           <BookOpen size={17} />
-          Active Courses Catalog ({courses.length})
+          Available Courses ({courses.length})
         </button>
         <button
           onClick={() => setActiveTab("requests")}
           className={`tab-btn ${activeTab === "requests" ? "active" : ""}`}
         >
           <Clock size={17} />
-          My Enrollment Requests
+          My Joining Requests
           {pendingRequests.length > 0 && (
             <span
               style={{
@@ -217,8 +217,8 @@ export default function StudentCourses() {
                     </p>
 
                     <div className="course-card-footer">
-                      <span>Instructor: {c.teacher_name || "Faculty"}</span>
-                      <span className="font-semibold">{c.lecture_count} Published Lectures</span>
+                      <span>Teacher: {c.teacher_name || "Faculty"}</span>
+                      <span className="font-semibold">{c.lecture_count} Lectures</span>
                     </div>
 
                     <div className="mt-4 pt-3 border-t">
@@ -229,7 +229,7 @@ export default function StudentCourses() {
                           style={{ textDecoration: "none" }}
                         >
                           <CheckCircle2 size={16} />
-                          <span>Open Course Workspace</span>
+                          <span>Open Course</span>
                           <ArrowRight size={15} />
                         </Link>
                       ) : isPending ? (
@@ -248,7 +248,7 @@ export default function StudentCourses() {
                           }}
                         >
                           <Clock size={15} />
-                          <span>Request Pending Admin Review</span>
+                          <span>Joining Request Pending Approval</span>
                         </div>
                       ) : isRejected ? (
                         <button
@@ -257,7 +257,7 @@ export default function StudentCourses() {
                           className="btn-secondary w-full justify-center flex items-center gap-2"
                         >
                           <XCircle size={15} color="#ef4444" />
-                          <span>Declined · Request Re-evaluation</span>
+                          <span>Declined · Request Again</span>
                         </button>
                       ) : (
                         <button
@@ -266,7 +266,7 @@ export default function StudentCourses() {
                           className="btn-primary w-full justify-center flex items-center gap-2"
                         >
                           <Plus size={16} />
-                          <span>{requestingCourseId === c.id ? "Submitting..." : "Request Enrollment"}</span>
+                          <span>{requestingCourseId === c.id ? "Sending Request..." : "Request to Join"}</span>
                         </button>
                       )}
                     </div>
@@ -283,15 +283,15 @@ export default function StudentCourses() {
         <div className="admin-tab-content">
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>My Course Enrollment Requests</h2>
+              <h2>My Joining Requests</h2>
               <span className="badge-count">{enrollments.length} Total Requests</span>
             </div>
 
             {enrollments.length === 0 ? (
               <div className="empty-state">
                 <Clock size={44} style={{ opacity: 0.4 }} />
-                <h3>No enrollment requests yet</h3>
-                <p>Browse the course catalog and click "Request Enrollment" to get started.</p>
+                <h3>No joining requests yet</h3>
+                <p>Browse available courses and click "Request to Join" to get started.</p>
               </div>
             ) : (
               <div className="table-responsive">
@@ -299,10 +299,10 @@ export default function StudentCourses() {
                   <thead>
                     <tr>
                       <th>Course</th>
-                      <th>Enrollment Code</th>
+                      <th>Course Code</th>
                       <th>Request Date</th>
-                      <th>Review Status</th>
-                      <th style={{ textAlign: "right" }}>Workspace</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: "right" }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -324,7 +324,7 @@ export default function StudentCourses() {
                         <td>
                           {en.status === "pending" && (
                             <span className="badge badge-warning flex items-center gap-1" style={{ width: "fit-content" }}>
-                              <Clock size={12} /> Awaiting Review
+                              <Clock size={12} /> Pending Approval
                             </span>
                           )}
                           {en.status === "approved" && (
@@ -335,7 +335,7 @@ export default function StudentCourses() {
                           {en.status === "rejected" && (
                             <div>
                               <span className="badge badge-danger flex items-center gap-1" style={{ width: "fit-content" }}>
-                                <XCircle size={12} /> Rejected
+                                <XCircle size={12} /> Not Approved
                               </span>
                               {en.rejection_reason && (
                                 <div style={{ fontSize: "0.75rem", color: "#ef4444", marginTop: "3px" }}>
@@ -352,12 +352,12 @@ export default function StudentCourses() {
                               className="btn-action"
                               style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
                             >
-                              <span>Open Workspace</span>
+                              <span>Open Course</span>
                               <ArrowRight size={13} />
                             </Link>
                           ) : (
                             <span style={{ fontSize: "0.78rem", color: "var(--text-muted, #64748b)" }}>
-                              Access locked
+                              Waiting for approval
                             </span>
                           )}
                         </td>

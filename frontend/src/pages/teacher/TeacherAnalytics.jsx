@@ -39,17 +39,16 @@ export default function TeacherAnalytics() {
   }, [selectedCourseId]);
 
   if (loading) {
-    return <div className="page-loading"><div className="spinner" /> Loading student learning analytics...</div>;
+    return <div className="page-loading"><div className="spinner" /> Loading class progress...</div>;
   }
 
   return (
     <div className="dashboard-page max-w-5xl">
       <div className="dashboard-header">
         <div>
-          <h1>Student Learning & Quiz Analytics</h1>
+          <h1>Class Learning Progress</h1>
           <p>
-            Track student retention, identify recurring topic misconceptions, and guide targeted
-            revision sessions.
+            Track student quiz performance and see which topics need more practice.
           </p>
         </div>
       </div>
@@ -95,7 +94,7 @@ export default function TeacherAnalytics() {
                 <div className="metric-value">
                   {analytics.topic_weakness_summary?.filter((t) => t.error_rate_percentage > 30).length || 0}
                 </div>
-                <div className="metric-label">Struggling Topics Detected</div>
+                <div className="metric-label">Topics Needing Practice</div>
               </div>
             </div>
           </div>
